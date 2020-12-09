@@ -393,8 +393,13 @@ class ItsFile
     //
     // ReadAllText
     //
-    string ReadAllText()
+    bool ReadAllText(string& str)
     {
+        if (this->IsInvalid())
+        {
+            return false;
+        }
+
         this->SetPosFromBeg(0);
 
         std::stringstream ss;
@@ -406,34 +411,76 @@ class ItsFile
             ss.write(data, bytesRead);
         }
 
-        return ss.str();
+        str = ss.str();
+        return true;
     }
 
     //
     // ReadAllTextLines
     //
-    std::vector<string> ReadAllTextLines()
+    bool ReadAllTextLines(std::vector<string>& lines)
     {
+        if (this->IsInvalid())
+        {
+            return false;
+        }
+
         this->SetPosFromBeg(0);
         
-        string str = this->ReadAllText();
+        string str;
+        if (!this->ReadAllText(str)) 
+        {
+            return false;
+        }
+
         string split("\n");
-        return ItsString::Split(str, split);
+        lines = ItsString::Split(str, split);
+        return true;
     }
 
-    void SetPosFromBeg(off_t offset)
+    bool SetPosFromBeg(off_t offset)
     {
-        lseek(this->m_fd, offset, SEEK_SET);
+        if (this->IsInvalid())
+        {
+            return false;
+        }
+
+        if (lseek(this->m_fd, offset, SEEK_SET) == -1) 
+        {
+            return false;
+        }
+        
+        return true;
     }
 
-    void SetPosFromEnd(off_t offset)
+    bool SetPosFromEnd(off_t offset)
     {
-        lseek(this->m_fd, offset, SEEK_END);
+        if (this->IsInvalid())
+        {
+            return false;
+        }
+
+        if (lseek(this->m_fd, offset, SEEK_END) == -1) 
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    void SetPosFromCur(off_t offset)
+    bool SetPosFromCur(off_t offset)
     {
-        lseek(this->m_fd, offset, SEEK_CUR);
+        if (this->IsInvalid())
+        {
+            return false;
+        }
+
+        if (lseek(this->m_fd, offset, SEEK_CUR) == -1) 
+        {
+            return false;
+        }
+        
+        return true;
     }
 
     bool Close()

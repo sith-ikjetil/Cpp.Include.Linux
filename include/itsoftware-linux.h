@@ -368,10 +368,32 @@ struct ItsString
 //
 struct ItsConvert
 {
-
-	static int ToInt(const string& str)
+	template<typename Numeric>
+	static Numeric ToNumber(const string& str)
 	{
-		return atoi(str.c_str());
+		if (std::is_same_v<Numeric, float>)
+		{
+			return std::stof(str);
+		}
+		else if (std::is_same_v<Numeric, double>)
+		{
+			return std::stod(str);
+		}
+		else if (std::is_same_v<Numeric, int>)
+		{
+			return std::stoi(str);
+		}
+		else if (std::is_same_v<Numeric, long>)
+		{
+			return std::stol(str);
+		}
+		else if (std::is_same_v<Numeric, long long>)
+		{
+			return std::stoll(str);
+		}
+		
+		Numeric x = std::stoull(str);
+		return x;
 	}
 
 	static int ToIntFromHex(const string& str)
@@ -382,21 +404,6 @@ struct ItsConvert
         	return 0;
     	}
 		return n;
-	}
-
-	static long ToLong(const string& str)
-	{
-		return atol(str.c_str());
-	}
-
-	static long long ToLongLong(const string& str)
-	{
-		return atoll(str.c_str());
-	}
-
-	static double ToFloat(const string& str)
-	{
-		return atof(str.c_str());
 	}
 
 	static string ToString(const bool flag)
@@ -468,12 +475,12 @@ struct ItsConvert
 	{
 		tm t = {0};
 
-		t.tm_year = ItsConvert::ToInt(dateTime.substr(0, 4)) - 1900;
-		t.tm_mon = ItsConvert::ToInt(dateTime.substr(5, 2)) - 1;
-		t.tm_mday = ItsConvert::ToInt(dateTime.substr(8, 2));
-		t.tm_hour = ItsConvert::ToInt(dateTime.substr(11, 2));
-		t.tm_min = ItsConvert::ToInt(dateTime.substr(14, 2));
-		t.tm_sec = ItsConvert::ToInt(dateTime.substr(17, 2));
+		t.tm_year = ItsConvert::ToNumber<int>(dateTime.substr(0, 4)) - 1900;
+		t.tm_mon = ItsConvert::ToNumber<int>(dateTime.substr(5, 2)) - 1;
+		t.tm_mday = ItsConvert::ToNumber<int>(dateTime.substr(8, 2));
+		t.tm_hour = ItsConvert::ToNumber<int>(dateTime.substr(11, 2));
+		t.tm_min = ItsConvert::ToNumber<int>(dateTime.substr(14, 2));
+		t.tm_sec = ItsConvert::ToNumber<int>(dateTime.substr(17, 2));
 
 		return t;
 	}
@@ -541,7 +548,7 @@ struct ItsConvert
 		{
 			if (!item.empty())
 			{
-				topk.push_back(ItsConvert::ToLongLong(string(item.begin(), item.end())));
+				topk.push_back(ItsConvert::ToNumber<long long>(string(item.begin(), item.end())));
 			}
 		}
 
