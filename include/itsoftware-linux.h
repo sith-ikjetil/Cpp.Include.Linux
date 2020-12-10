@@ -433,6 +433,51 @@ struct ItsConvert
 		return tos;
 	}
 
+	static string ToStringFormatted(size_t number, char thousandSep = ' ')
+	{
+		string txt = ItsConvert::ToString(number);
+
+		stringstream ss;
+
+		int groupSize = 3;
+		int i = groupSize;
+		size_t iCount = 0;
+		size_t iSize = txt.size();
+		for (auto itr = txt.rbegin(); itr < txt.rend(); itr++)
+		{
+			if (i-- > 0)
+			{
+				ss << *itr;
+				iCount++;
+			}
+			else
+			{
+				if (iCount < iSize)
+				{
+					ss << thousandSep;
+					ss << *itr;
+					iCount++;
+					i = groupSize - 1;
+				}
+				else {
+					i = groupSize;
+				}
+			}
+
+		}
+
+		txt = ss.str();
+		stringstream ss2;
+		for (auto itr = txt.rbegin(); itr < txt.rend(); itr++)
+		{
+			ss2 << *itr;
+		}
+
+		string retVal = ss2.str();
+
+		return retVal;
+	}
+
 	static string ToString(tm& dateTime)
 	{
 		stringstream ss;
@@ -553,6 +598,330 @@ struct ItsConvert
 		}
 
 		return topk;
+	}
+};
+
+//
+// class: ItsDateTime
+//
+class ItsDateTime
+{
+private:
+	tm m_tm;
+
+public:
+	ItsDateTime(tm timeDate)
+	{
+		this->m_tm = timeDate;
+	}
+
+	ItsDateTime(ItsDateTime& dateTime)
+	{
+		this->m_tm = dateTime.m_tm;
+	}
+
+	ItsDateTime(ItsDateTime&& dateTime) noexcept
+	{
+		this->m_tm = dateTime.m_tm;
+	}
+
+	static ItsDateTime Now()
+	{
+		time_t t;
+		time(&t);
+		tm tm2;
+		::localtime_r(&t, &tm2);
+
+		return ItsDateTime(tm2);
+	}
+
+	string ToString()
+	{
+		stringstream ss;
+		ss << std::setfill('0') << std::setw(4) << (this->m_tm.tm_year + 1900);
+		ss << "-" << std::setfill('0') << std::setw(2) << (this->m_tm.tm_mon + 1);
+		ss << "-" << std::setfill('0') << std::setw(2) << this->m_tm.tm_mday;
+		ss << " ";
+		ss << std::setfill('0') << std::setw(2) << this->m_tm.tm_hour;
+		ss << ":" << std::setfill('0') << std::setw(2) << this->m_tm.tm_min;
+		ss << ":" << std::setfill('0') << std::setw(2) << this->m_tm.tm_sec;
+
+		string tos = ss.str();
+		return tos;
+	}
+
+	string ToString(string option)
+	{
+		if (option == "s" || option == "S")
+		{
+			stringstream ss;
+			ss << std::setfill('0') << std::setw(4) << (this->m_tm.tm_year + 1900);
+			ss << "-" << std::setfill('0') << std::setw(2) << (this->m_tm.tm_mon + 1);
+			ss << "-" << std::setfill('0') << std::setw(2) << this->m_tm.tm_mday;
+			ss << "T";
+			ss << std::setfill('0') << std::setw(2) << this->m_tm.tm_hour;
+			ss << ":" << std::setfill('0') << std::setw(2) << this->m_tm.tm_min;
+			ss << ":" << std::setfill('0') << std::setw(2) << this->m_tm.tm_sec;
+
+			string tos = ss.str();
+			return tos;
+		}
+
+		// day
+		int d = this->GetDay();
+		string str_d = ItsConvert::ToString(d);
+		string str_dd;
+		if (d < 10)
+		{
+			str_dd = "0";
+			str_dd += str_d;
+		}
+		else
+		{
+			str_dd = str_d;
+		}
+
+		// month
+		int m = this->GetMonth();
+		string str_m = ItsConvert::ToString(m);
+		string str_mm;
+		if (m < 10)
+		{
+			str_mm = "0";
+			str_mm += str_m;
+		}
+		else
+		{
+			str_mm = str_m;
+		}
+
+		// year
+		int y = this->GetYear();
+		string str_yyyy = ItsConvert::ToString(y);
+		string str_yy = ItsString::Right(str_yyyy, 2);
+
+		// hour			
+		int h = this->GetHour();
+		string str_h = ItsConvert::ToString(h);
+		string str_hh;
+		if (h < 10)
+		{
+			str_hh = "0";
+			str_hh += str_m;
+		}
+		else
+		{
+			str_hh = str_h;
+		}
+
+		// minute
+		int min = this->GetMinute();
+		string str_min = ItsConvert::ToString(min);
+		string str_minmin;
+		if (min < 10)
+		{
+			str_minmin = "0";
+			str_minmin += str_min;
+		}
+		else
+		{
+			str_minmin = str_min;
+		}
+
+		// second
+		int s = this->GetSecond();
+		string str_s = ItsConvert::ToString(s);
+		string str_ss;
+		if (s < 10)
+		{
+			str_ss = "0";
+			str_ss += str_s;
+		}
+		else
+		{
+			str_ss = str_s;
+		}
+
+		string wdd = string("dd");
+		string wd = string("d");
+		option = ItsString::Replace(option, wdd, str_dd);
+		option = ItsString::Replace(option, wd, str_d);
+
+		string wMM = string("MM");
+		string wM = string("M");
+		option = ItsString::Replace(option, wMM, str_mm);
+		option = ItsString::Replace(option, wM, str_m);
+
+		string wyyyy = string("yyyy");
+		string wyy = string("yy");
+		option = ItsString::Replace(option, wyyyy, str_yyyy);
+		option = ItsString::Replace(option, wyy, str_yy);
+
+		string wHH = string("HH");
+		string wH = string("H");
+		option = ItsString::Replace(option, wHH, str_hh);
+		option = ItsString::Replace(option, wH, str_h);
+
+		string wmm = string("mm");
+		string wm = string("m");
+		option = ItsString::Replace(option, wmm, str_minmin);
+		option = ItsString::Replace(option, wm, str_min);
+
+		string wss = string("ss");
+		string ws = string("s");
+		option = ItsString::Replace(option, wss, str_ss);
+		option = ItsString::Replace(option, ws, str_s);
+
+		return option;
+	}
+
+	tm TM()
+	{
+		return this->m_tm;
+	}
+
+	void AddYears(int year)
+	{
+		this->m_tm.tm_year += year;
+
+		mktime(&this->m_tm);
+	}
+
+	void AddMonths(int month)
+	{
+		this->m_tm.tm_mon += month;
+
+		mktime(&this->m_tm);
+	}
+
+	void AddDays(int day)
+	{
+		this->m_tm.tm_mday += day;
+
+		mktime(&this->m_tm);
+	}
+
+	void AddHours(int hour)
+	{
+		this->m_tm.tm_hour += hour;
+
+		mktime(&this->m_tm);
+	}
+
+	void AddMinutes(int min)
+	{
+		this->m_tm.tm_min += min;
+
+		mktime(&this->m_tm);
+	}
+
+	void AddSeconds(int sec)
+	{
+		this->m_tm.tm_sec += sec;
+
+		mktime(&this->m_tm);
+	}
+
+	void Add(int year, int month, int day, int hour, int min, int sec)
+	{
+		this->m_tm.tm_year += year;
+		this->m_tm.tm_mon += month;
+		this->m_tm.tm_mday += day;
+		this->m_tm.tm_hour += hour;
+		this->m_tm.tm_min += min;
+		this->m_tm.tm_sec += sec;
+
+		mktime(&this->m_tm);
+	}
+
+	void SubtractYears(int year)
+	{
+		this->m_tm.tm_year -= year;
+
+		mktime(&this->m_tm);
+	}
+
+	void SubtractMonths(int month)
+	{
+		this->m_tm.tm_mon -= month;
+
+		mktime(&this->m_tm);
+	}
+
+	void SubtractDays(int day)
+	{
+		this->m_tm.tm_mday -= day;
+
+		mktime(&this->m_tm);
+	}
+
+	void SubtractHours(int hour)
+	{
+		this->m_tm.tm_hour -= hour;
+
+		mktime(&this->m_tm);
+	}
+
+	void SubtractMinutes(int min)
+	{
+		this->m_tm.tm_min -= min;
+
+		mktime(&this->m_tm);
+	}
+
+	void SubtractSeconds(int sec)
+	{
+		this->m_tm.tm_sec -= sec;
+
+		mktime(&this->m_tm);
+	}
+
+	void Subtract(int year, int month, int day, int hour, int min, int sec)
+	{
+		this->m_tm.tm_year -= year;
+		this->m_tm.tm_mon -= month;
+		this->m_tm.tm_mday -= day;
+		this->m_tm.tm_hour -= hour;
+		this->m_tm.tm_min -= min;
+		this->m_tm.tm_sec -= sec;
+
+		mktime(&this->m_tm);
+	}
+
+	int GetYear()
+	{
+		return this->m_tm.tm_year + 1900;
+	}
+
+	int GetMonth()
+	{
+		return this->m_tm.tm_mon + 1;
+	}
+
+	int GetDay()
+	{
+		return this->m_tm.tm_mday;
+	}
+
+	int GetHour()
+	{
+		return this->m_tm.tm_hour;
+	}
+
+	int GetMinute()
+	{
+		return this->m_tm.tm_min;
+	}
+
+	int GetSecond()
+	{
+		return this->m_tm.tm_sec;
+	}
+
+	ItsDateTime& operator=(const tm& timeDate)
+	{
+		this->m_tm = timeDate;
+		return *this;
 	}
 };
 

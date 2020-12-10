@@ -1,0 +1,1 @@
+g++ TestApplication.cpp --std=c++17
