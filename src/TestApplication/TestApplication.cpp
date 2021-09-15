@@ -20,6 +20,7 @@ using std::cout;
 using std::endl;
 using std::string;
 using ItSoftware::Linux::ItsString;
+using ItSoftware::Linux::ItsExpandDirection;
 using ItSoftware::Linux::ItsTime;
 using ItSoftware::Linux::ItsConvert;
 using ItSoftware::Linux::ItsRandom;
@@ -48,6 +49,7 @@ int main()
     TestRandom();
     TestTime();
     TestString();
+	TestLog();
 
     return EXIT_SUCCESS;
 }
@@ -154,6 +156,12 @@ void TestString()
     cout << "ItsString::ToLowerCase(test) = \"" << ItsString::ToLowerCase(test) << "\"" << endl;
     cout << "ItsString::ToUpperCase(test) = \"" << ItsString::ToUpperCase(test) << "\"" << endl;
     cout << "ItsString::Trim(testTrim) = \"" << ItsString::Trim(testTrim) << "\"" << endl;
+
+	string name("Kjetil");
+    cout << "ItsString::WidthExpand (ItsExpandDirection:Left,Middle,Right) Below" << endl;
+    cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Left) << endl;
+    cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Middle) << endl;
+    cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Right) << endl;
 
     cout << endl;
 }

@@ -214,12 +214,78 @@ namespace ItSoftware
 		};
 
 		//
+		// enum ItsExpandDirection
+		//
+		// (i): Where text in expanded string input text should be aligned.
+		//
+		enum class ItsExpandDirection
+		{
+			Left,
+			Middle,
+			Right
+		};
+
+		//
 		// struct: ItsString
 		//
 		// (i): Misc. string routines in one place.
 		//
 		struct ItsString
 		{
+			static string WidthExpand(string source, size_t width, char fill, ItsExpandDirection direction)
+			{
+				if (source.size() == 0) {
+					return string("");
+				}
+				if (width <= 0) {
+					return string("");
+				}
+
+				if (source.size() >= width) {
+					return source.substr(0, width);
+				}
+
+				stringstream result;
+				if (direction == ItsExpandDirection::Left)
+				{
+					for (size_t i = 0; i < (width - source.size()); i++)
+					{
+						result << fill;
+					}
+					result << source;
+				}
+				else if (direction == ItsExpandDirection::Middle)
+				{
+					for (size_t i = 0; i < ((width - source.size()) / 2); i++)
+					{
+						result << fill;
+					}
+
+					result << source;
+
+					for (size_t i = result.str().size(); i < width; i++)
+					{
+						result << fill;
+					}
+				}
+				else if (direction == ItsExpandDirection::Right)
+				{
+					result << source;
+
+					for (size_t i = 0; i < (width - source.size()); i++)
+					{
+						result << fill;
+					}
+				}
+				else {
+					return string("");
+				}
+
+				result << ends;
+
+				return result.str();
+			}
+
 			static vector<string> Split(string& data, string& token)
 			{
 				vector<string> output;
@@ -1093,7 +1159,7 @@ namespace ItSoftware
 			{
 				stringstream ss;
 				for (auto i : this->m_items) {
-					ss << std::setiosflags(std::ios::left) << std::setw(12) << this->LogTypeToString(i.Type) << ItsDateTime(i.When).ToString() << L" " << i.Description << endl;
+					ss << std::setiosflags(std::ios::left) << std::setw(12) << this->LogTypeToString(i.Type) << ItsDateTime(i.When).ToString() << " " << i.Description << endl;
 				}
 				ss << ends;
 
