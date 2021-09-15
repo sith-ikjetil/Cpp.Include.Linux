@@ -1,3 +1,10 @@
+///////////////////////////////////////////////////////////////////
+//: Title        : TestApplication.cpp
+//: Product:     : Cpp.Include.Windows
+//: Date         : 2020-05-01
+//: Author       : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
+//: Version      : 1.0.0.0
+//: Descriptions : Implementation of Cpp.Include.Window Test Application.
 //
 // #include
 //
@@ -17,6 +24,7 @@ using ItSoftware::Linux::ItsTime;
 using ItSoftware::Linux::ItsConvert;
 using ItSoftware::Linux::ItsRandom;
 using ItSoftware::Linux::ItsDateTime;
+using ItSoftware::Linux::ItsLog;
 
 //
 // Function Prototypes
@@ -26,8 +34,7 @@ void TestToString();
 void TestRandom();
 void TestTime();
 void TestString();
-// TestTimer
-// TestBase64
+void TestLog();
 
 //
 // Function: main
@@ -35,7 +42,7 @@ void TestString();
 int main()
 {
     cout << "### Cpp.Include.Linux - Test Application ###" << endl << endl;
-    
+
     TestToNumber();
     TestToString();
     TestRandom();
@@ -53,7 +60,7 @@ int main()
 void TestToNumber()
 {
     cout << endl;
-    
+
     cout << "## Test ToNumber ________________________________________________" << endl;
     cout << "ItsConvert::ToNumber<int>(L\"-1234\") = " << ItsConvert::ToNumber<int>("-1234") << endl;
     cout << "ItsConvert::ToNumber<unsigned int>(L\"1234\") = " << ItsConvert::ToNumber<unsigned int>("1234") << endl;
@@ -75,7 +82,7 @@ void TestToNumber()
 void TestToString()
 {
     cout << endl;
-    
+
     cout << "## Test ToString ________________________________________________" << endl;
     cout << "ItsConvert::ToString<int>(-1234) = \"" << ItsConvert::ToString<int>(-1234) << "\"" << endl;
     cout << "ItsConvert::ToString<unsigned int>(1234) = \"" << ItsConvert::ToString<unsigned int>(1234) << "\"" << endl;
@@ -86,7 +93,7 @@ void TestToString()
     cout << "ItsConvert::ToString<short>(1234) = \"" << ItsConvert::ToString<short>(1234) << "\"" << endl;
     cout << "ItsConvert::ToString<unsigned short>(40001) = \"" << ItsConvert::ToString<unsigned short>(40001) << "\"" << endl;
     cout << "ItsConvert::ToStringFormatted(256810246) = \"" << ItsConvert::ToStringFormatted(256810246) << "\"" << endl;
-    
+
     cout << endl;
 }
 
@@ -98,7 +105,7 @@ void TestToString()
 void TestRandom()
 {
     cout << endl;
-    
+
     cout << "## Test Random _________________________________________________" << endl;
     cout << "ItsRandom<long>(10'000, 1'000'000) = " << ItsRandom<long>(10'000, 1'000'000) << endl;
     cout << "ItsRandom<long>(10'000, 1'000'000) = " << ItsRandom<long>(10'000, 1'000'000) << endl;
@@ -123,7 +130,7 @@ void TestTime()
     cout << "ItsTime::RenderMsToFullString(92481379, false)" << " = " << ItsTime::RenderMsToFullString(92481379, false) << endl;
     cout << "ItsTime::RenderMsToFullString(92481379, true)" << " = " << ItsTime::RenderMsToFullString(92481379, true) << endl;
     cout << "ItsDateTime::Now().ToString(\"s\")" << " = " << ItsDateTime::Now().ToString() << endl;
-    
+
     cout << endl;
 }
 
@@ -147,6 +154,27 @@ void TestString()
     cout << "ItsString::ToLowerCase(test) = \"" << ItsString::ToLowerCase(test) << "\"" << endl;
     cout << "ItsString::ToUpperCase(test) = \"" << ItsString::ToUpperCase(test) << "\"" << endl;
     cout << "ItsString::Trim(testTrim) = \"" << ItsString::Trim(testTrim) << "\"" << endl;
+
+    cout << endl;
+}
+
+//
+// Function: TestLog
+//
+// (i): Test ItsLog.
+//
+void TestLog()
+{
+	cout << endl;
+    cout << "## Test Log _________________________________________________" << endl;
+
+    ItsLog log;
+    log.LogInformation("This is an information log item");
+    log.LogWarning("This is an warning log item");
+    log.LogError("This is an error log item");
+    log.LogOther("This is an other log item");
+    log.LogDebug("This is an debug log item");
+    cout << log.ToString();
 
     cout << endl;
 }
