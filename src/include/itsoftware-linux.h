@@ -438,13 +438,31 @@ namespace ItSoftware
 		};
 
 		//
+		// enum: DataSizeStringType
+		//
+		// (i): Enum for string representation of ToDataSizeString ItsConvert function.
+		//
+		enum class ItsDataSizeStringType {
+			Recommended,
+			IEC
+		};
+
+		//
 		// struct: ItsConvert
 		//
 		// (i): Misc. convertion routines in one place.
 		//
 		struct ItsConvert
 		{
+			static string ToDataSizeString(size_t size)
+			{
+				return ItsConvert::ToDataSizeString(size, 0);
+			}
 			static string ToDataSizeString(size_t size, int digits)
+			{
+				return ItsConvert::ToDataSizeString(size, digits, ItsDataSizeStringType::Recommended);
+			}
+			static string ToDataSizeString(size_t size, int digits, ItsDataSizeStringType type)
 			{
 				if (digits < 0)
 				{
@@ -465,13 +483,25 @@ namespace ItSoftware
 					index++;
 				}
 
-				vector<string> szSize{ "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "GP" };
+				vector<string> szSize;
+				if (type == ItsDataSizeStringType::IEC) {
+					szSize = { "Bi", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB", "BB", "GP" };
+				}
+				else {//(type == ItsDataSizeStringType::Recommended) { // defaults to this notation
+					szSize = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "GP" };
+				}
 
 				size_t tst = (size_t)dSize;
 				ss << tst;
 				if (digits > 0) {
 					double t = dSize - tst;
 					string ws = ItsConvert::ToString<double>(t);
+					if (ws[0] == '0' && t != 0.0) {
+						ws += "000";
+					}
+					else {
+						ws += ".000";
+					}
 					ss << ws.substr(1, digits+1);
 				}
 				ss << " ";

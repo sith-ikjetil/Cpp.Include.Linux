@@ -26,6 +26,7 @@ using ItSoftware::Linux::ItsConvert;
 using ItSoftware::Linux::ItsRandom;
 using ItSoftware::Linux::ItsDateTime;
 using ItSoftware::Linux::ItsLog;
+using ItSoftware::Linux::ItsDataSizeStringType;
 
 //
 // Function Prototypes
@@ -99,6 +100,8 @@ void TestToString()
     cout << "ItsConvert::ToDataSizeString(1024, 2) = \"" << ItsConvert::ToDataSizeString(1024, 2) << "\"" << endl;
 	cout << "ItsConvert::ToDataSizeString(200100400, 0) = \"" << ItsConvert::ToDataSizeString(200100400, 0) << "\"" << endl;
 	cout << "ItsConvert::ToDataSizeString(200100400, 2) = \"" << ItsConvert::ToDataSizeString(200100400, 2) << "\"" << endl;
+	cout << "ItsConvert::ToDataSizeString(9807804606, 3) = \"" << ItsConvert::ToDataSizeString(9807804606, 3, ItsDataSizeStringType::IEC) << "\"" << endl;
+    cout << "ItsConvert::ToDataSizeString(1000, 3) = \"" << ItsConvert::ToDataSizeString(1000, 3, ItsDataSizeStringType::IEC) << "\"" << endl;
 
     cout << endl;
 }
