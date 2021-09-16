@@ -672,8 +672,6 @@ namespace ItSoftware
                 	return mode;
                 }
             };
-
-
         } // namespace Core
     } // namespace Linux
 } // namespace ItSoftware
