@@ -95,6 +95,10 @@ void TestToString()
     cout << "ItsConvert::ToString<short>(1234) = \"" << ItsConvert::ToString<short>(1234) << "\"" << endl;
     cout << "ItsConvert::ToString<unsigned short>(40001) = \"" << ItsConvert::ToString<unsigned short>(40001) << "\"" << endl;
     cout << "ItsConvert::ToStringFormatted(256810246) = \"" << ItsConvert::ToStringFormatted(256810246) << "\"" << endl;
+	cout << "ItsConvert::ToDataSizeString(0, 0) = \"" << ItsConvert::ToDataSizeString(0, 0) << "\"" << endl;
+    cout << "ItsConvert::ToDataSizeString(1024, 2) = \"" << ItsConvert::ToDataSizeString(1024, 2) << "\"" << endl;
+	cout << "ItsConvert::ToDataSizeString(200100400, 0) = \"" << ItsConvert::ToDataSizeString(200100400, 0) << "\"" << endl;
+	cout << "ItsConvert::ToDataSizeString(200100400, 2) = \"" << ItsConvert::ToDataSizeString(200100400, 2) << "\"" << endl;
 
     cout << endl;
 }

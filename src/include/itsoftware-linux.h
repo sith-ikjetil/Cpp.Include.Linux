@@ -444,6 +444,43 @@ namespace ItSoftware
 		//
 		struct ItsConvert
 		{
+			static string ToDataSizeString(size_t size, int digits)
+			{
+				if (digits < 0)
+				{
+					digits = 0;
+				}
+				else if (digits > 3)
+				{
+					digits = 3;
+				}
+
+				stringstream ss;
+				double dSize = (double)size;
+
+				int index = 0;
+				while (dSize >= 1024)
+				{
+					dSize /= 1024;
+					index++;
+				}
+
+				vector<string> szSize{ "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "GP" };
+
+				size_t tst = (size_t)dSize;
+				ss << tst;
+				if (digits > 0) {
+					double t = dSize - tst;
+					string ws = ItsConvert::ToString<double>(t);
+					ss << ws.substr(1, digits+1);
+				}
+				ss << " ";
+				ss << ((index > (szSize.size() - 1) || index < 0) ? "?" : szSize[index]);
+				ss << ends;
+
+				return ss.str();
+			}
+
 			template<typename Numeric>
 			static Numeric ToNumber(const string& str)
 			{
