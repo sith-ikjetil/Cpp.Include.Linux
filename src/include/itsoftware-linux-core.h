@@ -51,20 +51,20 @@ namespace ItSoftware
             struct ItsTimer
             {
               private:
-                clock_t m_start = 0;
-                clock_t m_end = 0;
+                size_t m_start = 0;
+                size_t m_end = 0;
                 tms m_tms;
                 bool m_isRunning = false;
 
-                clock_t GetTickCount()
+                size_t GetTickCount()
                 {
-                    struct timeval tv;
-                    if (gettimeofday(&tv, NULL) != 0)
+                    struct timespec ts;
+                    if (clock_gettime(CLOCK_REALTIME,&ts) != 0)
                     {
                         return 0;
                     }
 
-                    return tv.tv_sec * 1'000'000 + tv.tv_usec;
+                    return ts.tv_nsec;
                 }
 
               public:
@@ -96,7 +96,7 @@ namespace ItSoftware
                         return 0;
                     }
 
-                    return (size_t)((this->GetTickCount() - this->m_start) / 1'000'000);
+                    return (size_t)((this->GetTickCount() - this->m_start) / 1'000'000'000);
                 }
 
                 size_t LapMilliseconds()
@@ -106,7 +106,7 @@ namespace ItSoftware
                         return 0;
                     }
 
-                    return (size_t)((this->GetTickCount() - this->m_start) / 1'000);
+                    return (size_t)((this->GetTickCount() - this->m_start) / 1'000'000);
                 }
 
                 size_t LapMicroseconds()
@@ -116,7 +116,16 @@ namespace ItSoftware
                         return 0;
                     }
 
-                    return (size_t)(this->GetTickCount() - this->m_start);
+                    return (size_t)((this->GetTickCount() - this->m_start) / 1'000);
+                }
+
+                size_t LapNanoseconds()
+                {
+                	if (!this->IsRunning())
+                	{
+                		return 0;
+                	}
+                	return (this->GetTickCount() - this->m_start);
                 }
 
                 size_t GetSeconds()
@@ -126,7 +135,7 @@ namespace ItSoftware
                         return 0;
                     }
 
-                    return (size_t)((this->m_end - this->m_start) / 1'000'000);
+                    return (size_t)((this->m_end - this->m_start) / 1'000'000'000);
                 }
 
                 size_t GetMilliseconds()
@@ -136,7 +145,7 @@ namespace ItSoftware
                         return 0;
                     }
 
-                    return (size_t)((this->m_end - this->m_start) / 1'000);
+                    return (size_t)((this->m_end - this->m_start) / 1'000'000);
                 }
 
                 size_t GetMicroseconds()
@@ -146,7 +155,16 @@ namespace ItSoftware
                         return 0;
                     }
 
-                    return this->m_end - this->m_start;
+                    return (size_t)((this->m_end - this->m_start) / 1'000);
+                }
+
+                size_t GetNanoseconds()
+                {
+                	if (this->IsRunning())
+                	{
+                		return 0;
+                	}
+                	return (this->m_end - this->m_start);
                 }
             };
 
@@ -237,7 +255,7 @@ namespace ItSoftware
                 //
                 string GetFilename()
                 {
-	            return this->m_filename;
+	           		return this->m_filename;
                 }
 
                 //
@@ -302,7 +320,7 @@ namespace ItSoftware
                         return false;
                     }
 
-	            this->m_filename = filename;
+	            	this->m_filename = filename;
                     return true;
                 }
 
@@ -365,7 +383,7 @@ namespace ItSoftware
                         return false;
                     }
 
-	            this->m_filename = filename;
+	            	this->m_filename = filename;
 
                     return true;
                 }
@@ -440,7 +458,7 @@ namespace ItSoftware
                     }
 
                     this->SetPosFromBeg(0);
-        
+
                     string str;
                     if (!this->ReadAllText(str)) 
                     {
@@ -463,7 +481,7 @@ namespace ItSoftware
                     {
                         return false;
                     }
-        
+
                     return true;
                 }
 
@@ -493,7 +511,7 @@ namespace ItSoftware
                     {
                         return false;
                     }
-        
+
                     return true;
                 }
 

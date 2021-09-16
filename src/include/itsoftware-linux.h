@@ -91,7 +91,7 @@ namespace ItSoftware
 
 				*part_hours = 0;
 				*part_minutes = 0;
-				;
+
 				*part_seconds = 0;
 				*part_ms = 0;
 
@@ -203,7 +203,7 @@ namespace ItSoftware
 						ss << ".0" << ms;
 					}
 					else {
-						ss << ms;
+						ss << "." << ms;
 					}
 				}
 

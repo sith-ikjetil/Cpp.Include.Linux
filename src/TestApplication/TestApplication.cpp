@@ -27,6 +27,9 @@ using ItSoftware::Linux::ItsRandom;
 using ItSoftware::Linux::ItsDateTime;
 using ItSoftware::Linux::ItsLog;
 using ItSoftware::Linux::ItsDataSizeStringType;
+using ItSoftware::Linux::Core::ItsTimer;
+using ItSoftware::Linux::Core::ItsFile;
+
 
 //
 // Function Prototypes
@@ -37,6 +40,15 @@ void TestRandom();
 void TestTime();
 void TestString();
 void TestLog();
+void TestStartTimer();
+void TestStopTimer();
+void TestFile();
+
+//
+// global data
+//
+ItsTimer g_timer;
+char g_filename[] = "/home/kjetilso/test.txt";
 
 //
 // Function: main
@@ -45,12 +57,15 @@ int main()
 {
     cout << "### Cpp.Include.Linux - Test Application ###" << endl << endl;
 
+	TestStartTimer();
     TestToNumber();
     TestToString();
     TestRandom();
     TestTime();
     TestString();
 	TestLog();
+	TestFile();
+	TestStopTimer();
 
     return EXIT_SUCCESS;
 }
@@ -192,4 +207,65 @@ void TestLog()
     cout << log.ToString();
 
     cout << endl;
+}
+
+//
+// Function: TestFile
+//
+// (i): Test of ItsFile.
+//
+void TestFile()
+{
+	cout << endl;
+	cout << "## Test File _______________________________________________" << endl;
+
+	ItsFile file;
+	if (!file.OpenOrCreate(g_filename,"rwt",S_IRUSR | S_IWUSR))
+	{
+		cout << "Error creating: " << g_filename << endl;
+		cout << endl;
+		return;
+	}
+
+	char text[] = "Test Line 1\nTest Line 2\n";
+	size_t written(0);
+	if ( !file.Write((void*)text,strlen(text), &written) )
+	{
+		cout << "Error writing: " << g_filename << endl;
+		cout << endl;
+		return;
+	}
+
+	cout << written << " bytes written to file " << g_filename << " successfully" << endl;
+
+	cout << endl;
+}
+
+//
+// Function: TestStartTimer
+//
+// (i): Test of ItsTimer.
+//
+void TestStartTimer()
+{
+	cout << endl;
+	cout << "## Test Start Timer _________________________________________" << endl;
+
+	g_timer.Start();
+}
+
+//
+// Function: TestStopTimer
+//
+// (i): Test of ItsTimer.
+//
+void TestStopTimer()
+{
+	cout << endl;
+	cout << "## Test Stop Timer ___________________________________________" << endl;
+
+	g_timer.Stop();
+	cout << "Exceution time: " << ItsTime::RenderMsToFullString(g_timer.GetMicroseconds(),true) << endl;
+
+	cout << endl;
 }
