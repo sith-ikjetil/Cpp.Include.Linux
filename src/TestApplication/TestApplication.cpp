@@ -220,7 +220,7 @@ void TestFile()
 	cout << "## Test File _______________________________________________" << endl;
 
 	ItsFile file;
-	if (!file.OpenOrCreate(g_filename,"rwt",S_IRUSR | S_IWUSR))
+	if (!file.OpenOrCreate(g_filename,"rwt",ItsFile::CreateMode("rw","rw","rw")))
 	{
 		cout << "Error creating: " << g_filename << endl;
 		cout << endl;

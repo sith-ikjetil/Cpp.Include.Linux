@@ -625,6 +625,52 @@ namespace ItSoftware
                     *mode = stat1.st_mode;
                     return true;
                 }
+
+                static int CreateMode(string user, string group, string other)
+                {
+                	int mode(0);
+
+                	if (user.size() > 0)
+                	{
+                		if (user.find('r',0) != string::npos) {
+							mode |= S_IRUSR;
+                		}
+                		if (user.find('w',0) != string::npos) {
+							mode |= S_IWUSR;
+                		}
+                		if (user.find('x',0) != string::npos) {
+							mode |= S_IXUSR;
+                		}
+                	}
+
+                	if (group.size() > 0)
+                    {
+                         if (group.find('r',0) != string::npos) {
+                             mode |= S_IRGRP;
+                         }
+                         if (group.find('w',0) != string::npos) {
+                             mode |= S_IWGRP;
+                         }
+                         if (group.find('x',0) != string::npos) {
+                             mode |= S_IXGRP;
+                         }
+                    }
+
+					if (other.size() > 0)
+                    {
+                        if (other.find('r',0) != string::npos) {
+                             mode |= S_IROTH;
+                        }
+                        if (other.find('w',0) != string::npos) {
+                             mode |= S_IWOTH;
+                        }
+                        if (other.find('x',0) != string::npos) {
+                             mode |= S_IXOTH;
+                        }
+                    }
+
+                	return mode;
+                }
             };
 
 
