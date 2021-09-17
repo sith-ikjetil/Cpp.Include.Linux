@@ -44,6 +44,8 @@ void TestStartTimer();
 void TestStopTimer();
 void TestFile();
 void TestDateTime();
+void ExitFn();
+void PrintTestHeader(string txt);
 
 //
 // global data
@@ -52,13 +54,25 @@ ItsTimer g_timer;
 char g_filename[] = "/home/kjetilso/test.txt";
 
 //
+// Function: ExitFn
+//
+// (i): Print exit message.
+// 
+void ExitFn()
+{
+    cout << "> Test Application - Exited <" << endl;
+}
+
+//
 // Function: main
 //
 // (i): Application entry point
 //
 int main(int argc, char* argv[])
 {
-    cout << "### Cpp.Include.Linux - Test Application ###" << endl << endl;
+    atexit(ExitFn);
+
+    cout << "> Test Application - Started <" << endl;
 
 	TestStartTimer();
     TestToNumber();
@@ -75,15 +89,25 @@ int main(int argc, char* argv[])
 }
 
 //
+// Function: PrintTestHeader
+//
+// (i): Prints a tests header.
+//
+void PrintTestHeader(string txt)
+{
+    cout << endl;
+    cout << ItsString::WidthExpand(txt, 80, '_', ItsExpandDirection::Right) << endl;
+}
+
+//
 // Function: TestToNumber
 //
 // (i): Test numerics as string converted to primitive data types.
 //
 void TestToNumber()
 {
-    cout << endl;
+    PrintTestHeader("## Test ItsConvert::ToNumber ");
 
-    cout << "## Test ToNumber ________________________________________________" << endl;
     cout << R"(ItsConvert::ToNumber<int>("-1234") = )" << ItsConvert::ToNumber<int>("-1234") << endl;
     cout << R"(ItsConvert::ToNumber<unsigned int>("1234") = )" << ItsConvert::ToNumber<unsigned int>("1234") << endl;
     cout << R"(ItsConvert::ToNumber<long>("-1234") = )" << ItsConvert::ToNumber<long>("-1234") << endl;
@@ -103,9 +127,8 @@ void TestToNumber()
 //
 void TestToString()
 {
-    cout << endl;
+    PrintTestHeader("## Test ItsConvert::ToString ");
 
-    cout << "## Test ToString ________________________________________________" << endl;
     cout << R"(ItsConvert::ToString<int>(-1234) = ")" << ItsConvert::ToString<int>(-1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<unsigned int>(1234) = ")" << ItsConvert::ToString<unsigned int>(1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<long>(-1234) = ")" << ItsConvert::ToString<long>(-1234) << R"(")" << endl;
@@ -132,9 +155,8 @@ void TestToString()
 //
 void TestRandom()
 {
-    cout << endl;
+    PrintTestHeader("## Test ItsRandom ");
 
-    cout << "## Test Random _________________________________________________" << endl;
     cout << "ItsRandom<long>(10'000, 1'000'000) = " << ItsRandom<long>(10'000, 1'000'000) << endl;
     cout << "ItsRandom<long>(10'000, 1'000'000) = " << ItsRandom<long>(10'000, 1'000'000) << endl;
     cout << "ItsRandom<float>(1, 10) = " << ItsRandom<float>(1, 10) << endl;
@@ -152,9 +174,8 @@ void TestRandom()
 //
 void TestTime()
 {
-    cout << endl;
+    PrintTestHeader("## Test ItsTime ");
 
-    cout << "## Test Time ___________________________________________________" << endl;
     cout << "ItsTime::RenderMsToFullString(92481379, false)" << " = " << ItsTime::RenderMsToFullString(92481379, false) << endl;
     cout << "ItsTime::RenderMsToFullString(92481379, true)" << " = " << ItsTime::RenderMsToFullString(92481379, true) << endl;
     cout << R"(ItsDateTime::Now().ToString("s"))" << " = " << ItsDateTime::Now().ToString("s") << endl;
@@ -169,11 +190,10 @@ void TestTime()
 //
 void TestString()
 {
+    PrintTestHeader("## Test ItsString ");
+
     string test("Ab12Cd");
     string testTrim("  Ab12Cd  ");
-    cout << endl;
-
-    cout << "## Test String ________________________________________________" << endl;
     cout << R"(test = ")" << test << R"(")" << endl;
     cout << R"(testTrim = ")" << testTrim << R"(")" << endl;
     cout << R"(ItsString::Left(test,4) = ")" << ItsString::Left(test, 4) << R"(")" << endl;
@@ -199,8 +219,7 @@ void TestString()
 //
 void TestLog()
 {
-	cout << endl;
-    cout << "## Test Log _________________________________________________" << endl;
+	PrintTestHeader("## Test ItsLog ");
 
     ItsLog log;
     log.LogInformation("This is an information log item");
@@ -220,8 +239,7 @@ void TestLog()
 //
 void TestFile()
 {
-	cout << endl;
-	cout << "## Test File _______________________________________________" << endl;
+	PrintTestHeader("## Test ItsFile ");
 
 	ItsFile file;
 	if (!file.OpenOrCreate(g_filename,"rwt",ItsFile::CreateMode("rw","rw","rw")))
@@ -252,10 +270,11 @@ void TestFile()
 //
 void TestStartTimer()
 {
-	cout << endl;
-	cout << "## Test Start Timer _________________________________________" << endl;
+	PrintTestHeader("## Test ItsTimer::Start ");
 
 	g_timer.Start();
+
+    cout << endl;
 }
 
 //
@@ -265,8 +284,7 @@ void TestStartTimer()
 //
 void TestStopTimer()
 {
-	cout << endl;
-	cout << "## Test Stop Timer __________________________________________" << endl;
+	PrintTestHeader("## Test ItsTimer::Stop ");
 
 	g_timer.Stop();
 	cout << "Exceution time: " << ItsTime::RenderMsToFullString(g_timer.GetMilliseconds(),true) << endl;
@@ -281,8 +299,7 @@ void TestStopTimer()
 //
 void TestDateTime()
 {
-    cout << endl;
-    cout << "## Test DateTime ___________________________________________" << endl;
+    PrintTestHeader("## Test ItsDateTime ");
 
     auto now = ItsDateTime::Now();
     cout << "ItsDateTime.Now(): " << now.ToString() << endl;
