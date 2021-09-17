@@ -27,9 +27,9 @@ using ItSoftware::Linux::ItsRandom;
 using ItSoftware::Linux::ItsDateTime;
 using ItSoftware::Linux::ItsLog;
 using ItSoftware::Linux::ItsDataSizeStringType;
+using ItSoftware::Linux::ItsDateTime;
 using ItSoftware::Linux::Core::ItsTimer;
 using ItSoftware::Linux::Core::ItsFile;
-
 
 //
 // Function Prototypes
@@ -43,6 +43,7 @@ void TestLog();
 void TestStartTimer();
 void TestStopTimer();
 void TestFile();
+void TestDateTime();
 
 //
 // global data
@@ -67,6 +68,7 @@ int main(int argc, char* argv[])
     TestString();
 	TestLog();
 	TestFile();
+    TestDateTime();
 	TestStopTimer();
 
     return EXIT_SUCCESS;
@@ -264,10 +266,38 @@ void TestStartTimer()
 void TestStopTimer()
 {
 	cout << endl;
-	cout << "## Test Stop Timer ___________________________________________" << endl;
+	cout << "## Test Stop Timer __________________________________________" << endl;
 
 	g_timer.Stop();
 	cout << "Exceution time: " << ItsTime::RenderMsToFullString(g_timer.GetMilliseconds(),true) << endl;
 
 	cout << endl;
+}
+
+//
+// Function: TestDateTime
+//
+// (i): Test ItsDateTime
+//
+void TestDateTime()
+{
+    cout << endl;
+    cout << "## Test DateTime ___________________________________________" << endl;
+
+    auto now = ItsDateTime::Now();
+    cout << "ItsDateTime.Now(): " << now.ToString() << endl;
+
+    now.AddDays(7);
+    now.AddHours(1);
+    now.AddMinutes(1);
+    now.AddSeconds(1);
+    cout << "Added Days(7), Hours(1), Minutes(1) and Seconds(1): " << now.ToString() << endl;
+
+    now.SubtractDays(7);
+    now.SubtractHours(1);
+    now.SubtractMinutes(1);
+    now.SubtractSeconds(1);
+    cout << "Subtracted Days(7), Hours(1), Minutes(1) and Seconds(1): " << now.ToString() << endl;
+
+    cout << endl;
 }
