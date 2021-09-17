@@ -63,8 +63,8 @@ namespace ItSoftware
                     {
                         return 0;
                     }
-
-                    return ts.tv_nsec;
+                    
+                    return (ts.tv_sec * 1'000'000'000) + ts.tv_nsec;
                 }
 
               public:

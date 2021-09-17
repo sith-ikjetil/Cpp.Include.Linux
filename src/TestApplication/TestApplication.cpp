@@ -267,7 +267,7 @@ void TestStopTimer()
 	cout << "## Test Stop Timer ___________________________________________" << endl;
 
 	g_timer.Stop();
-	cout << "Exceution time: " << ItsTime::RenderMsToFullString(g_timer.GetMicroseconds(),true) << endl;
+	cout << "Exceution time: " << ItsTime::RenderMsToFullString(g_timer.GetMilliseconds(),true) << endl;
 
 	cout << endl;
 }
