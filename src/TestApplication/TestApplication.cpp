@@ -53,7 +53,9 @@ char g_filename[] = "/home/kjetilso/test.txt";
 //
 // Function: main
 //
-int main()
+// (i): Application entry point
+//
+int main(int argc, char* argv[])
 {
     cout << "### Cpp.Include.Linux - Test Application ###" << endl << endl;
 
@@ -73,21 +75,21 @@ int main()
 //
 // Function: TestToNumber
 //
-// (i) Test numerics as string converted to primitive data types.
+// (i): Test numerics as string converted to primitive data types.
 //
 void TestToNumber()
 {
     cout << endl;
 
     cout << "## Test ToNumber ________________________________________________" << endl;
-    cout << "ItsConvert::ToNumber<int>(L\"-1234\") = " << ItsConvert::ToNumber<int>("-1234") << endl;
-    cout << "ItsConvert::ToNumber<unsigned int>(L\"1234\") = " << ItsConvert::ToNumber<unsigned int>("1234") << endl;
-    cout << "ItsConvert::ToNumber<long>(L\"-1234\") = " << ItsConvert::ToNumber<long>("-1234") << endl;
-    cout << "ItsConvert::ToNumber<unsigned long>(L\"123456789\") = " << ItsConvert::ToNumber<unsigned long>("12346789") << endl;
-    cout << "ItsConvert::ToNumber<float>(L\"-12.34\") = " << ItsConvert::ToNumber<float>("-12.34") << endl;
-    cout << "ItsConvert::ToNumber<double>(L\"1.234\") = " << ItsConvert::ToNumber<double>("1.234") << endl;
-    cout << "ItsConvert::ToNumber<short>(L\"1234\") = " << ItsConvert::ToNumber<short>("1234") << endl;
-    cout << "ItsConvert::ToNumber<unsigned short>(L\"40001\") = " << ItsConvert::ToNumber<unsigned short>("40001") << endl;
+    cout << R"(ItsConvert::ToNumber<int>("-1234") = )" << ItsConvert::ToNumber<int>("-1234") << endl;
+    cout << R"(ItsConvert::ToNumber<unsigned int>("1234") = )" << ItsConvert::ToNumber<unsigned int>("1234") << endl;
+    cout << R"(ItsConvert::ToNumber<long>("-1234") = )" << ItsConvert::ToNumber<long>("-1234") << endl;
+    cout << R"(ItsConvert::ToNumber<unsigned long>("123456789") = )" << ItsConvert::ToNumber<unsigned long>("12346789") << endl;
+    cout << R"(ItsConvert::ToNumber<float>("-12.34") = )" << ItsConvert::ToNumber<float>("-12.34") << endl;
+    cout << R"(ItsConvert::ToNumber<double>("1.234") = )" << ItsConvert::ToNumber<double>("1.234") << endl;
+    cout << R"(ItsConvert::ToNumber<short>("1234") = )" << ItsConvert::ToNumber<short>("1234") << endl;
+    cout << R"(ItsConvert::ToNumber<unsigned short>("40001") = )" << ItsConvert::ToNumber<unsigned short>("40001") << endl;
 
     cout << endl;
 }
@@ -95,28 +97,28 @@ void TestToNumber()
 //
 // Function: TestToString
 //
-// (i) Tests primitive data types to string. I.e. numeric types.
+// (i): Tests primitive data types to string. I.e. numeric types.
 //
 void TestToString()
 {
     cout << endl;
 
     cout << "## Test ToString ________________________________________________" << endl;
-    cout << "ItsConvert::ToString<int>(-1234) = \"" << ItsConvert::ToString<int>(-1234) << "\"" << endl;
-    cout << "ItsConvert::ToString<unsigned int>(1234) = \"" << ItsConvert::ToString<unsigned int>(1234) << "\"" << endl;
-    cout << "ItsConvert::ToString<long>(-1234) = \"" << ItsConvert::ToString<long>(-1234) << "\"" << endl;
-    cout << "ItsConvert::ToString<unsigned long>(123456789) = \"" << ItsConvert::ToString<unsigned long>(12346789) << "\"" << endl;
-    cout << "ItsConvert::ToString<float>(-12.34) = \"" << ItsConvert::ToString<float>(-12.34f) << "\"" << endl;
-    cout << "ItsConvert::ToString<double>(1.234) = \"" << ItsConvert::ToString<double>(1.234) << "\"" << endl;
-    cout << "ItsConvert::ToString<short>(1234) = \"" << ItsConvert::ToString<short>(1234) << "\"" << endl;
-    cout << "ItsConvert::ToString<unsigned short>(40001) = \"" << ItsConvert::ToString<unsigned short>(40001) << "\"" << endl;
-    cout << "ItsConvert::ToStringFormatted(256810246) = \"" << ItsConvert::ToStringFormatted(256810246) << "\"" << endl;
-	cout << "ItsConvert::ToDataSizeString(0, 0) = \"" << ItsConvert::ToDataSizeString(0, 0) << "\"" << endl;
-    cout << "ItsConvert::ToDataSizeString(1024, 2) = \"" << ItsConvert::ToDataSizeString(1024, 2) << "\"" << endl;
-	cout << "ItsConvert::ToDataSizeString(200100400, 0) = \"" << ItsConvert::ToDataSizeString(200100400, 0) << "\"" << endl;
-	cout << "ItsConvert::ToDataSizeString(200100400, 2) = \"" << ItsConvert::ToDataSizeString(200100400, 2) << "\"" << endl;
-	cout << "ItsConvert::ToDataSizeString(9807804606, 3) = \"" << ItsConvert::ToDataSizeString(9807804606, 3, ItsDataSizeStringType::IEC) << "\"" << endl;
-    cout << "ItsConvert::ToDataSizeString(1000, 3) = \"" << ItsConvert::ToDataSizeString(1000, 3, ItsDataSizeStringType::IEC) << "\"" << endl;
+    cout << R"(ItsConvert::ToString<int>(-1234) = ")" << ItsConvert::ToString<int>(-1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<unsigned int>(1234) = ")" << ItsConvert::ToString<unsigned int>(1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<long>(-1234) = ")" << ItsConvert::ToString<long>(-1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<unsigned long>(123456789) = ")" << ItsConvert::ToString<unsigned long>(12346789) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<float>(-12.34) = ")" << ItsConvert::ToString<float>(-12.34f) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<double>(1.234) = ")" << ItsConvert::ToString<double>(1.234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<short>(1234) = ")" << ItsConvert::ToString<short>(1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<unsigned short>(40001) = ")" << ItsConvert::ToString<unsigned short>(40001) << R"(")" << endl;
+    cout << R"(ItsConvert::ToStringFormatted(256810246) = ")" << ItsConvert::ToStringFormatted(256810246) << R"(")" << endl;
+	cout << R"(ItsConvert::ToDataSizeString(0, 0) = ")" << ItsConvert::ToDataSizeString(0, 0) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(1024, 2) = ")" << ItsConvert::ToDataSizeString(1024, 2) << R"(")" << endl;
+	cout << R"(ItsConvert::ToDataSizeString(200100400, 0) = ")" << ItsConvert::ToDataSizeString(200100400, 0) << R"(")" << endl;
+	cout << R"(ItsConvert::ToDataSizeString(200100400, 2) = ")" << ItsConvert::ToDataSizeString(200100400, 2) << R"(")" << endl;
+	cout << R"(ItsConvert::ToDataSizeString(9807804606, 3) = ")" << ItsConvert::ToDataSizeString(9807804606, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(1000, 3) = ")" << ItsConvert::ToDataSizeString(1000, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
 
     cout << endl;
 }
@@ -124,7 +126,7 @@ void TestToString()
 //
 // Function: TestRandom
 //
-// (i) Test random integers and floats.
+// (i): Test random integers and floats.
 //
 void TestRandom()
 {
@@ -144,7 +146,7 @@ void TestRandom()
 //
 // Function: TestTime
 //
-// (i) Test rendering of time in milliseconds.
+// (i): Test rendering of time from milliseconds.
 //
 void TestTime()
 {
@@ -153,7 +155,7 @@ void TestTime()
     cout << "## Test Time ___________________________________________________" << endl;
     cout << "ItsTime::RenderMsToFullString(92481379, false)" << " = " << ItsTime::RenderMsToFullString(92481379, false) << endl;
     cout << "ItsTime::RenderMsToFullString(92481379, true)" << " = " << ItsTime::RenderMsToFullString(92481379, true) << endl;
-    cout << "ItsDateTime::Now().ToString(\"s\")" << " = " << ItsDateTime::Now().ToString() << endl;
+    cout << R"(ItsDateTime::Now().ToString("s"))" << " = " << ItsDateTime::Now().ToString("s") << endl;
 
     cout << endl;
 }
@@ -161,7 +163,7 @@ void TestTime()
 //
 // Function: TestString
 //
-// (i) Test string manipulation routines.
+// (i): Test string manipulation routines.
 //
 void TestString()
 {
@@ -170,14 +172,14 @@ void TestString()
     cout << endl;
 
     cout << "## Test String ________________________________________________" << endl;
-    cout << "test = \"" << test << "\"" << endl;
-    cout << "testTrim = \"" << testTrim << "\"" << endl;
-    cout << "ItsString::Left(test,4) = \"" << ItsString::Left(test, 4) << "\"" << endl;
-    cout << "ItsString::Right(test,4) = \"" << ItsString::Right(test, 4) << "\"" << endl;
-    cout << "ItsString::Mid(test,2,2) = \"" << ItsString::Mid(test, 2, 2) << "\"" << endl;
-    cout << "ItsString::ToLowerCase(test) = \"" << ItsString::ToLowerCase(test) << "\"" << endl;
-    cout << "ItsString::ToUpperCase(test) = \"" << ItsString::ToUpperCase(test) << "\"" << endl;
-    cout << "ItsString::Trim(testTrim) = \"" << ItsString::Trim(testTrim) << "\"" << endl;
+    cout << R"(test = ")" << test << R"(")" << endl;
+    cout << R"(testTrim = ")" << testTrim << R"(")" << endl;
+    cout << R"(ItsString::Left(test,4) = ")" << ItsString::Left(test, 4) << R"(")" << endl;
+    cout << R"(ItsString::Right(test,4) = ")" << ItsString::Right(test, 4) << R"(")" << endl;
+    cout << R"(ItsString::Mid(test,2,2) = ")" << ItsString::Mid(test, 2, 2) << R"(")" << endl;
+    cout << R"(ItsString::ToLowerCase(test) = ")" << ItsString::ToLowerCase(test) << R"(")" << endl;
+    cout << R"(ItsString::ToUpperCase(test) = ")" << ItsString::ToUpperCase(test) << R"(")" << endl;
+    cout << R"(ItsString::Trim(testTrim) = ")" << ItsString::Trim(testTrim) << R"(")" << endl;
 
 	string name("Kjetil");
     cout << "ItsString::WidthExpand (ItsExpandDirection:Left,Middle,Right) Below" << endl;
