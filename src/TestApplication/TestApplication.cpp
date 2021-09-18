@@ -18,7 +18,9 @@
 //
 using std::cout;
 using std::endl;
+using std::ends;
 using std::string;
+using std::stringstream;
 using ItSoftware::Linux::ItsString;
 using ItSoftware::Linux::ItsExpandDirection;
 using ItSoftware::Linux::ItsTime;
@@ -200,8 +202,11 @@ void TestString()
     string test("Ab12Cd");
     string testTrim("  Ab12Cd  ");
     string testReplace("__ ABCDEF __");
+    string testSplit("A;BC;DEF;G");
     cout << R"(test = ")" << test << R"(")" << endl;
     cout << R"(testTrim = ")" << testTrim << R"(")" << endl;
+    cout << R"(testReplace = ")" << testReplace << R"(")" << endl;
+    cout << R"(testSplit = ")" << testSplit << R"(")" << endl;
     cout << R"(ItsString::Left(test,4) = ")" << ItsString::Left(test, 4) << R"(")" << endl;
     cout << R"(ItsString::Right(test,4) = ")" << ItsString::Right(test, 4) << R"(")" << endl;
     cout << R"(ItsString::Mid(test,2,2) = ")" << ItsString::Mid(test, 2, 2) << R"(")" << endl;
@@ -210,6 +215,15 @@ void TestString()
     cout << R"(ItsString::Trim(testTrim) = ")" << ItsString::Trim(testTrim) << R"(")" << endl;
     cout << R"(ItsString::Replace(testReplace) = ")" << ItsString::Replace(testReplace, "_", "#") << R"(")" << endl;
 	
+    auto vs = ItsString::Split(testSplit, ";");
+    stringstream ss;
+    for (auto s : vs)
+    {
+        ss << s << " ";
+    }
+    ss << ends;
+    cout << R"(ItsString::Split(testSplit,";") = )" << ss.str() << endl;
+
     string name("Kjetil");
     cout << "ItsString::WidthExpand (ItsExpandDirection:Left,Middle,Right) Below" << endl;
     cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Left) << endl;
