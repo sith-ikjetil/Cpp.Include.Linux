@@ -60,6 +60,7 @@ char g_filename[] = "/home/kjetilso/test.txt";
 // 
 void ExitFn()
 {
+    cout << endl;
     cout << "> Test Application - Exited <" << endl;
 }
 
@@ -315,6 +316,8 @@ void TestDateTime()
     now.SubtractMinutes(1);
     now.SubtractSeconds(1);
     cout << "Subtracted Days(7), Hours(1), Minutes(1) and Seconds(1): " << now.ToString() << endl;
+
+    cout << "Custom: " << now.ToString("dd.MM.yyyy HH:mm:ss") << endl;
 
     cout << endl;
 }
