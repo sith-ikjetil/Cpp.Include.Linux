@@ -28,6 +28,8 @@ using ItSoftware::Linux::ItsDateTime;
 using ItSoftware::Linux::ItsLog;
 using ItSoftware::Linux::ItsDataSizeStringType;
 using ItSoftware::Linux::ItsDateTime;
+using ItSoftware::Linux::ItsID;
+using ItSoftware::Linux::ItsCreateIDOptions;
 using ItSoftware::Linux::Core::ItsTimer;
 using ItSoftware::Linux::Core::ItsFile;
 
@@ -44,6 +46,7 @@ void TestStartTimer();
 void TestStopTimer();
 void TestFile();
 void TestDateTime();
+void TestID();
 void ExitFn();
 void PrintTestHeader(string txt);
 
@@ -84,6 +87,7 @@ int main(int argc, char* argv[])
 	TestLog();
 	TestFile();
     TestDateTime();
+    TestID();
 	TestStopTimer();
 
     return EXIT_SUCCESS;
@@ -318,6 +322,27 @@ void TestDateTime()
     cout << "Subtracted Days(7), Hours(1), Minutes(1) and Seconds(1): " << now.ToString() << endl;
 
     cout << "Custom: " << now.ToString("dd.MM.yyyy HH:mm:ss") << endl;
+
+    cout << endl;
+}
+
+//
+// Function: TestID
+//
+// (i): Tests ItsID.
+//
+void TestID()
+{
+    PrintTestHeader("## Test ItsID ");
+
+    cout << "ID (12): " << ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false) << endl;
+    cout << "ID (10): " << ItsID::CreateID(10, ItsCreateIDOptions::LowerAndUpperCase, true) << endl;
+    cout << "ID (8) : " << ItsID::CreateID(8, ItsCreateIDOptions::UpperCase, false) << endl;
+    cout << "ID (6) : " << ItsID::CreateID(6, ItsCreateIDOptions::UpperCase, true) << endl;
+    cout << "ID (14): " << ItsID::CreateID(14, ItsCreateIDOptions::LowerCase, false) << endl;
+    cout << "ID (16): " << ItsID::CreateID(16, ItsCreateIDOptions::LowerCase, true) << endl;
+    cout << "ID (64): " << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, false) << endl;
+    cout << "ID (64): " << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, true) << endl;
 
     cout << endl;
 }
