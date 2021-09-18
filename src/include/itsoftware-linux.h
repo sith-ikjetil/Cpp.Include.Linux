@@ -286,7 +286,7 @@ namespace ItSoftware
 				return result.str();
 			}
 
-			static vector<string> Split(string& data, string& token)
+			static vector<string> Split(string data, string token)
 			{
 				vector<string> output;
 				size_t pos = string::npos; // size_t to avoid improbable overflow
@@ -301,42 +301,42 @@ namespace ItSoftware
 				return output;
 			}
 			// to lower case
-			static string ToLowerCase(string &s)
+			static string ToLowerCase(string s)
 			{
 				std::transform(s.begin(), s.end(), s.begin(), tolower);
 				return s;
 			}
 
 			// to upper case
-			static string ToUpperCase(string &s)
+			static string ToUpperCase(string s)
 			{
 				std::transform(s.begin(), s.end(), s.begin(), toupper);
 				return s;
 			}
 
 			// trim from left
-			static string TrimLeft(string &s, const char *t = " \t\n\r\f\v")
+			static string TrimLeft(string s, const char *t = " \t\n\r\f\v")
 			{
 				s.erase(0, s.find_first_not_of(t));
 				return s;
 			}
 
 			// trim from right
-			static string TrimRight(string &s, const char *t = " \t\n\r\f\v")
+			static string TrimRight(string s, const char *t = " \t\n\r\f\v")
 			{
 				s.erase(s.find_last_not_of(t) + 1);
 				return s;
 			}
 
 			// trim from left & right
-			static string Trim(string &s, const char *t = " \t\n\r\f\v")
+			static string Trim(string s, const char *t = " \t\n\r\f\v")
 			{
 				auto val = TrimRight(s, t);
 				return TrimLeft(val, t);
 			}
 
 			// left count chars
-			static string Left(string &s, uint32_t count)
+			static string Left(string s, uint32_t count)
 			{
 				if (s.size() == 0 || count <= 0)
 				{
@@ -359,7 +359,7 @@ namespace ItSoftware
 			}
 
 			// mid index, count chars
-			static string Mid(string &s, uint32_t index, uint32_t count)
+			static string Mid(string s, uint32_t index, uint32_t count)
 			{
 				if (s.size() == 0 || count <= 0 || index < 0 || index >= s.size())
 				{
@@ -388,7 +388,7 @@ namespace ItSoftware
 			}
 
 			// right count chars
-			static string Right(string &s, uint32_t count)
+			static string Right(string s, uint32_t count)
 			{
 				if (s.size() == 0 || count <= 0)
 				{
@@ -410,30 +410,33 @@ namespace ItSoftware
 				return str;
 			}
 
-			static string Replace(string& s, string& replace, string& replace_with)
+			static string Replace(string s, string replace, string replace_with)
 			{
 				if (s.size() == 0 || replace.size() == 0 || replace.size() > s.size())
 				{
 					return string("");
 				}
 
-				stringstream ss;
-				size_t index = s.find(replace);
+				string retVal = s;
+				size_t index = retVal.find(replace);
 				if (index == string::npos)
 				{
 					return s;
 				}
 				while (index != string::npos)
 				{
-					ss << ItsString::Left(s, (int)index);
+					stringstream ss;
+					ss << ItsString::Left(retVal, (int)index);
 					ss << replace_with;
-					ss << ItsString::Right(s, (int)(s.size() - index - replace.size()));
+					ss << ItsString::Right(retVal, (int)(retVal.size() - index - replace.size()));
+					ss << ends;
 
-					index = s.find(replace, index + replace.size());
+					retVal = ss.str();
+
+					index = retVal.find(replace, index + replace.size());
 				}
 
-				string str = ss.str();
-				return str;
+				return retVal;
 			}
 		};
 
@@ -1222,11 +1225,30 @@ namespace ItSoftware
 				return type;
 			}
 
-			string ToString()
+			string ToFriendlyString()
 			{
 				stringstream ss;
 				for (auto i : this->m_items) {
 					ss << std::setiosflags(std::ios::left) << std::setw(12) << this->LogTypeToString(i.Type) << ItsDateTime(i.When).ToString() << " " << i.Description << endl;
+				}
+				ss << ends;
+
+				return ss.str();
+			}
+
+			string ToString()
+			{
+				stringstream ss;
+				string nl1("\r\n");
+				string nl2("\n");
+				string s1(";");
+				string rep_nl(" ");
+				string rep_s(",");
+				for (auto i : this->m_items) {
+					auto description = ItsString::Replace(i.Description, nl1, rep_nl);
+					description = ItsString::Replace(description, nl2, rep_nl);
+					description = ItsString::Replace(description, s1, rep_s);
+					ss << this->LogTypeToString(i.Type) << ";" << ItsDateTime(i.When).ToString("s") << ";" << description << endl;
 				}
 				ss << ends;
 

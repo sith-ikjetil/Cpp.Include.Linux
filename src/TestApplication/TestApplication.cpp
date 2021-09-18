@@ -199,6 +199,7 @@ void TestString()
 
     string test("Ab12Cd");
     string testTrim("  Ab12Cd  ");
+    string testReplace("__ ABCDEF __");
     cout << R"(test = ")" << test << R"(")" << endl;
     cout << R"(testTrim = ")" << testTrim << R"(")" << endl;
     cout << R"(ItsString::Left(test,4) = ")" << ItsString::Left(test, 4) << R"(")" << endl;
@@ -207,8 +208,9 @@ void TestString()
     cout << R"(ItsString::ToLowerCase(test) = ")" << ItsString::ToLowerCase(test) << R"(")" << endl;
     cout << R"(ItsString::ToUpperCase(test) = ")" << ItsString::ToUpperCase(test) << R"(")" << endl;
     cout << R"(ItsString::Trim(testTrim) = ")" << ItsString::Trim(testTrim) << R"(")" << endl;
-
-	string name("Kjetil");
+    cout << R"(ItsString::Replace(testReplace) = ")" << ItsString::Replace(testReplace, "_", "#") << R"(")" << endl;
+	
+    string name("Kjetil");
     cout << "ItsString::WidthExpand (ItsExpandDirection:Left,Middle,Right) Below" << endl;
     cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Left) << endl;
     cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Middle) << endl;
@@ -232,8 +234,13 @@ void TestLog()
     log.LogError("This is an error log item");
     log.LogOther("This is an other log item");
     log.LogDebug("This is an debug log item");
-    cout << log.ToString();
 
+    cout << "__ ToFriendlyString __" << endl;
+    cout << log.ToFriendlyString() << endl;
+
+    cout << "__ ToString __" << endl;
+    cout << log.ToString() << endl;
+    
     cout << endl;
 }
 
