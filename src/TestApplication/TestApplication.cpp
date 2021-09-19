@@ -314,6 +314,20 @@ void TestItsFile()
         cout << "File " << g_filename << " successfully copied to " << g_copyToFilename << endl;
     }
 
+    if (!ItsFile::Exists(g_copyToFilename)) {
+        cout << "File " << g_copyToFilename << " does not exist" << endl;
+    }
+    else {
+        cout << "File " << g_copyToFilename << " exists" << endl;
+    }
+
+    if (!ItsFile::Delete(g_copyToFilename)) {
+        cout << "File " << g_copyToFilename << " failed to be deleted" << endl;
+    }
+    else {
+        cout << "File " << g_copyToFilename << " successfully deleted" << endl;
+    }
+
 	cout << endl;
 }
 
