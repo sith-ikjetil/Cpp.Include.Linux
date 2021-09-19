@@ -145,7 +145,9 @@ void TestItsConvert()
     cout << R"(ItsConvert::ToString<short>(1234) = ")" << ItsConvert::ToString<short>(1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<unsigned short>(40001) = ")" << ItsConvert::ToString<unsigned short>(40001) << R"(")" << endl;
     cout << R"(ItsConvert::ToStringFormatted(256810246) = ")" << ItsConvert::ToStringFormatted(256810246) << R"(")" << endl;
-	cout << R"(ItsConvert::ToDataSizeString(0, 0) = ")" << ItsConvert::ToDataSizeString(0, 0) << R"(")" << endl;
+	
+    PrintTestSubHeader("ToDataSizeString");
+    cout << R"(ItsConvert::ToDataSizeString(0, 0) = ")" << ItsConvert::ToDataSizeString(0, 0) << R"(")" << endl;
     cout << R"(ItsConvert::ToDataSizeString(1024, 2) = ")" << ItsConvert::ToDataSizeString(1024, 2) << R"(")" << endl;
 	cout << R"(ItsConvert::ToDataSizeString(200100400, 0) = ")" << ItsConvert::ToDataSizeString(200100400, 0) << R"(")" << endl;
 	cout << R"(ItsConvert::ToDataSizeString(200100400, 2) = ")" << ItsConvert::ToDataSizeString(200100400, 2) << R"(")" << endl;
@@ -283,12 +285,23 @@ void TestItsFile()
 		cout << endl;
 		return;
 	}
+    else {
+        cout << written << " bytes written to file " << g_filename << " successfully" << endl;
+    }
+
+    string str;
+    if (!file.ReadAllText(str)) {
+        cout << "File " << g_filename << " failed to ReadAllText" << endl;
+    }
+    else {
+        cout << "Successfully read all text from file " << g_filename << ": " << endl << str << endl;
+    }
 
     if (!file.Close() ) {
         cout << "File " << g_filename << " failed to close" << endl;
     }
     else {
-	    cout << written << " bytes written to file " << g_filename << " successfully" << endl;
+	    cout << "File " << g_filename << " closed successfully" << endl;
     }
 
     if (!ItsFile::Copy(g_filename, g_copyToFilename, true)) {
@@ -297,6 +310,7 @@ void TestItsFile()
     else {
         cout << "File " << g_filename << " successfully copied to " << g_copyToFilename << endl;
     }
+
 	cout << endl;
 }
 
