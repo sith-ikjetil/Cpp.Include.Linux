@@ -579,7 +579,7 @@ namespace ItSoftware
 				return tos;
 			}
 
-			static string ToStringFormatted(size_t number, char thousandSep = ' ')
+			static string ToStringFormatted(size_t number, char thousandSep = ',')
 			{
 				string txt = ItsConvert::ToString(number);
 

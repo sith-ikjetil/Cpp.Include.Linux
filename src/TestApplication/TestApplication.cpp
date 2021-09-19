@@ -144,7 +144,10 @@ void TestItsConvert()
     cout << R"(ItsConvert::ToString<double>(1.234) = ")" << ItsConvert::ToString<double>(1.234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<short>(1234) = ")" << ItsConvert::ToString<short>(1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<unsigned short>(40001) = ")" << ItsConvert::ToString<unsigned short>(40001) << R"(")" << endl;
+    
+    PrintTestSubHeader("ToStringFormatted");
     cout << R"(ItsConvert::ToStringFormatted(256810246) = ")" << ItsConvert::ToStringFormatted(256810246) << R"(")" << endl;
+	cout << R"(ItsConvert::ToStringFormatted(256810246, ' ') = ")" << ItsConvert::ToStringFormatted(256810246, ' ') << R"(")" << endl;
 	
     PrintTestSubHeader("ToDataSizeString");
     cout << R"(ItsConvert::ToDataSizeString(0, 0) = ")" << ItsConvert::ToDataSizeString(0, 0) << R"(")" << endl;
