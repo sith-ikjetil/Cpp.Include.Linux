@@ -1193,6 +1193,11 @@ namespace ItSoftware
 				return copy;
 			}
 
+			size_t Count() 
+			{
+				return this->m_items.size();
+			}
+
 			void Clear()
 			{
 				this->m_items.clear();
