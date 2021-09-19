@@ -327,6 +327,7 @@ void TestItsTimerStart()
 	PrintTestHeader("## Test ItsTimer::Start ");
 
 	g_timer.Start();
+    cout << "Timer started..." << endl;
 
     cout << endl;
 }
@@ -341,7 +342,7 @@ void TestItsTimerStop()
 	PrintTestHeader("## Test ItsTimer::Stop ");
 
 	g_timer.Stop();
-	cout << "Exceution time: " << ItsTime::RenderMsToFullString(g_timer.GetMilliseconds(),true) << endl;
+	cout << "Elapsed Time: " << ItsTime::RenderMsToFullString(g_timer.GetMilliseconds(),true) << endl;
 
 	cout << endl;
 }
