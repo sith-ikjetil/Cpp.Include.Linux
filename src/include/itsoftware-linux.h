@@ -923,7 +923,7 @@ namespace ItSoftware
 				return option;
 			}
 
-			tm TM()
+			const tm& TM()
 			{
 				return this->m_tm;
 			}
@@ -1181,16 +1181,9 @@ namespace ItSoftware
 				this->m_items.push_back(item);
 			}
 
-			vector<ItsLogItem> GetItems()
+			const vector<ItsLogItem>& GetItems()
 			{
-				vector<ItsLogItem> copy;
-
-				for (auto i : this->m_items)
-				{
-					copy.push_back(i);
-				}
-
-				return copy;
+				return this->m_items;
 			}
 
 			size_t Count() 
