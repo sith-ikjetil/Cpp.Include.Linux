@@ -38,17 +38,16 @@ using ItSoftware::Linux::Core::ItsFile;
 //
 // Function Prototypes
 //
-void TestToNumber();
-void TestToString();
-void TestRandom();
-void TestTime();
-void TestString();
-void TestLog();
-void TestStartTimer();
-void TestStopTimer();
-void TestFile();
-void TestDateTime();
-void TestID();
+void TestItsConvert();
+void TestItsRandom();
+void TestItsTime();
+void TestItsString();
+void TestItsLog();
+void TestItsTimerStart();
+void TestItsTimerStop();
+void TestItsFile();
+void TestItsDateTime();
+void TestItsID();
 void ExitFn();
 void PrintTestHeader(string txt);
 
@@ -57,6 +56,7 @@ void PrintTestHeader(string txt);
 //
 ItsTimer g_timer;
 char g_filename[] = "/home/kjetilso/test.txt";
+char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 
 //
 // Function: ExitFn
@@ -80,17 +80,16 @@ int main(int argc, char* argv[])
 
     cout << "> Test Application - Started <" << endl;
 
-	TestStartTimer();
-    TestToNumber();
-    TestToString();
-    TestRandom();
-    TestTime();
-    TestString();
-	TestLog();
-	TestFile();
-    TestDateTime();
-    TestID();
-	TestStopTimer();
+	TestItsTimerStart();
+    TestItsConvert();
+    TestItsRandom();
+    TestItsTime();
+    TestItsString();
+	TestItsLog();
+	TestItsFile();
+    TestItsDateTime();
+    TestItsID();
+	TestItsTimerStop();
 
     return EXIT_SUCCESS;
 }
@@ -107,14 +106,26 @@ void PrintTestHeader(string txt)
 }
 
 //
+// Function: PrintTestSubHeader
+//
+// (i): Prints a tests sub header.
+//
+void PrintTestSubHeader(string txt)
+{
+    cout << endl;
+    cout << "__ " << txt << " __" << endl;
+}
+
+//
 // Function: TestToNumber
 //
 // (i): Test numerics as string converted to primitive data types.
 //
-void TestToNumber()
+void TestItsConvert()
 {
-    PrintTestHeader("## Test ItsConvert::ToNumber ");
+    PrintTestHeader("## Test ItsConvert ");
 
+    PrintTestSubHeader("ToNumber");
     cout << R"(ItsConvert::ToNumber<int>("-1234") = )" << ItsConvert::ToNumber<int>("-1234") << endl;
     cout << R"(ItsConvert::ToNumber<unsigned int>("1234") = )" << ItsConvert::ToNumber<unsigned int>("1234") << endl;
     cout << R"(ItsConvert::ToNumber<long>("-1234") = )" << ItsConvert::ToNumber<long>("-1234") << endl;
@@ -124,18 +135,7 @@ void TestToNumber()
     cout << R"(ItsConvert::ToNumber<short>("1234") = )" << ItsConvert::ToNumber<short>("1234") << endl;
     cout << R"(ItsConvert::ToNumber<unsigned short>("40001") = )" << ItsConvert::ToNumber<unsigned short>("40001") << endl;
 
-    cout << endl;
-}
-
-//
-// Function: TestToString
-//
-// (i): Tests primitive data types to string. I.e. numeric types.
-//
-void TestToString()
-{
-    PrintTestHeader("## Test ItsConvert::ToString ");
-
+    PrintTestSubHeader("ToString");
     cout << R"(ItsConvert::ToString<int>(-1234) = ")" << ItsConvert::ToString<int>(-1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<unsigned int>(1234) = ")" << ItsConvert::ToString<unsigned int>(1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<long>(-1234) = ")" << ItsConvert::ToString<long>(-1234) << R"(")" << endl;
@@ -160,7 +160,7 @@ void TestToString()
 //
 // (i): Test random integers and floats.
 //
-void TestRandom()
+void TestItsRandom()
 {
     PrintTestHeader("## Test ItsRandom ");
 
@@ -179,7 +179,7 @@ void TestRandom()
 //
 // (i): Test rendering of time from milliseconds.
 //
-void TestTime()
+void TestItsTime()
 {
     PrintTestHeader("## Test ItsTime ");
 
@@ -195,7 +195,7 @@ void TestTime()
 //
 // (i): Test string manipulation routines.
 //
-void TestString()
+void TestItsString()
 {
     PrintTestHeader("## Test ItsString ");
 
@@ -238,7 +238,7 @@ void TestString()
 //
 // (i): Test ItsLog.
 //
-void TestLog()
+void TestItsLog()
 {
 	PrintTestHeader("## Test ItsLog ");
 
@@ -249,10 +249,10 @@ void TestLog()
     log.LogOther("This is an other log item");
     log.LogDebug("This is an debug log item");
 
-    cout << "__ ToFriendlyString __" << endl;
+    PrintTestSubHeader("ToFriendlyString");
     cout << log.ToFriendlyString() << endl;
 
-    cout << "__ ToString __" << endl;
+    PrintTestSubHeader("ToString");
     cout << log.ToString() << endl;
     
     cout << endl;
@@ -263,7 +263,7 @@ void TestLog()
 //
 // (i): Test of ItsFile.
 //
-void TestFile()
+void TestItsFile()
 {
 	PrintTestHeader("## Test ItsFile ");
 
@@ -284,8 +284,19 @@ void TestFile()
 		return;
 	}
 
-	cout << written << " bytes written to file " << g_filename << " successfully" << endl;
+    if (!file.Close() ) {
+        cout << "File " << g_filename << " failed to close" << endl;
+    }
+    else {
+	    cout << written << " bytes written to file " << g_filename << " successfully" << endl;
+    }
 
+    if (!ItsFile::Copy(g_filename, g_copyToFilename, true)) {
+        cout << "File " << g_filename << " failed to copy to " << g_copyToFilename << endl;
+    }
+    else {
+        cout << "File " << g_filename << " successfully copied to " << g_copyToFilename << endl;
+    }
 	cout << endl;
 }
 
@@ -294,7 +305,7 @@ void TestFile()
 //
 // (i): Test of ItsTimer.
 //
-void TestStartTimer()
+void TestItsTimerStart()
 {
 	PrintTestHeader("## Test ItsTimer::Start ");
 
@@ -308,7 +319,7 @@ void TestStartTimer()
 //
 // (i): Test of ItsTimer.
 //
-void TestStopTimer()
+void TestItsTimerStop()
 {
 	PrintTestHeader("## Test ItsTimer::Stop ");
 
@@ -323,7 +334,7 @@ void TestStopTimer()
 //
 // (i): Test ItsDateTime
 //
-void TestDateTime()
+void TestItsDateTime()
 {
     PrintTestHeader("## Test ItsDateTime ");
 
@@ -352,7 +363,7 @@ void TestDateTime()
 //
 // (i): Tests ItsID.
 //
-void TestID()
+void TestItsID()
 {
     PrintTestHeader("## Test ItsID ");
 
