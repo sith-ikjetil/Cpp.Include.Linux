@@ -36,11 +36,11 @@ namespace ItSoftware
 		//
 		// using
 		//
+		using std::endl;
+		using std::ends;
 		using std::string;
 		using std::stringstream;
 		using std::vector;
-		using std::endl;
-		using std::ends;
 
 		//
 		// Macros
@@ -195,14 +195,18 @@ namespace ItSoftware
 					ss << sec;
 				}
 
-				if ( bWithMilliseconds ) {
-					if (ms < 10 ) {
+				if (bWithMilliseconds)
+				{
+					if (ms < 10)
+					{
 						ss << ".00" << ms;
 					}
-					else if ( ms < 100 ) {
+					else if (ms < 100)
+					{
 						ss << ".0" << ms;
 					}
-					else {
+					else
+					{
 						ss << "." << ms;
 					}
 				}
@@ -234,14 +238,17 @@ namespace ItSoftware
 		{
 			static string WidthExpand(string source, size_t width, char fill, ItsExpandDirection direction)
 			{
-				if (source.size() == 0) {
+				if (source.size() == 0)
+				{
 					return string("");
 				}
-				if (width <= 0) {
+				if (width <= 0)
+				{
 					return string("");
 				}
 
-				if (source.size() >= width) {
+				if (source.size() >= width)
+				{
 					return source.substr(0, width);
 				}
 
@@ -277,7 +284,8 @@ namespace ItSoftware
 						result << fill;
 					}
 				}
-				else {
+				else
+				{
 					return string("");
 				}
 
@@ -445,7 +453,8 @@ namespace ItSoftware
 		//
 		// (i): Enum for string representation of ToDataSizeString ItsConvert function.
 		//
-		enum class ItsDataSizeStringType {
+		enum class ItsDataSizeStringType
+		{
 			Recommended,
 			IEC
 		};
@@ -487,25 +496,30 @@ namespace ItSoftware
 				}
 
 				vector<string> szSize;
-				if (type == ItsDataSizeStringType::IEC) {
-					szSize = { "Bi", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB", "BB", "GP" };
+				if (type == ItsDataSizeStringType::IEC)
+				{
+					szSize = {"Bi", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB", "BB", "GP"};
 				}
-				else {//(type == ItsDataSizeStringType::Recommended) { // defaults to this notation
-					szSize = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "GP" };
+				else
+				{ //(type == ItsDataSizeStringType::Recommended) { // defaults to this notation
+					szSize = {"B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", "BB", "GP"};
 				}
 
 				size_t tst = (size_t)dSize;
 				ss << tst;
-				if (digits > 0) {
+				if (digits > 0)
+				{
 					double t = dSize - tst;
 					string ws = ItsConvert::ToString<double>(t);
-					if (ws[0] == '0' && t != 0.0) {
+					if (ws[0] == '0' && t != 0.0)
+					{
 						ws += "000";
 					}
-					else {
+					else
+					{
 						ws += ".000";
 					}
-					ss << ws.substr(1, digits+1);
+					ss << ws.substr(1, digits + 1);
 				}
 				ss << " ";
 				ss << ((index > (szSize.size() - 1) || index < 0) ? "?" : szSize[index]);
@@ -514,8 +528,8 @@ namespace ItSoftware
 				return ss.str();
 			}
 
-			template<typename Numeric>
-			static Numeric ToNumber(const string& str)
+			template <typename Numeric>
+			static Numeric ToNumber(const string &str)
 			{
 				if (std::is_same_v<Numeric, float>)
 				{
@@ -537,18 +551,19 @@ namespace ItSoftware
 				{
 					return std::stoll(str);
 				}
-		
+
 				Numeric x = std::stoull(str);
 				return x;
 			}
 
-			static int ToIntFromHex(const string& str)
+			static int ToIntFromHex(const string &str)
 			{
-				char * p;
-    			int n = strtol( str.c_str(), &p, 16 );
-    			if ( *p != 0 ) {
-        			return 0;
-    			}
+				char *p;
+				int n = strtol(str.c_str(), &p, 16);
+				if (*p != 0)
+				{
+					return 0;
+				}
 				return n;
 			}
 
@@ -561,11 +576,11 @@ namespace ItSoftware
 				return string("False");
 			}
 
-			template<typename Numeric>
+			template <typename Numeric>
 			static string ToString(Numeric number)
 			{
 				stringstream ss;
-				if (std::is_same_v<Numeric,float>)
+				if (std::is_same_v<Numeric, float>)
 				{
 					ss << std::setprecision(std::numeric_limits<float>::digits10);
 				}
@@ -605,11 +620,11 @@ namespace ItSoftware
 							iCount++;
 							i = groupSize - 1;
 						}
-						else {
+						else
+						{
 							i = groupSize;
 						}
 					}
-
 				}
 
 				txt = ss.str();
@@ -624,7 +639,7 @@ namespace ItSoftware
 				return retVal;
 			}
 
-			static string ToString(tm& dateTime)
+			static string ToString(tm &dateTime)
 			{
 				stringstream ss;
 				ss << std::setfill('0') << std::setw(4) << (dateTime.tm_year + 1900);
@@ -639,7 +654,7 @@ namespace ItSoftware
 				return tos;
 			}
 
-			template<typename Numeric>
+			template <typename Numeric>
 			static string ToHexString(Numeric number, bool uppercase = true, uint32_t width = 0, char fillChar = '0', bool showBase = false)
 			{
 				stringstream ss;
@@ -662,7 +677,7 @@ namespace ItSoftware
 				return tos;
 			}
 
-			static tm ToTM(const string& dateTime)
+			static tm ToTM(const string &dateTime)
 			{
 				tm t = {0};
 
@@ -676,19 +691,19 @@ namespace ItSoftware
 				return t;
 			}
 
-			static string ToLowerCase(string& text)
+			static string ToLowerCase(string &text)
 			{
 				std::transform(text.begin(), text.end(), text.begin(), tolower);
 				return text;
 			}
 
-			static string ToUpperCase(string& text)
+			static string ToUpperCase(string &text)
 			{
 				std::transform(text.begin(), text.end(), text.begin(), toupper);
 				return text;
 			}
 
-			static bool ToBool(string& flag)
+			static bool ToBool(string &flag)
 			{
 				flag = ItsConvert::ToLowerCase(flag);
 
@@ -711,7 +726,7 @@ namespace ItSoftware
 				return false;
 			}
 
-			static string ToString(vector<uint64_t>& pks)
+			static string ToString(vector<uint64_t> &pks)
 			{
 				stringstream ss;
 				bool bAddSep = false;
@@ -728,7 +743,7 @@ namespace ItSoftware
 				return tos;
 			}
 
-			static vector<uint64_t> ToPK(const string& pks)
+			static vector<uint64_t> ToPK(const string &pks)
 			{
 				stringstream ss;
 				ss.str(string(pks.begin(), pks.end()));
@@ -763,12 +778,12 @@ namespace ItSoftware
 				this->m_tm = timeDate;
 			}
 
-			ItsDateTime(ItsDateTime& dateTime)
+			ItsDateTime(ItsDateTime &dateTime)
 			{
 				this->m_tm = dateTime.m_tm;
 			}
 
-			ItsDateTime(ItsDateTime&& dateTime) noexcept
+			ItsDateTime(ItsDateTime &&dateTime) noexcept
 			{
 				this->m_tm = dateTime.m_tm;
 			}
@@ -781,6 +796,55 @@ namespace ItSoftware
 				::localtime_r(&t, &tm2);
 
 				return ItsDateTime(tm2);
+			}
+
+			bool operator==(const ItsDateTime &other)
+			{
+				if (this->m_tm.tm_year == other.m_tm.tm_year &&
+					this->m_tm.tm_mon == other.m_tm.tm_mon &&
+					this->m_tm.tm_mday == other.m_tm.tm_mday &&
+					this->m_tm.tm_hour == other.m_tm.tm_hour &&
+					this->m_tm.tm_min == other.m_tm.tm_min &&
+					this->m_tm.tm_sec == other.m_tm.tm_sec &&
+					this->m_tm.tm_wday == other.m_tm.tm_wday &&
+					this->m_tm.tm_isdst == other.m_tm.tm_isdst &&
+					this->m_tm.tm_yday == other.m_tm.tm_yday)
+				{
+					return true;
+				}
+				return false;
+			}
+
+			bool operator!=(const ItsDateTime &other)
+			{
+				if (this->m_tm.tm_year == other.m_tm.tm_year &&
+					this->m_tm.tm_mon == other.m_tm.tm_mon &&
+					this->m_tm.tm_mday == other.m_tm.tm_mday &&
+					this->m_tm.tm_hour == other.m_tm.tm_hour &&
+					this->m_tm.tm_min == other.m_tm.tm_min &&
+					this->m_tm.tm_sec == other.m_tm.tm_sec &&
+					this->m_tm.tm_wday == other.m_tm.tm_wday &&
+					this->m_tm.tm_isdst == other.m_tm.tm_isdst &&
+					this->m_tm.tm_yday == other.m_tm.tm_yday)
+				{
+					return false;
+				}
+				return true;
+			}
+
+			const ItsDateTime &operator=(const ItsDateTime &other)
+			{
+				this->m_tm.tm_year = other.m_tm.tm_year;
+				this->m_tm.tm_mon = other.m_tm.tm_mon;
+				this->m_tm.tm_mday = other.m_tm.tm_mday;
+				this->m_tm.tm_hour = other.m_tm.tm_hour;
+				this->m_tm.tm_min = other.m_tm.tm_min;
+				this->m_tm.tm_sec = other.m_tm.tm_sec;
+				this->m_tm.tm_wday = other.m_tm.tm_wday;
+				this->m_tm.tm_isdst = other.m_tm.tm_isdst;
+				this->m_tm.tm_yday = other.m_tm.tm_yday;
+
+				return *this;
 			}
 
 			string ToString()
@@ -848,7 +912,7 @@ namespace ItSoftware
 				string str_yyyy = ItsConvert::ToString(y);
 				string str_yy = ItsString::Right(str_yyyy, 2);
 
-				// hour			
+				// hour
 				int h = this->GetHour();
 				string str_h = ItsConvert::ToString(h);
 				string str_hh;
@@ -923,7 +987,7 @@ namespace ItSoftware
 				return option;
 			}
 
-			const tm& TM()
+			const tm &TM()
 			{
 				return this->m_tm;
 			}
@@ -1066,7 +1130,7 @@ namespace ItSoftware
 				return this->m_tm.tm_sec;
 			}
 
-			ItsDateTime& operator=(const tm& timeDate)
+			ItsDateTime &operator=(const tm &timeDate)
 			{
 				this->m_tm = timeDate;
 				return *this;
@@ -1078,17 +1142,13 @@ namespace ItSoftware
 		//
 		// (i): A random number wrapper.
 		//
-		template<typename Numeric, typename Generator = std::mt19937>
+		template <typename Numeric, typename Generator = std::mt19937>
 		Numeric ItsRandom(Numeric from, Numeric to)
 		{
 			thread_local static Generator gen(std::random_device{}());
 
-			using dist_type = typename std::conditional
-			<
-				std::is_integral<Numeric>::value
-				, std::uniform_int_distribution<Numeric>
-				, std::uniform_real_distribution<Numeric>
-			>::type;
+			using dist_type = typename std::conditional<
+				std::is_integral<Numeric>::value, std::uniform_int_distribution<Numeric>, std::uniform_real_distribution<Numeric>>::type;
 
 			thread_local static dist_type dist;
 
@@ -1117,7 +1177,7 @@ namespace ItSoftware
 		struct ItsLogItem
 		{
 			ItsLogType Type;
-			string	Description;
+			string Description;
 			tm When;
 		};
 
@@ -1130,6 +1190,7 @@ namespace ItSoftware
 		{
 		private:
 			vector<ItsLogItem> m_items;
+
 		public:
 			void LogInformation(string description)
 			{
@@ -1181,12 +1242,12 @@ namespace ItSoftware
 				this->m_items.push_back(item);
 			}
 
-			const vector<ItsLogItem>& GetItems()
+			const vector<ItsLogItem> &GetItems()
 			{
 				return this->m_items;
 			}
 
-			size_t Count() 
+			size_t Count()
 			{
 				return this->m_items.size();
 			}
@@ -1226,7 +1287,8 @@ namespace ItSoftware
 			string ToFriendlyString()
 			{
 				stringstream ss;
-				for (auto i : this->m_items) {
+				for (auto i : this->m_items)
+				{
 					ss << std::setiosflags(std::ios::left) << std::setw(12) << this->LogTypeToString(i.Type) << ItsDateTime(i.When).ToString() << " " << i.Description << endl;
 				}
 				ss << ends;
@@ -1242,7 +1304,8 @@ namespace ItSoftware
 				string s1(";");
 				string rep_nl(" ");
 				string rep_s(",");
-				for (auto i : this->m_items) {
+				for (auto i : this->m_items)
+				{
 					auto description = ItsString::Replace(i.Description, nl1, rep_nl);
 					description = ItsString::Replace(description, nl2, rep_nl);
 					description = ItsString::Replace(description, s1, rep_s);
@@ -1268,7 +1331,7 @@ namespace ItSoftware
 
 		//
 		// struct: ItsID
-		// 
+		//
 		// (i): Generates unique ID's.
 		//
 		struct ItsID
