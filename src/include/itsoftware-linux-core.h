@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <iostream>
 #include <vector>
+#include <uuid/uuid.h>
 #include "itsoftware-linux.h"
 
 //
@@ -165,6 +166,54 @@ namespace ItSoftware
                 		return 0;
                 	}
                 	return (this->m_end - this->m_start);
+                }
+            };
+
+            //
+            // struct: ItsGuidFormat
+            //
+            // (i): Container for premade Guid format strings.
+            //
+            struct ItsGuidFormat {
+                const string RegistryFormat{ "{%08lX-%04X-%04x-%02X%02X-%02X%02X%02X%02X%02X%02X}" };
+                const string RegistryFormatStripped{ "%08lX-%04X-%04x-%02X%02X-%02X%02X%02X%02X%02X%02X" };
+                const string ConstFormat{ "{ 0x%lx, 0x%x, 0x%x, { 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x } }" };
+                const string CompactFormat{ "%08lX%04X%04x%02X%02X%02X%02X%02X%02X%02X%02X" };
+                const string PrefixedCompactFormat{ "GUID%08lX%04X%04x%02X%02X%02X%02X%02X%02X%02X%02X" };
+            };
+
+            //
+            // struct: ItsGuid
+            //
+            // (i): Wrapper for Guid generation and rendering.
+            //
+            struct ItsGuid
+            {
+            public:
+                static string CreateGuid()
+                {
+                    uuid_t guid{0};
+                    uuid_generate(guid);
+                    return ItsGuid::ToString(guid);
+                }
+                static bool CreateGuid(uuid_t pGuid)
+                {
+                    uuid_generate_random(pGuid);
+                    return true;
+                }
+                static string ToString(uuid_t guid) {
+                    ItsGuidFormat fmt;
+                    return ItsGuid::ToString(guid, fmt.RegistryFormat);
+                }
+                static string ToString(uuid_t guid, string format) {
+                    char szBuffer[100];
+                    memset(szBuffer, 0, 100);
+
+                    sprintf(szBuffer, format.c_str(),
+                        static_cast<uint32_t>(guid[0]), static_cast<uint16_t>(guid[4]), static_cast<uint16_t>(guid[6]),
+                        guid[8], guid[9], guid[10], guid[11], guid[12], guid[13], guid[14], guid[15]);
+
+                    return string(szBuffer);
                 }
             };
 

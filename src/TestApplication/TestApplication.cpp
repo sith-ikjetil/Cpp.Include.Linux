@@ -34,6 +34,9 @@ using ItSoftware::Linux::ItsID;
 using ItSoftware::Linux::ItsCreateIDOptions;
 using ItSoftware::Linux::Core::ItsTimer;
 using ItSoftware::Linux::Core::ItsFile;
+using ItSoftware::Linux::Core::ItsGuid;
+using ItSoftware::Linux::Core::ItsGuidFormat;
+
 
 //
 // Function Prototypes
@@ -48,6 +51,7 @@ void TestItsTimerStop();
 void TestItsFile();
 void TestItsDateTime();
 void TestItsID();
+void TestItsGuid();
 void ExitFn();
 void PrintTestHeader(string txt);
 
@@ -89,6 +93,7 @@ int main(int argc, char* argv[])
 	TestItsFile();
     TestItsDateTime();
     TestItsID();
+    TestItsGuid();
 	TestItsTimerStop();
 
     return EXIT_SUCCESS;
@@ -463,6 +468,43 @@ void TestItsID()
     cout << R"(> ")" << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, false) << R"(")" << endl;
     cout << "ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, true)" << endl;
     cout << R"(> ")" << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, true) << R"(")" << endl;
+
+    cout << endl;
+}
+
+//
+// Function: TestItsGuid
+//
+// (i): Tests ItsGuid.
+//
+void TestItsGuid()
+{
+    PrintTestHeader("## Test ItsGuid ");
+
+    cout << "ItsGuid::CreateGuid()" << endl;
+    cout << R"(> ")" << ItsGuid::CreateGuid() << R"(")" << endl;
+    
+    uuid_t guid{ 0 };
+    cout << "ItsGuid::CreateGuid(guid)" << endl;
+    if (ItsGuid::CreateGuid(guid))
+    {
+        cout << "> Success" << endl;
+        
+        ItsGuidFormat fmt;
+        cout << "ItsGuid::ToString(guid,fmt.RegistryFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.RegistryFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid, fmt.RegistryFormatStripped)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.RegistryFormatStripped) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,fmt.ConstFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.ConstFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,fmt.CompactFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.CompactFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,fmt.PrefixedCompactFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.PrefixedCompactFormat) << R"(")" << endl;
+    }
+    else {
+        cout << L"> FAILED: " << strerror(errno) << endl;
+    }
 
     cout << endl;
 }

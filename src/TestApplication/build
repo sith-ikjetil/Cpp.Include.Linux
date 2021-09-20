@@ -1,1 +1,1 @@
-g++ TestApplication.cpp --std=c++17
+g++ TestApplication.cpp --std=c++17 -luuid
