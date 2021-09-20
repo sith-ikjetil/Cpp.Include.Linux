@@ -126,36 +126,66 @@ void TestItsConvert()
     PrintTestHeader("## Test ItsConvert ");
 
     PrintTestSubHeader("ToNumber");
-    cout << R"(ItsConvert::ToNumber<int>("-1234") = )" << ItsConvert::ToNumber<int>("-1234") << endl;
-    cout << R"(ItsConvert::ToNumber<unsigned int>("1234") = )" << ItsConvert::ToNumber<unsigned int>("1234") << endl;
-    cout << R"(ItsConvert::ToNumber<long>("-1234") = )" << ItsConvert::ToNumber<long>("-1234") << endl;
-    cout << R"(ItsConvert::ToNumber<unsigned long>("123456789") = )" << ItsConvert::ToNumber<unsigned long>("12346789") << endl;
-    cout << R"(ItsConvert::ToNumber<float>("-12.34") = )" << ItsConvert::ToNumber<float>("-12.34") << endl;
-    cout << R"(ItsConvert::ToNumber<double>("1.234") = )" << ItsConvert::ToNumber<double>("1.234") << endl;
-    cout << R"(ItsConvert::ToNumber<short>("1234") = )" << ItsConvert::ToNumber<short>("1234") << endl;
-    cout << R"(ItsConvert::ToNumber<unsigned short>("40001") = )" << ItsConvert::ToNumber<unsigned short>("40001") << endl;
+    cout << R"(ItsConvert::ToNumber<int>("-1234"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<int>("-1234") << endl;
+    cout << R"(ItsConvert::ToNumber<unsigned int>("1234"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<unsigned int>("1234") << endl;
+    cout << R"(ItsConvert::ToNumber<long>("-1234"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<long>("-1234") << endl;
+    cout << R"(ItsConvert::ToNumber<unsigned long>("123456789"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<unsigned long>("12346789") << endl;
+    cout << R"(ItsConvert::ToNumber<long long>("12345678900"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<long long>("12345678900") << endl;
+    cout << R"(ItsConvert::ToNumber<float>("-12.34"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<float>("-12.34") << endl;
+    cout << R"(ItsConvert::ToNumber<double>("1.234"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<double>("1.234") << endl;
+    cout << R"(ItsConvert::ToNumber<short>("1234"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<short>("1234") << endl;
+    cout << R"(ItsConvert::ToNumber<unsigned short>("40001"))" << endl;
+    cout << "> " << ItsConvert::ToNumber<unsigned short>("40001") << endl;
 
     PrintTestSubHeader("ToString");
-    cout << R"(ItsConvert::ToString<int>(-1234) = ")" << ItsConvert::ToString<int>(-1234) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<unsigned int>(1234) = ")" << ItsConvert::ToString<unsigned int>(1234) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<long>(-1234) = ")" << ItsConvert::ToString<long>(-1234) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<unsigned long>(123456789) = ")" << ItsConvert::ToString<unsigned long>(12346789) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<float>(-12.34) = ")" << ItsConvert::ToString<float>(-12.34f) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<double>(1.234) = ")" << ItsConvert::ToString<double>(1.234) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<short>(1234) = ")" << ItsConvert::ToString<short>(1234) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<unsigned short>(40001) = ")" << ItsConvert::ToString<unsigned short>(40001) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<int>(-1234))" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<int>(-1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<unsigned int>(1234))" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<unsigned int>(1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<long>(-1234))" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<long>(-1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<unsigned long>(123456789))" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<unsigned long>(12346789) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<long long>(12345678900))" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<long long>(12345678900) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<float>(-12.34))" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<float>(-12.34f) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<double>(1.234))" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<double>(1.234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<short>(1234)" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<short>(1234) << R"(")" << endl;
+    cout << R"(ItsConvert::ToString<unsigned short>(40001)" << endl;
+    cout << R"(> ")" << ItsConvert::ToString<unsigned short>(40001) << R"(")" << endl;
     
     PrintTestSubHeader("ToStringFormatted");
-    cout << R"(ItsConvert::ToStringFormatted(256810246) = ")" << ItsConvert::ToStringFormatted(256810246) << R"(")" << endl;
-	cout << R"(ItsConvert::ToStringFormatted(256810246, ' ') = ")" << ItsConvert::ToStringFormatted(256810246, ' ') << R"(")" << endl;
-	
+    cout << R"(ItsConvert::ToStringFormatted(256810246))" << endl;
+    cout << R"(> ")" << ItsConvert::ToStringFormatted(256810246) << R"(")" << endl;
+    cout << R"(ItsConvert::ToStringFormatted(256810246, L' '))" << endl;
+    cout << R"(> ")" << ItsConvert::ToStringFormatted(256810246, L' ') << R"(")" << endl;
+    
     PrintTestSubHeader("ToDataSizeString");
-    cout << R"(ItsConvert::ToDataSizeString(0, 0) = ")" << ItsConvert::ToDataSizeString(0, 0) << R"(")" << endl;
-    cout << R"(ItsConvert::ToDataSizeString(1024, 2) = ")" << ItsConvert::ToDataSizeString(1024, 2) << R"(")" << endl;
-	cout << R"(ItsConvert::ToDataSizeString(200100400, 0) = ")" << ItsConvert::ToDataSizeString(200100400, 0) << R"(")" << endl;
-	cout << R"(ItsConvert::ToDataSizeString(200100400, 2) = ")" << ItsConvert::ToDataSizeString(200100400, 2) << R"(")" << endl;
-	cout << R"(ItsConvert::ToDataSizeString(9807804606, 3) = ")" << ItsConvert::ToDataSizeString(9807804606, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
-    cout << R"(ItsConvert::ToDataSizeString(1000, 3) = ")" << ItsConvert::ToDataSizeString(1000, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(1024, 2))" << endl;
+    cout << R"(> ")" << ItsConvert::ToDataSizeString(1024, 2) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(200100400, 0))" << endl;
+    cout << R"(> ")" << ItsConvert::ToDataSizeString(200100400, 0) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(200100400, 2))" << endl;
+    cout << R"(> ")" << ItsConvert::ToDataSizeString(200100400, 2) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(9807804606, 3))" << endl;
+    cout << R"(> ")" << ItsConvert::ToDataSizeString(9807804606, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(1000, 3))" << endl;
+    cout << R"(> ")" << ItsConvert::ToDataSizeString(1000, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(size_t max, 2))" << endl;
+    cout << R"(> ")" << ItsConvert::ToDataSizeString(SIZE_MAX, 2) << R"(")" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(size_t max, 2))" << endl;
+    cout << R"(> ")" << ItsConvert::ToDataSizeString(SIZE_MAX, 2, ItsDataSizeStringType::IEC) << R"(")" << endl;
 
     cout << endl;
 }
@@ -169,12 +199,18 @@ void TestItsRandom()
 {
     PrintTestHeader("## Test ItsRandom ");
 
-    cout << "ItsRandom<long>(10'000, 1'000'000) = " << ItsRandom<long>(10'000, 1'000'000) << endl;
-    cout << "ItsRandom<long>(10'000, 1'000'000) = " << ItsRandom<long>(10'000, 1'000'000) << endl;
-    cout << "ItsRandom<float>(1, 10) = " << ItsRandom<float>(1, 10) << endl;
-    cout << "ItsRandom<float>(1, 10) = " << ItsRandom<float>(1, 10) << endl;
-    cout << "ItsRandom<double>(1, 2) = " << ItsRandom<double>(1, 2) << endl;
-    cout << "ItsRandom<double>(1, 2) = " << ItsRandom<double>(1, 2) << endl;
+    cout << "ItsRandom<long>(10'000, 1'000'000)" << endl;
+    cout << "> " << ItsRandom<long>(10'000, 1'000'000) << endl;
+    cout << "ItsRandom<long>(10'000, 1'000'000)" << endl;
+    cout << "> " << ItsRandom<long>(10'000, 1'000'000) << endl;
+    cout << "ItsRandom<float>(1, 10)" << endl;
+    cout << "> " << ItsRandom<float>(1, 10) << endl;
+    cout << "ItsRandom<float>(1, 10)" << endl;
+    cout << "> " << ItsRandom<float>(1, 10) << endl;
+    cout << "ItsRandom<double>(1, 2)" << endl;
+    cout << "> " << ItsRandom<double>(1, 2) << endl;
+    cout << "ItsRandom<double>(1, 2)" << endl;
+    cout << "> " << ItsRandom<double>(1, 2) << endl;
 
     cout << endl;
 }
@@ -188,9 +224,17 @@ void TestItsTime()
 {
     PrintTestHeader("## Test ItsTime ");
 
-    cout << "ItsTime::RenderMsToFullString(92481379, false)" << " = " << ItsTime::RenderMsToFullString(92481379, false) << endl;
-    cout << "ItsTime::RenderMsToFullString(92481379, true)" << " = " << ItsTime::RenderMsToFullString(92481379, true) << endl;
-    cout << R"(ItsDateTime::Now().ToString("s"))" << " = " << ItsDateTime::Now().ToString("s") << endl;
+    PrintTestSubHeader("RenderMsToFullString");
+    cout << "ItsTime::RenderMsToFullString(92481379, false)" << endl;
+    cout << R"(> ")" << ItsTime::RenderMsToFullString(92481379, false) << R"(")" << endl;
+    cout << "ItsTime::RenderMsToFullString(92481379, true)" << endl;
+    cout << R"(> ")" << ItsTime::RenderMsToFullString(92481379, true) << R"(")" << endl;
+    
+    PrintTestSubHeader("Now + ToString");
+    cout << "ItsDateTime::Now().ToString()" << endl;
+    cout << R"(> ")" << ItsDateTime::Now().ToString() << R"(")" << endl;
+    cout << R"(ItsDateTime.Now().ToString("s"))" << endl;
+    cout << R"(> ")" << ItsDateTime::Now().ToString("s") << R"(")" << endl;
 
     cout << endl;
 }
@@ -204,36 +248,34 @@ void TestItsString()
 {
     PrintTestHeader("## Test ItsString ");
 
-    string test("Ab12Cd");
-    string testTrim("  Ab12Cd  ");
-    string testReplace("__ ABCDEF __");
-    string testSplit("A;BC;DEF;G");
-    cout << R"(test = ")" << test << R"(")" << endl;
-    cout << R"(testTrim = ")" << testTrim << R"(")" << endl;
-    cout << R"(testReplace = ")" << testReplace << R"(")" << endl;
-    cout << R"(testSplit = ")" << testSplit << R"(")" << endl;
-    cout << R"(ItsString::Left(test,4) = ")" << ItsString::Left(test, 4) << R"(")" << endl;
-    cout << R"(ItsString::Right(test,4) = ")" << ItsString::Right(test, 4) << R"(")" << endl;
-    cout << R"(ItsString::Mid(test,2,2) = ")" << ItsString::Mid(test, 2, 2) << R"(")" << endl;
-    cout << R"(ItsString::ToLowerCase(test) = ")" << ItsString::ToLowerCase(test) << R"(")" << endl;
-    cout << R"(ItsString::ToUpperCase(test) = ")" << ItsString::ToUpperCase(test) << R"(")" << endl;
-    cout << R"(ItsString::Trim(testTrim) = ")" << ItsString::Trim(testTrim) << R"(")" << endl;
-    cout << R"(ItsString::Replace(testReplace) = ")" << ItsString::Replace(testReplace, "_", "#") << R"(")" << endl;
-	
-    auto vs = ItsString::Split(testSplit, ";");
+    cout << R"(ItsString::Left("Ab12Cd",4))" << endl;
+    cout << R"(> ")" << ItsString::Left("Ab12Cd", 4) << R"(")" << endl;
+    cout << R"(ItsString::Right("Ab12Cd",4))" << endl;
+    cout << R"(> ")" << ItsString::Right("Ab12Cd", 4) << R"(")" << endl;
+    cout << R"(ItsString::Mid("Ab12Cd",2,2))" << endl;
+    cout << R"(> ")" << ItsString::Mid("Ab12Cd", 2, 2) << R"(")" << endl;
+    cout << R"(ItsString::ToLowerCase("Ab12Cd"))" << endl;
+    cout << R"(> ")" << ItsString::ToLowerCase("Ab12Cd") << R"(")" << endl;
+    cout << R"(ItsString::ToUpperCase("Ab12Cd"))" << endl;
+    cout << R"(> ")" << ItsString::ToUpperCase("Ab12Cd") << R"(")" << endl;
+    cout << R"(ItsString::Trim("  Ab12Cd  "))" << endl;
+    cout << R"(> ")" << ItsString::Trim("  Ab12Cd  ") << R"(")" << endl;
+    cout << R"(ItsString::Replace("__ ABCDEF __"))" << endl;
+    cout << R"(> ")" << ItsString::Replace("__ ABCDEF __", "__", "##") << R"(")" << endl;
+    cout << R"(ItsString::Split("A;BC;DEF;G",";"))" << endl;
+    auto vs = ItsString::Split("A;BC;DEF;G", ";");
     stringstream ss;
-    for (auto s : vs)
-    {
-        ss << s << " ";
+    for (auto s : vs) {
+        ss << s << L" ";
     }
     ss << ends;
-    cout << R"(ItsString::Split(testSplit,";") = )" << ss.str() << endl;
-
-    string name("Kjetil");
-    cout << "ItsString::WidthExpand (ItsExpandDirection:Left,Middle,Right) Below" << endl;
-    cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Left) << endl;
-    cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Middle) << endl;
-    cout << ItsString::WidthExpand(name, 30, '_', ItsExpandDirection::Right) << endl;
+    cout << R"(> ")" << ss.str() << endl;
+    cout << R"(ItsString::WidthExpand ("Kjetil", 30, L'_', ItsExpandDirection:Left))" << endl;
+    cout << R"(> ")" << ItsString::WidthExpand("Kjetil", 30, L'_', ItsExpandDirection::Left) << R"(")" << endl;
+    cout << R"(ItsString::WidthExpand ("Kjetil", 30, L'_', ItsExpandDirection:Middle))" << endl;
+    cout << R"(> ")" << ItsString::WidthExpand("Kjetil", 30, L'_', ItsExpandDirection::Middle) << R"(")" << endl;
+    cout << R"(ItsString::WidthExpand ("Kjetil", 30, L'_', ItsExpandDirection:Right))" << endl;
+    cout << R"(> ")" << ItsString::WidthExpand("Kjetil", 30, L'_', ItsExpandDirection::Right) << R"(")" << endl;
 
     cout << endl;
 }
@@ -275,58 +317,64 @@ void TestItsFile()
 	ItsFile file;
 	if (!file.OpenOrCreate(g_filename,"rwt",ItsFile::CreateMode("rw","rw","rw")))
 	{
-		cout << "Error creating: " << g_filename << endl;
+		cout << "> FAILED: " << strerror(errno) << endl;
 		cout << endl;
 		return;
 	}
+    cout << "> Success" << endl;
 
 	char text[] = "Test Line 1\nTest Line 2\n";
 	size_t written(0);
-	if ( !file.Write((void*)text,strlen(text), &written) )
+	cout << "file.Write((void*)text,strlen(text), &written)" << endl;
+    if ( !file.Write((void*)text,strlen(text), &written) )
 	{
-		cout << "Error writing: " << g_filename << endl;
+		cout << "> FAILED: " << strerror(errno) << endl;
 		cout << endl;
 		return;
 	}
-    else {
-        cout << written << " bytes written to file " << g_filename << " successfully" << endl;
-    }
+    cout << "> Success. " << written << " bytes written to " << g_filename << endl;
+    
 
     string str;
+    cout << "file.ReadAllText(str)" << endl;
     if (!file.ReadAllText(str)) {
-        cout << "File " << g_filename << " failed to ReadAllText" << endl;
+        cout << "> FAILED: " << strerror(errno) << endl;
+        cout << endl;
+        return;
     }
-    else {
-        cout << "Successfully read all text from file " << g_filename << ": " << endl << str << endl;
-    }
+    cout << "> Success. Read all text from file " << g_filename << endl;
+    
 
+    cout << "file.Close()" << endl;
     if (!file.Close() ) {
-        cout << "File " << g_filename << " failed to close" << endl;
+        cout << "> FAILED: " << strerror(errno) << endl;;
     }
-    else {
-	    cout << "File " << g_filename << " closed successfully" << endl;
-    }
+    cout << "> Success" << endl;
 
+
+    cout << "ItsFile::Copy(g_filename, g_copyToFilename, true)" << endl;
     if (!ItsFile::Copy(g_filename, g_copyToFilename, true)) {
-        cout << "File " << g_filename << " failed to copy to " << g_copyToFilename << endl;
+        cout << "> FAILED: " << strerror(errno) << endl;
+        cout << endl;
+        return;
     }
-    else {
-        cout << "File " << g_filename << " successfully copied to " << g_copyToFilename << endl;
-    }
-
+    cout << "> Success. File " << g_filename << " successfully copied to " << g_copyToFilename << endl;
+    
+    cout << "ItsFile::Exists(g_copyToFilename)" << endl;
     if (!ItsFile::Exists(g_copyToFilename)) {
-        cout << "File " << g_copyToFilename << " does not exist" << endl;
+        cout << "> File " << g_copyToFilename << " does not exist" << endl;
     }
     else {
-        cout << "File " << g_copyToFilename << " exists" << endl;
+        cout << "> File " << g_copyToFilename << " exists" << endl;
     }
 
+    cout << "ItsFile::Delete(g_copyToFilename)" << endl;
     if (!ItsFile::Delete(g_copyToFilename)) {
-        cout << "File " << g_copyToFilename << " failed to be deleted" << endl;
+        cout << "> FAILED: " << strerror(errno) << endl;
+        cout << endl;
+        return;
     }
-    else {
-        cout << "File " << g_copyToFilename << " successfully deleted" << endl;
-    }
+    cout << "> Success. File " << g_copyToFilename << " deleted" << endl;
 
 	cout << endl;
 }
@@ -399,14 +447,22 @@ void TestItsID()
 {
     PrintTestHeader("## Test ItsID ");
 
-    cout << "ID (12): " << ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false) << endl;
-    cout << "ID (10): " << ItsID::CreateID(10, ItsCreateIDOptions::LowerAndUpperCase, true) << endl;
-    cout << "ID (8) : " << ItsID::CreateID(8, ItsCreateIDOptions::UpperCase, false) << endl;
-    cout << "ID (6) : " << ItsID::CreateID(6, ItsCreateIDOptions::UpperCase, true) << endl;
-    cout << "ID (14): " << ItsID::CreateID(14, ItsCreateIDOptions::LowerCase, false) << endl;
-    cout << "ID (16): " << ItsID::CreateID(16, ItsCreateIDOptions::LowerCase, true) << endl;
-    cout << "ID (64): " << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, false) << endl;
-    cout << "ID (64): " << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, true) << endl;
+    cout << "ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false) << R"(")" << endl;
+    cout << "ItsID::CreateID(10, ItsCreateIDOptions::LowerAndUpperCase, true)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(10, ItsCreateIDOptions::LowerAndUpperCase, true) << R"(")" << endl;
+    cout << "ItsID::CreateID(8, ItsCreateIDOptions::UpperCase, false)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(8, ItsCreateIDOptions::UpperCase, false) << R"(")" << endl;
+    cout << "ItsID::CreateID(6, ItsCreateIDOptions::UpperCase, true)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(6, ItsCreateIDOptions::UpperCase, true) << R"(")" << endl;
+    cout << "ItsID::CreateID(14, ItsCreateIDOptions::LowerCase, false)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(14, ItsCreateIDOptions::LowerCase, false) << R"(")" << endl;
+    cout << "ItsID::CreateID(16, ItsCreateIDOptions::LowerCase, true)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(16, ItsCreateIDOptions::LowerCase, true) << R"(")" << endl;
+    cout << "ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, false)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, false) << R"(")" << endl;
+    cout << "ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, true)" << endl;
+    cout << R"(> ")" << ItsID::CreateID(64, ItsCreateIDOptions::LowerAndUpperCase, true) << R"(")" << endl;
 
     cout << endl;
 }
