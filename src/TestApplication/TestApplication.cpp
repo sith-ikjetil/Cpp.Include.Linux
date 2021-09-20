@@ -271,7 +271,7 @@ void TestItsString()
     auto vs = ItsString::Split("A;BC;DEF;G", ";");
     stringstream ss;
     for (auto s : vs) {
-        ss << s << L" ";
+        ss << s << " ";
     }
     ss << ends;
     cout << R"(> ")" << ss.str() << endl;
@@ -503,7 +503,7 @@ void TestItsGuid()
         cout << R"(> ")" << ItsGuid::ToString(guid, fmt.PrefixedCompactFormat) << R"(")" << endl;
     }
     else {
-        cout << L"> FAILED: " << strerror(errno) << endl;
+        cout << "> FAILED: " << strerror(errno) << endl;
     }
 
     cout << endl;
