@@ -183,13 +183,13 @@ void TestItsConvert()
     cout << R"(> ")" << ItsConvert::ToDataSizeString(200100400, 0) << R"(")" << endl;
     cout << R"(ItsConvert::ToDataSizeString(200100400, 2))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(200100400, 2) << R"(")" << endl;
-    cout << R"(ItsConvert::ToDataSizeString(9807804606, 3))" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(9807804606, 3, ItsDataSizeStringType::IEC))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(9807804606, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
-    cout << R"(ItsConvert::ToDataSizeString(1000, 3))" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(1000, 3, ItsDataSizeStringType::IEC))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(1000, 3, ItsDataSizeStringType::IEC) << R"(")" << endl;
     cout << R"(ItsConvert::ToDataSizeString(size_t max, 2))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(SIZE_MAX, 2) << R"(")" << endl;
-    cout << R"(ItsConvert::ToDataSizeString(size_t max, 2))" << endl;
+    cout << R"(ItsConvert::ToDataSizeString(size_t max, 2, ItsDataSizeStringType::IEC))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(SIZE_MAX, 2, ItsDataSizeStringType::IEC) << R"(")" << endl;
 
     cout << endl;
