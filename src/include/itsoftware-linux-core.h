@@ -5,6 +5,7 @@
 //: Author       : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
 //: Version      : 1.0.0.0
 //: Descriptions : Implementation of Cpp.Include.Linux.
+//: Uses         : libuuid.a.
 #pragma once
 //
 // #include
