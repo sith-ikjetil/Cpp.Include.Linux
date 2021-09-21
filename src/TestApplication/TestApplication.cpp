@@ -270,11 +270,20 @@ void TestItsString()
     cout << R"(ItsString::Split("A;BC;DEF;G",";"))" << endl;
     auto vs = ItsString::Split("A;BC;DEF;G", ";");
     stringstream ss;
+    ss << "{";
+    bool bFirst{true};
     for (auto s : vs) {
-        ss << s << " ";
+        if ( !bFirst ) {
+            ss << ",";
+        }
+        ss << R"(")" << s << R"(")";
+        if ( bFirst ) {
+            bFirst = false;
+        }
     }
+    ss << "}";
     ss << ends;
-    cout << R"(> ")" << ss.str() << endl;
+    cout << "> " << ss.str() << endl;
     cout << R"(ItsString::WidthExpand ("Kjetil", 30, L'_', ItsExpandDirection:Left))" << endl;
     cout << R"(> ")" << ItsString::WidthExpand("Kjetil", 30, L'_', ItsExpandDirection::Left) << R"(")" << endl;
     cout << R"(ItsString::WidthExpand ("Kjetil", 30, L'_', ItsExpandDirection:Middle))" << endl;
