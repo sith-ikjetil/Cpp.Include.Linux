@@ -211,7 +211,7 @@ namespace ItSoftware
                     memset(szBuffer, 0, 100);
 
                     sprintf(szBuffer, format.c_str(),
-                        static_cast<uint32_t>(guid[0]), static_cast<uint16_t>(guid[4]), static_cast<uint16_t>(guid[6]),
+                        *reinterpret_cast<uint32_t*>(&guid[0]), *reinterpret_cast<uint16_t*>(&guid[4]), *reinterpret_cast<uint16_t*>(&guid[6]),
                         guid[8], guid[9], guid[10], guid[11], guid[12], guid[13], guid[14], guid[15]);
 
                     return string(szBuffer);
