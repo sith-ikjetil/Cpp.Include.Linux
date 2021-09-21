@@ -847,6 +847,10 @@ namespace ItSoftware
 				return *this;
 			}
 
+			explicit operator string() {
+				return this->ToString("s");
+			}
+
 			string ToString()
 			{
 				stringstream ss;
