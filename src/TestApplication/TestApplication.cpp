@@ -36,6 +36,7 @@ using ItSoftware::Linux::Core::ItsTimer;
 using ItSoftware::Linux::Core::ItsFile;
 using ItSoftware::Linux::Core::ItsGuid;
 using ItSoftware::Linux::Core::ItsGuidFormat;
+using ItSoftware::Linux::Core::ItsPath;
 
 
 //
@@ -52,6 +53,7 @@ void TestItsFile();
 void TestItsDateTime();
 void TestItsID();
 void TestItsGuid();
+void TestItsPath();
 void ExitFn();
 void PrintTestHeader(string txt);
 
@@ -61,6 +63,9 @@ void PrintTestHeader(string txt);
 ItsTimer g_timer;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
+string g_path1("/home");
+string g_path2("kjetilso/test.txt");
+string g_invalidPath("home\0/kjetilso");
 
 //
 // Function: ExitFn
@@ -94,6 +99,7 @@ int main(int argc, char* argv[])
     TestItsDateTime();
     TestItsID();
     TestItsGuid();
+    TestItsPath();
 	TestItsTimerStop();
 
     return EXIT_SUCCESS;
@@ -514,6 +520,44 @@ void TestItsGuid()
     else {
         cout << "> FAILED: " << strerror(errno) << endl;
     }
+
+    cout << endl;
+}
+
+//
+// Function: TestItsPath
+//
+// (i): Test ItsPath
+//
+void TestItsPath()
+{
+    PrintTestHeader("## Test ItsPath ");
+
+    string path = ItsPath::Combine(g_path1, g_path2);
+    cout << R"(ItsPath::Exists(path))" << endl;
+    if (ItsPath::Exists(path)) {
+        cout << "> Path: " << path << " exists" << endl;
+    }
+    else {
+        cout << "> Path: " << path << " does not exist" << endl;
+    }
+
+    cout << R"(ItsPath::GetDirectory(path))" << endl; 
+    cout << R"(> ")" << ItsPath::GetDirectory(path) << R"(")" << endl;
+    cout << R"(ItsPath::GetFilename(path))" << endl; 
+    cout << R"(> ")" << ItsPath::GetFilename(path) << R"(")" << endl;
+    cout << R"(ItsPath::GetExtension(path))" << endl; 
+    cout << R"(> ")" << ItsPath::GetExtension(path) << R"(")" << endl;
+    cout << R"(ItsPath::HasExtension(path, ".txt"))" << endl; 
+    cout << R"(> )" << ((ItsPath::HasExtension(path, ".txt")) ? "true" : "false") << endl;
+    cout << R"(ItsPath::HasExtension(path, ".js"))" << endl; 
+    cout << R"(> )" << ((ItsPath::HasExtension(path, ".js")) ? "true" : "false") << endl;
+    cout << R"(ItsPath::ChangeExtension(path,".js"))" << endl; 
+    cout << R"(> ")" << ItsPath::ChangeExtension(path, ".js") << endl;
+    cout << R"(ItsPath::IsPathValid(path))" << endl; 
+    cout << R"(> )" << ((ItsPath::IsPathValid(path)) ? "true" : "false") << endl;
+    cout << R"(ItsPath::IsPathValid(g_invalidPath))" << endl; 
+    cout << R"(> )" << ((ItsPath::IsPathValid(g_invalidPath)) ? "true" : "false") << endl;
 
     cout << endl;
 }
