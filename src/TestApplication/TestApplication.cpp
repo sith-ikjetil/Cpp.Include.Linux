@@ -36,7 +36,7 @@ using ItSoftware::Linux::Core::ItsFile;
 using ItSoftware::Linux::Core::ItsGuid;
 using ItSoftware::Linux::Core::ItsGuidFormat;
 using ItSoftware::Linux::Core::ItsPath;
-
+using ItSoftware::Linux::Core::ItsDirectory;
 
 //
 // Function Prototypes
@@ -53,6 +53,7 @@ void TestItsDateTime();
 void TestItsID();
 void TestItsGuid();
 void TestItsPath();
+void TestItsDirectory();
 void ExitFn();
 void PrintTestHeader(string txt);
 
@@ -65,6 +66,8 @@ char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 string g_path1("/home");
 string g_path2("/kjetilso/test.txt");
 string g_invalidPath("home\0/kjetilso");
+string g_directoryRoot("/home/kjetilso");
+string g_creatDir("/home/kjetilso/testdir");
 
 //
 // Function: ExitFn
@@ -99,6 +102,7 @@ int main(int argc, char* argv[])
     TestItsID();
     TestItsGuid();
     TestItsPath();
+    TestItsDirectory();
 	TestItsTimerStop();
 
     return EXIT_SUCCESS;
@@ -558,6 +562,58 @@ void TestItsPath()
     cout << R"(> )" << ((ItsPath::IsPathValid(path)) ? "true" : "false") << endl;
     cout << R"(ItsPath::IsPathValid(g_invalidPath))" << endl; 
     cout << R"(> )" << ((ItsPath::IsPathValid(g_invalidPath)) ? "true" : "false") << endl;
+
+    cout << endl;
+}
+
+//
+// Function: TestItsDirectory
+//
+// (i): Tests ItsDirectory.
+//
+void TestItsDirectory()
+{
+    PrintTestHeader("## Test ItsDirectory ");
+
+    cout << R"(ItsDirectory::GetDirectories(g_directoryRoot))" << endl;
+    auto result = ItsDirectory::GetDirectories(g_directoryRoot);
+    if (result.size() > 0) {
+        cout << "> Success. Found " << result.size() << " sub-directories under " << g_directoryRoot << endl;
+        for (auto r : result) {
+            cout << ">> " << r << endl;
+        }
+    }
+    else {
+        cout << "> FAILED. No directories found under " << g_directoryRoot << endl;
+    }
+
+    cout << R"(ItsDirectory::GetFiles(g_directoryRoot))" << endl;
+    auto result2 = ItsDirectory::GetFiles(g_directoryRoot);
+    if (result2.size() > 0) {
+        cout << "> Success. Found " << result2.size() << " files under " << g_directoryRoot << endl;
+        for (auto r : result2) {
+            cout << ">> " << r << endl;
+        }
+    }
+
+    auto cdir = g_creatDir;
+    cout << R"(ItsDirectory::CreateDirectory(cdir))" << endl;
+    bool bResult = ItsDirectory::CreateDirectory(cdir, ItsFile::CreateMode("rw","rw","rw"));
+    if (!bResult) {
+        cout << "> FAILED. Error: " << strerror(errno) << endl;
+        cout << endl;
+        return;
+    }
+    cout << "> Success creating " << cdir << endl;
+
+    cout << R"(ItsDirectory::RemoveDirectory(cdir))" << endl;
+    bResult = ItsDirectory::RemoveDirectory(cdir);
+    if (!bResult) {
+        cout << "> FAILED: " << strerror(errno) << endl;;
+        cout << endl;
+        return;
+    }
+    cout << "> Success removing directory " << cdir << endl;
 
     cout << endl;
 }

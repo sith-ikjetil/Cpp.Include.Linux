@@ -19,6 +19,7 @@
 #include <sys/times.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <dirent.h>
 #include <iostream>
 #include <vector>
 #include <uuid/uuid.h>
@@ -402,6 +403,74 @@ namespace ItSoftware
                     return retVal;
                 }
 
+            };
+
+            //
+            // struct: ItsDirectory
+            // 
+            // (i): Linux directory routines.
+            //
+            struct ItsDirectory
+            {
+            public:
+                static bool CreateDirectory(string path, int mode)
+                {
+                    return (mkdir(path.c_str(), mode) == 0);
+                }
+                static bool RemoveDirectory(string path)
+                {
+                    return (rmdir(path.c_str()) == 0);
+                }
+                static bool SetCurrentDirectory(string path)
+                {
+                    return (chdir(path.c_str()) == 0);
+                }
+                static vector<string> GetDirectories(string path) {
+                    if (path.size() == 0) {
+                        return vector<string>();
+                    }
+
+                    DIR *dir;
+                    struct dirent *entry;
+
+                    if ((dir = opendir(path.c_str())) == nullptr) {
+                        return vector<string>();
+                    }
+
+                    vector<string> directories;
+                    while ((entry = readdir(dir)) != nullptr) {
+                        if (entry->d_type & DT_DIR) {
+                            directories.push_back(entry->d_name);
+                        }
+                    }
+
+                    closedir(dir);
+                    
+                    return directories;
+                }
+                static vector<string> GetFiles(string path) {
+                    if (path.size() == 0) {
+                        return vector<string>();
+                    }
+
+                    DIR *dir;
+                    struct dirent *entry;
+
+                    if ((dir = opendir(path.c_str())) == nullptr) {
+                        return vector<string>();
+                    }
+
+                    vector<string> files;
+                    while ((entry = readdir(dir)) != nullptr) {
+                        if (entry->d_type & DT_REG) {
+                            files.push_back(entry->d_name);
+                        }
+                    }
+
+                    closedir(dir);
+                    
+                    return files;
+                }
             };
 
             //
