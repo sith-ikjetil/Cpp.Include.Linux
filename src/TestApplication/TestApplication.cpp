@@ -117,7 +117,10 @@ int main(int argc, char* argv[])
 void PrintTestHeader(string txt)
 {
     cout << endl;
-    cout << ItsString::WidthExpand(txt, 80, '_', ItsExpandDirection::Right) << endl;
+
+    stringstream ss;
+    ss << " " << txt << " ";
+    cout << ItsString::WidthExpand(ss.str(), 80, '_', ItsExpandDirection::Middle) << endl;
 }
 
 //
@@ -138,7 +141,7 @@ void PrintTestSubHeader(string txt)
 //
 void TestItsConvert()
 {
-    PrintTestHeader("## Test ItsConvert ");
+    PrintTestHeader("ItsConvert");
 
     PrintTestSubHeader("ToNumber");
     cout << R"(ItsConvert::ToNumber<int>("-1234"))" << endl;
@@ -212,7 +215,7 @@ void TestItsConvert()
 //
 void TestItsRandom()
 {
-    PrintTestHeader("## Test ItsRandom ");
+    PrintTestHeader("ItsRandom");
 
     cout << "ItsRandom<long>(10'000, 1'000'000)" << endl;
     cout << "> " << ItsRandom<long>(10'000, 1'000'000) << endl;
@@ -237,7 +240,7 @@ void TestItsRandom()
 //
 void TestItsTime()
 {
-    PrintTestHeader("## Test ItsTime ");
+    PrintTestHeader("ItsTime");
 
     PrintTestSubHeader("RenderMsToFullString");
     cout << "ItsTime::RenderMsToFullString(92481379, false)" << endl;
@@ -261,7 +264,7 @@ void TestItsTime()
 //
 void TestItsString()
 {
-    PrintTestHeader("## Test ItsString ");
+    PrintTestHeader("ItsString");
 
     cout << R"(ItsString::Left("Ab12Cd",4))" << endl;
     cout << R"(> ")" << ItsString::Left("Ab12Cd", 4) << R"(")" << endl;
@@ -312,7 +315,7 @@ void TestItsString()
 //
 void TestItsLog()
 {
-	PrintTestHeader("## Test ItsLog ");
+	PrintTestHeader("ItsLog");
 
     ItsLog log;
     log.LogInformation("This is an information log item");
@@ -337,9 +340,10 @@ void TestItsLog()
 //
 void TestItsFile()
 {
-	PrintTestHeader("## Test ItsFile ");
+	PrintTestHeader("ItsFile");
 
 	ItsFile file;
+    cout << R"(file.OpenOrCreate(g_filename,"rwt",ItsFile::CreateMode("rw","rw","rw")))" << endl;
 	if (!file.OpenOrCreate(g_filename,"rwt",ItsFile::CreateMode("rw","rw","rw")))
 	{
 		cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
@@ -411,7 +415,7 @@ void TestItsFile()
 //
 void TestItsTimerStart()
 {
-	PrintTestHeader("## Test ItsTimer::Start ");
+	PrintTestHeader("ItsTimer::Start");
 
 	g_timer.Start();
     cout << "Timer started..." << endl;
@@ -426,7 +430,7 @@ void TestItsTimerStart()
 //
 void TestItsTimerStop()
 {
-	PrintTestHeader("## Test ItsTimer::Stop ");
+	PrintTestHeader("ItsTimer::Stop");
 
 	g_timer.Stop();
 	cout << "Elapsed Time: " << ItsTime::RenderMsToFullString(g_timer.GetMilliseconds(),true) << endl;
@@ -441,7 +445,7 @@ void TestItsTimerStop()
 //
 void TestItsDateTime()
 {
-    PrintTestHeader("## Test ItsDateTime ");
+    PrintTestHeader("ItsDateTime");
 
     auto now = ItsDateTime::Now();
     cout << "ItsDateTime.Now(): " << now.ToString() << endl;
@@ -470,7 +474,7 @@ void TestItsDateTime()
 //
 void TestItsID()
 {
-    PrintTestHeader("## Test ItsID ");
+    PrintTestHeader("ItsID");
 
     cout << "ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false)" << endl;
     cout << R"(> ")" << ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false) << R"(")" << endl;
@@ -499,7 +503,7 @@ void TestItsID()
 //
 void TestItsGuid()
 {
-    PrintTestHeader("## Test ItsGuid ");
+    PrintTestHeader("ItsGuid");
 
     cout << "ItsGuid::CreateGuid()" << endl;
     cout << R"(> ")" << ItsGuid::CreateGuid() << R"(")" << endl;
@@ -536,7 +540,7 @@ void TestItsGuid()
 //
 void TestItsPath()
 {
-    PrintTestHeader("## Test ItsPath ");
+    PrintTestHeader("ItsPath");
 
     string path = ItsPath::Combine(g_path1, g_path2);
     cout << R"(ItsPath::Exists(path))" << endl;
@@ -574,7 +578,7 @@ void TestItsPath()
 //
 void TestItsDirectory()
 {
-    PrintTestHeader("## Test ItsDirectory ");
+    PrintTestHeader("ItsDirectory");
 
     cout << R"(ItsDirectory::GetDirectories(g_directoryRoot))" << endl;
     auto result = ItsDirectory::GetDirectories(g_directoryRoot);
