@@ -18,7 +18,6 @@
 //
 using std::cout;
 using std::endl;
-using std::ends;
 using std::string;
 using std::stringstream;
 using ItSoftware::Linux::ItsString;
@@ -64,7 +63,7 @@ ItsTimer g_timer;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 string g_path1("/home");
-string g_path2("kjetilso/test.txt");
+string g_path2("/kjetilso/test.txt");
 string g_invalidPath("home\0/kjetilso");
 
 //
@@ -288,8 +287,9 @@ void TestItsString()
         }
     }
     ss << "}";
-    ss << ends;
-    cout << "> " << ss.str() << endl;
+    
+    string temp = ss.str();
+    cout << "> " << temp << endl;
     cout << R"(ItsString::WidthExpand ("Kjetil", 30, L'_', ItsExpandDirection:Left))" << endl;
     cout << R"(> ")" << ItsString::WidthExpand("Kjetil", 30, L'_', ItsExpandDirection::Left) << R"(")" << endl;
     cout << R"(ItsString::WidthExpand ("Kjetil", 30, L'_', ItsExpandDirection:Middle))" << endl;

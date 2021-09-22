@@ -37,7 +37,6 @@ namespace ItSoftware
 		// using
 		//
 		using std::endl;
-		using std::ends;
 		using std::string;
 		using std::stringstream;
 		using std::vector;
@@ -289,9 +288,8 @@ namespace ItSoftware
 					return string("");
 				}
 
-				result << ends;
-
-				return result.str();
+				string retVal = result.str();
+				return retVal;
 			}
 
 			static vector<string> Split(string data, string token)
@@ -437,9 +435,9 @@ namespace ItSoftware
 					ss << ItsString::Left(retVal, (int)index);
 					ss << replace_with;
 					ss << ItsString::Right(retVal, (int)(retVal.size() - index - replace.size()));
-					ss << ends;
 
-					retVal = ss.str();
+					string temp = ss.str();
+					retVal = temp;
 
 					index = retVal.find(replace, index + replace.size());
 				}
@@ -523,9 +521,9 @@ namespace ItSoftware
 				}
 				ss << " ";
 				ss << ((index > (szSize.size() - 1) || index < 0) ? "?" : szSize[index]);
-				ss << ends;
-
-				return ss.str();
+				
+				string retVal = ss.str();
+				return retVal;
 			}
 
 			template <typename Numeric>
@@ -1295,9 +1293,9 @@ namespace ItSoftware
 				{
 					ss << std::setiosflags(std::ios::left) << std::setw(12) << this->LogTypeToString(i.Type) << ItsDateTime(i.When).ToString() << " " << i.Description << endl;
 				}
-				ss << ends;
-
-				return ss.str();
+				
+				string retVal = ss.str();
+				return retVal;
 			}
 
 			string ToString()
@@ -1315,9 +1313,9 @@ namespace ItSoftware
 					description = ItsString::Replace(description, s1, rep_s);
 					ss << this->LogTypeToString(i.Type) << ";" << ItsDateTime(i.When).ToString("s") << ";" << description << endl;
 				}
-				ss << ends;
 
-				return ss.str();
+				string retVal = ss.str();
+				return retVal;
 			}
 		};
 
@@ -1389,9 +1387,9 @@ namespace ItSoftware
 					id << data[j];
 
 				} while (++i < count);
-				id << ends;
-
-				return id.str();
+				
+				string retVal = id.str();
+				return retVal;
 			}
 		};
 	} // namespace Linux

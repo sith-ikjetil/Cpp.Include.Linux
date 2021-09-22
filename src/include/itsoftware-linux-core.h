@@ -257,13 +257,14 @@ namespace ItSoftware
 
                     stringstream path;
                     path << path1;
-                    if (path1[path1.size() - 1] != ItsPath::PathSeparator) {
+                    if (path1[path1.size() - 1] != ItsPath::PathSeparator &&
+                       path2[0] != ItsPath::PathSeparator ) {
                         path << ItsPath::PathSeparator;
                     }
                     path << path2;
-                    path << ends;
-
-                    return path.str();
+                    
+                    string retVal = path.str();
+                    return retVal;
                 }
                 static bool Exists(string path)
                 {
@@ -293,7 +294,7 @@ namespace ItSoftware
                     if (path.size() == 0) {
                         return string("");
                     }
-
+                    
                     if (path.find(ItsPath::PathSeparator) == -1) {
                         return string("");
                     }
@@ -328,7 +329,7 @@ namespace ItSoftware
 
                     string directory = ItsPath::GetDirectory(path);
                     string filename = ItsPath::GetFilename(path);
-
+                    
                     auto invalidPathChars = ItsPath::GetInvalidPathCharacters();
                     auto invalidFileChars = ItsPath::GetInvalidFilenameCharacters();
                     
@@ -347,7 +348,7 @@ namespace ItSoftware
 
                     for (auto f : filename) {
                         for (auto i : invalidFileChars) {
-                            if (f != filename[filename.size()] && f == i) {
+                            if (f == i) {
                                 return false;
                             }
                         }
