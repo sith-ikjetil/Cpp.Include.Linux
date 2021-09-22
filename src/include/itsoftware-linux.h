@@ -1339,15 +1339,15 @@ namespace ItSoftware
 				stringstream ss;
 				string nl1("\r\n");
 				string nl2("\n");
-				string s1(";");
+				string s1(":");
 				string rep_nl(" ");
-				string rep_s(",");
+				string rep_s(" - ");
 				for (auto i : this->m_items)
 				{
 					auto description = ItsString::Replace(i.Description, nl1, rep_nl);
 					description = ItsString::Replace(description, nl2, rep_nl);
 					description = ItsString::Replace(description, s1, rep_s);
-					ss << this->LogTypeToString(i.Type) << ";" << ItsDateTime(i.When).ToString("s") << ";" << description << endl;
+					ss << this->LogTypeToString(i.Type) << " : " << ItsDateTime(i.When).ToString("s") << " : " << description << endl;
 				}
 
 				string retVal = ss.str();
