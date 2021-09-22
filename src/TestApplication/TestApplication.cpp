@@ -166,8 +166,6 @@ void TestItsConvert()
     cout << "> " << ItsConvert::ToNumber<short>("1234") << endl;
     cout << R"(ItsConvert::ToNumber<unsigned short>("40001"))" << endl;
     cout << "> " << ItsConvert::ToNumber<unsigned short>("40001") << endl;
-    cout << R"(ItsConvert::ToNumber<unsigned char>("40001"))" << endl;
-    cout << "> " << ItsConvert::ToNumber<unsigned char>("101") << endl;
 
     PrintTestSubHeader("ToString");
     cout << R"(ItsConvert::ToString<int>(-1234))" << endl;
@@ -192,8 +190,6 @@ void TestItsConvert()
     cout << R"(> ")" << ItsConvert::ToString<short>(1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<unsigned short>(40001))" << endl;
     cout << R"(> ")" << ItsConvert::ToString<unsigned short>(40001) << R"(")" << endl;
-    cout << R"(ItsConvert::ToString<unsigned char>(101))" << endl;
-    cout << R"(> ")" << ItsConvert::ToString<unsigned char>(101) << R"(")" << endl;
     
     PrintTestSubHeader("ToStringFormatted");
     cout << R"(ItsConvert::ToStringFormatted(256810246))" << endl;
