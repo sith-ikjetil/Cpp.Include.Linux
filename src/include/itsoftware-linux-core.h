@@ -406,6 +406,24 @@ namespace ItSoftware
             };
 
             //
+            // struct: ItsError
+            //
+            // (i): Linux error messages
+            //
+            struct ItsError
+            {
+            public:
+                static string GetErrorDescription(int err) 
+                {
+                    return strerror(err);
+                }
+                static string GetLastErrorDescription()
+                {
+                    return strerror(errno);
+                }
+            };
+            
+            //
             // struct: ItsDirectory
             // 
             // (i): Linux directory routines.
