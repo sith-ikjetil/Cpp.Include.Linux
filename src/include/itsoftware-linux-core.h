@@ -24,6 +24,10 @@
 #include <vector>
 #include <uuid/uuid.h>
 #include "itsoftware-linux.h"
+#include <thread>
+#include <functional>
+#include <sys/inotify.h>
+
 
 //
 // namespace
@@ -47,7 +51,14 @@ namespace ItSoftware
             using std::string;
             using std::unique_ptr;
             using std::vector;
+            using std::thread;
+            using std::function;
             using ItSoftware::Linux::ItsString;
+            
+            //
+            // #define
+            //
+            #define FILE_MONITOR_BUFFER_LENGTH (10 * (sizeof(inotify_event) + NAME_MAX + 1))
 
             //
             // struct: ItsTimer
@@ -993,6 +1004,101 @@ namespace ItSoftware
                     }
 
                 	return mode;
+                }
+            };
+
+            //
+            // class: ItsFileMonitor
+            //
+            // (i): Monitors a given file folder
+            //
+            class ItsFileMonitor
+            {
+            private:
+                int m_fd;
+                int m_wd;
+                uint32_t m_mask;
+                unique_ptr<thread> m_pthread;
+                string m_pathname;
+                bool m_bPause;
+                bool m_bStopped;
+                
+            protected:
+                void ExecuteDispatchThread(function<void(inotify_event*)> func) {
+                    char buffer[FILE_MONITOR_BUFFER_LENGTH];
+                    while( !this->m_bStopped ) {
+                        if (this->m_bPause) {
+                            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                            continue;
+                        }
+
+                        ssize_t nRead = read(this->m_fd, buffer, FILE_MONITOR_BUFFER_LENGTH);
+                        if (nRead == 0) {
+                            continue;
+                        }
+                        if (nRead == -1) {
+                            std::cerr << "ItsFileMonitor::ExecuteDispatchThread.read returned -1" << endl;
+                            this->m_bStopped = true;
+                            break;
+                        }
+                        for (char *p = buffer; p < buffer + nRead;) {
+                            inotify_event* event = (inotify_event*)p;
+                            func(event);
+                            p += sizeof(inotify_event) + event->len;
+                        }
+                    }
+                }
+            public:
+                ItsFileMonitor(const string pathname, uint32_t mask, function<void(inotify_event*)> func)
+                    :   m_pathname(pathname), 
+                        m_mask(mask),
+                        m_fd(-1),
+                        m_wd(-1),
+                        m_bPause(false),
+                        m_bStopped(false)
+                {
+                    if (ItsFile::Exists(this->m_pathname) ) {
+                        this->m_fd = inotify_init();
+                        if (this->m_fd == -1) {
+                            std::cerr << "inotify_init" << endl;
+                            return;
+                        }
+
+                        this->m_wd = inotify_add_watch(this->m_fd, pathname.c_str(), mask);
+                        if (this->m_wd == -1) {
+                            std::cerr << "inotify_add_watch" << endl;
+                            return;
+                        }
+                        using std::placeholders::_1;
+                        this->m_pthread = make_unique<thread>(&ItsFileMonitor::ExecuteDispatchThread, this, func);
+                    }
+                }
+                void Pause() {
+                    this->m_bPause = !this->m_bPause;
+                }
+                bool IsPaused() {
+                    return this->m_bPause;
+                }
+                void Stop() {
+                    this->m_bStopped = true;
+                }
+                bool IsStopped()
+                {
+                    return this->m_bStopped;
+                }
+                ~ItsFileMonitor()
+                {
+                    this->Stop();
+
+                    if ( this->m_fd != -1 && this->m_wd != -1) {
+                        close(this->m_wd);
+                        this->m_wd = -1;
+                        
+                        close(this->m_fd);
+                        this->m_fd = -1;
+
+                        this->m_pthread->detach();
+                    }
                 }
             };
         } // namespace Core

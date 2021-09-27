@@ -10,6 +10,7 @@
 //
 #include <iostream>
 #include <string>
+#include <vector>
 #include "../include/itsoftware-linux.h"
 #include "../include/itsoftware-linux-core.h"
 
@@ -18,8 +19,11 @@
 //
 using std::cout;
 using std::endl;
+using std::vector;
 using std::string;
 using std::stringstream;
+using std::unique_ptr;
+using std::make_unique;
 using ItSoftware::Linux::ItsString;
 using ItSoftware::Linux::ItsExpandDirection;
 using ItSoftware::Linux::ItsTime;
@@ -38,6 +42,7 @@ using ItSoftware::Linux::Core::ItsGuidFormat;
 using ItSoftware::Linux::Core::ItsPath;
 using ItSoftware::Linux::Core::ItsDirectory;
 using ItSoftware::Linux::Core::ItsError;
+using ItSoftware::Linux::Core::ItsFileMonitor;
 
 //
 // Function Prototypes
@@ -55,13 +60,17 @@ void TestItsID();
 void TestItsGuid();
 void TestItsPath();
 void TestItsDirectory();
+void TestItsFileMonitorStart();
+void TestItsFileMonitorStop();
 void ExitFn();
 void PrintTestHeader(string txt);
+void HandleFileEvent(inotify_event* event);
 
 //
 // global data
 //
 ItsTimer g_timer;
+unique_ptr<ItsFileMonitor> fm;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 string g_path1("/home");
@@ -69,6 +78,7 @@ string g_path2("/kjetilso/test.txt");
 string g_invalidPath("home\0/kjetilso");
 string g_directoryRoot("/home/kjetilso");
 string g_creatDir("/home/kjetilso/testdir");
+vector<string> g_fileMonNames;
 
 //
 // Function: ExitFn
@@ -79,6 +89,16 @@ void ExitFn()
 {
     cout << endl;
     cout << "> Test Application - Exited <" << endl;
+}
+
+//
+// Function: PrintFileEvent
+//
+// (i): Print file event.
+//
+void HandleFileEvent(inotify_event* event)
+{
+    g_fileMonNames.push_back(event->name);
 }
 
 //
@@ -93,6 +113,7 @@ int main(int argc, char* argv[])
     cout << "> Test Application - Started <" << endl;
 
 	TestItsTimerStart();
+    TestItsFileMonitorStart();
     TestItsConvert();
     TestItsRandom();
     TestItsTime();
@@ -104,6 +125,7 @@ int main(int argc, char* argv[])
     TestItsGuid();
     TestItsPath();
     TestItsDirectory();
+    TestItsFileMonitorStop();
 	TestItsTimerStop();
 
     return EXIT_SUCCESS;
@@ -627,6 +649,40 @@ void TestItsDirectory()
         return;
     }
     cout << "> Success removing directory " << cdir << endl;
+
+    cout << endl;
+}
+
+//
+// Function: TestItsFileMonitor
+//
+// (i): Tests ItsFileMonitor.
+//
+void TestItsFileMonitorStart()
+{
+    fm = make_unique<ItsFileMonitor>(g_directoryRoot, IN_CREATE, HandleFileEvent);  
+
+    PrintTestHeader("ItsFileMonitor Start");
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mode 'IN_CREATE'" << endl;
+    
+    cout << endl;
+}
+
+//
+// Function: TestItsFileMonitor
+//
+// (i): Tests ItsFileMonitor.
+//
+void TestItsFileMonitorStop()
+{
+    fm->Stop();
+
+    PrintTestHeader("ItsFileMonitor Stop");
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mode 'IN_CREATE'" << endl;
+    cout << "Items found:" << endl;
+    for ( auto i : g_fileMonNames ) {
+        cout << ">> " << i << endl;
+    }
 
     cout << endl;
 }
