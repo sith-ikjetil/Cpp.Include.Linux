@@ -347,7 +347,7 @@ void TestItsLog()
 {
 	PrintTestHeader("ItsLog");
 
-    ItsLog log;
+    ItsLog log{"ItsTestApp",true};
     log.LogInformation("This is an information log item");
     log.LogWarning("This is an warning log item");
     log.LogError("This is an error log item");
@@ -359,6 +359,9 @@ void TestItsLog()
 
     PrintTestSubHeader("ToString");
     cout << log.ToString() << endl;
+
+    PrintTestSubHeader("ToString(tailN=1)");
+    cout << log.ToString(1) << endl;
     
     cout << endl;
 }

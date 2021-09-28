@@ -22,6 +22,7 @@
 #include <random>
 #include <functional>
 #include <stdlib.h>
+#include <syslog.h>
 #include <time.h>
 #include <string.h>
 #include <type_traits>
@@ -1194,6 +1195,11 @@ namespace ItSoftware
 		}
 
 		//
+		// forward declare
+		//
+		struct ItsLog;
+
+		//
 		// ItsLogType
 		//
 		// (i): Log type for ItsLogItem
@@ -1208,94 +1214,13 @@ namespace ItSoftware
 		};
 
 		//
-		// struct: ItsLogItem
+		// ItsLogUtil
 		//
-		// (i): Log item for ItsLog
+		// (i): Convertion misc. methods.
 		//
-		struct ItsLogItem
+		struct ItsLogUtil
 		{
-			ItsLogType Type;
-			string Description;
-			tm When;
-		};
-
-		//
-		// struct: ItsLog
-		//
-		// (i): CUstom application event log.
-		//
-		struct ItsLog
-		{
-		private:
-			vector<ItsLogItem> m_items;
-
-		public:
-			void LogInformation(string description)
-			{
-				ItsLogItem item;
-				item.When = ItsDateTime::Now().TM();
-				item.Description = description;
-				item.Type = ItsLogType::Information;
-
-				this->m_items.push_back(item);
-			}
-
-			void LogWarning(string description)
-			{
-				ItsLogItem item;
-				item.When = ItsDateTime::Now().TM();
-				item.Description = description;
-				item.Type = ItsLogType::Warning;
-
-				this->m_items.push_back(item);
-			}
-
-			void LogError(string description)
-			{
-				ItsLogItem item;
-				item.When = ItsDateTime::Now().TM();
-				item.Description = description;
-				item.Type = ItsLogType::Error;
-
-				this->m_items.push_back(item);
-			}
-
-			void LogOther(string description)
-			{
-				ItsLogItem item;
-				item.When = ItsDateTime::Now().TM();
-				item.Description = description;
-				item.Type = ItsLogType::Other;
-
-				this->m_items.push_back(item);
-			}
-
-			void LogDebug(string description)
-			{
-				ItsLogItem item;
-				item.When = ItsDateTime::Now().TM();
-				item.Description = description;
-				item.Type = ItsLogType::Debug;
-
-				this->m_items.push_back(item);
-			}
-
-			const vector<ItsLogItem> &GetItems()
-			{
-				return this->m_items;
-			}
-
-			size_t Count()
-			{
-				return this->m_items.size();
-			}
-
-			void Clear()
-			{
-				this->m_items.clear();
-			}
-
-			string LogTypeToString(ItsLogType t)
+			static string LogTypeToString(ItsLogType t)
 			{
 				string type;
 				switch (t)
@@ -1321,13 +1246,165 @@ namespace ItSoftware
 				}
 				return type;
 			}
+		};
+
+		//
+		// struct: ItsLogItem
+		//
+		// (i): Log item for ItsLog
+		//
+		struct ItsLogItem
+		{
+			ItsLogType Type;
+			string Description;
+			tm When;
+
+			string ToFriendlyString()
+			{
+				stringstream ss;
+				
+				ss << std::setiosflags(std::ios::left) << std::setw(12) << ItsLogUtil::LogTypeToString(this->Type) << ItsDateTime(this->When).ToString() << " " << this->Description;
+				
+				string retVal = ss.str();
+				return retVal;
+			}
+
+			string ToString()
+			{
+				stringstream ss;
+				string nl1("\r\n");
+				string nl2("\n");
+				string s1(":");
+				string rep_nl(" ");
+				string rep_s(" - ");
+				
+				auto description = ItsString::Replace(this->Description, nl1, rep_nl);
+				description = ItsString::Replace(description, nl2, rep_nl);
+				description = ItsString::Replace(description, s1, rep_s);
+				ss << ItsLogUtil::LogTypeToString(this->Type) << " : " << ItsDateTime(this->When).ToString("s") << " : " << description;
+
+				string retVal = ss.str();
+				return retVal;
+			}
+		};
+
+		//
+		// struct: ItsLog
+		//
+		// (i): CUstom application event log.
+		//
+		struct ItsLog
+		{
+		private:
+			vector<ItsLogItem> m_items;
+			string m_ident;
+			bool m_bLogToSyslog;
+		public:
+			ItsLog(string ident, bool log_to_syslog)
+			:	m_ident(ident),
+				m_bLogToSyslog(log_to_syslog)
+			{
+				if (this->m_bLogToSyslog) {
+					openlog(this->m_ident.c_str(), LOG_NDELAY|LOG_NOWAIT|LOG_PID,0);
+				}
+			}
+			~ItsLog()
+			{
+				if (this->m_bLogToSyslog) {
+					closelog();
+				}
+			}
+			void LogInformation(string description)
+			{
+				ItsLogItem item;
+				item.When = ItsDateTime::Now().TM();
+				item.Description = description;
+				item.Type = ItsLogType::Information;
+
+				this->m_items.push_back(item);
+
+				if ( this->m_bLogToSyslog ) {
+					syslog(LOG_INFO, "%s", item.ToString().c_str());
+				}
+			}
+
+			void LogWarning(string description)
+			{
+				ItsLogItem item;
+				item.When = ItsDateTime::Now().TM();
+				item.Description = description;
+				item.Type = ItsLogType::Warning;
+
+				this->m_items.push_back(item);
+
+				if ( this->m_bLogToSyslog ) {
+					syslog(LOG_INFO, "%s", item.ToString().c_str());
+				}
+			}
+
+			void LogError(string description)
+			{
+				ItsLogItem item;
+				item.When = ItsDateTime::Now().TM();
+				item.Description = description;
+				item.Type = ItsLogType::Error;
+
+				this->m_items.push_back(item);
+
+				if ( this->m_bLogToSyslog ) {
+					syslog(LOG_INFO, "%s", item.ToString().c_str());
+				}
+			}
+
+			void LogOther(string description)
+			{
+				ItsLogItem item;
+				item.When = ItsDateTime::Now().TM();
+				item.Description = description;
+				item.Type = ItsLogType::Other;
+
+				this->m_items.push_back(item);
+
+				if ( this->m_bLogToSyslog ) {
+					syslog(LOG_INFO, "%s", item.ToString().c_str());
+				}
+			}
+
+			void LogDebug(string description)
+			{
+				ItsLogItem item;
+				item.When = ItsDateTime::Now().TM();
+				item.Description = description;
+				item.Type = ItsLogType::Debug;
+
+				this->m_items.push_back(item);
+
+				if ( this->m_bLogToSyslog ) {
+					syslog(LOG_INFO, "%s", item.ToString().c_str());
+				}
+			}
+
+			const vector<ItsLogItem> &GetItems()
+			{
+				return this->m_items;
+			}
+
+			size_t Count()
+			{
+				return this->m_items.size();
+			}
+
+			void Clear()
+			{
+				this->m_items.clear();
+			}
 
 			string ToFriendlyString()
 			{
 				stringstream ss;
 				for (auto i : this->m_items)
 				{
-					ss << std::setiosflags(std::ios::left) << std::setw(12) << this->LogTypeToString(i.Type) << ItsDateTime(i.When).ToString() << " " << i.Description << endl;
+					ss << i.ToFriendlyString();
 				}
 				
 				string retVal = ss.str();
@@ -1344,10 +1421,35 @@ namespace ItSoftware
 				string rep_s(" - ");
 				for (auto i : this->m_items)
 				{
-					auto description = ItsString::Replace(i.Description, nl1, rep_nl);
-					description = ItsString::Replace(description, nl2, rep_nl);
-					description = ItsString::Replace(description, s1, rep_s);
-					ss << this->LogTypeToString(i.Type) << " : " << ItsDateTime(i.When).ToString("s") << " : " << description << endl;
+					ss << i.ToString() << endl;
+				}
+
+				string retVal = ss.str();
+				return retVal;
+			}
+
+			string ToString(uint32_t tailN)
+			{
+				stringstream ss;
+				string nl1("\r\n");
+				string nl2("\n");
+				string s1(":");
+				string rep_nl(" ");
+				string rep_s(" - ");
+				if ( this->m_items.size() > tailN ) {
+					auto ptr = this->m_items.end();
+					ptr -= tailN;
+
+					do
+					{
+						ss << (*ptr).ToString() << endl;
+					} while (++ptr != this->m_items.end());
+				}
+				else {
+					for (auto i : this->m_items)
+					{
+						ss << i.ToString() << endl;
+					}
 				}
 
 				string retVal = ss.str();
