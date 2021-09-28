@@ -8,16 +8,12 @@
 //
 // #include
 //
-#include <string>
-#include <vector>
-#include <functional>
 #include "../include/itsoftware-linux.h"
 #include "../include/itsoftware-linux-core.h"
 
 //
 // using
 //
-using std::function;
 using ItSoftware::Linux::Core::ItsDaemon;
 using ItSoftware::Linux::Core::ItsFile;
 

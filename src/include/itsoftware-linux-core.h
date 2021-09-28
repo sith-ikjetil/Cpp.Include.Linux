@@ -1116,7 +1116,7 @@ namespace ItSoftware
             private:
                 int m_deamonRetVal;
                 struct sigaction m_sa;
-                inline static bool s_sigkill;
+                inline static bool s_sigkill = false;
             protected:
                 static void SigHupHandler(int sig) {
                     switch(sig)
