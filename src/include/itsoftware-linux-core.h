@@ -1188,6 +1188,11 @@ namespace ItSoftware
                 }
 
             public:            
+                ItsDaemon()
+                : ItsDaemon(0) {
+
+                }
+                
                 ItsDaemon(int flags) {
                     ItsDaemon::s_sigkill = false;
                     this->m_deamonRetVal = this->BecomeDaemon(flags);

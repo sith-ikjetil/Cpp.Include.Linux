@@ -23,10 +23,11 @@ using ItSoftware::Linux::Core::ItsFile;
 
 int main(int argc, char* argv[]) 
 {
-    ItsDaemon daemon(0);    // This makes this a daemon
+    // This makes this app a daemon
+    ItsDaemon daemon;    
 
     /*
-    Implement a daemon logic here. Example writing lines to a file.
+    Implement a daemon logic here. This example writing lines to a file.
     */
     while (!ItsDaemon::get_SIGKILL()) {
         ItsFile file;
