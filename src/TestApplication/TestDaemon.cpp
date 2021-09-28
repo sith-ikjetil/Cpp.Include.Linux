@@ -19,12 +19,25 @@ using ItSoftware::Linux::Core::ItsFile;
 
 int main(int argc, char* argv[]) 
 {
+    //
     // This makes this app a daemon
-    ItsDaemon daemon;    
+    //
+    ItsDaemon daemon;
 
-    /*
-    Implement a daemon logic here. This example writing lines to a file.
-    */
+    //
+    // Sanity check that daemon is successfull.
+    //
+    if (!daemon.IsDaemonSuccessfull()) {
+        //
+        // Return daemon unsuccessfull
+        //
+        return 1;
+    }    
+
+    //
+    // Implement your daemon logic here. 
+    // This is only an example: writing lines to a file.
+    //
     while (!ItsDaemon::get_SIGKILL()) {
         ItsFile file;
         if (!file.OpenOrCreate("/home/kjetilso/daemon.txt","rwa",ItsFile::CreateMode("rw","rw","rw")))
@@ -42,5 +55,8 @@ int main(int argc, char* argv[])
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 
+    //
+    // Return all ok
+    //
     return 0;
 }

@@ -1205,6 +1205,9 @@ namespace ItSoftware
                         }
                     }
                 }
+                bool IsDaemonSuccessfull() {
+                    return (this->m_deamonRetVal == 0);
+                }
                 static bool get_SIGKILL() {
                     return ItsDaemon::s_sigkill;
                 }
