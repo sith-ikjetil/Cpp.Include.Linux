@@ -1070,7 +1070,7 @@ namespace ItSoftware
                             std::cerr << "inotify_add_watch" << endl;
                             return;
                         }
-                        using std::placeholders::_1;
+                    
                         this->m_pthread = make_unique<thread>(&ItsFileMonitor::ExecuteDispatchThread, this, func);
                     }
                 }
