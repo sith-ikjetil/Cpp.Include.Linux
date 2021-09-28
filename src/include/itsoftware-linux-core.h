@@ -27,6 +27,7 @@
 #include <thread>
 #include <functional>
 #include <sys/inotify.h>
+#include <signal.h>
 
 
 //
@@ -1020,14 +1021,14 @@ namespace ItSoftware
                 uint32_t m_mask;
                 unique_ptr<thread> m_pthread;
                 string m_pathname;
-                bool m_bPause;
+                bool m_bPaused;
                 bool m_bStopped;
                 
             protected:
                 void ExecuteDispatchThread(function<void(inotify_event*)> func) {
                     char buffer[FILE_MONITOR_BUFFER_LENGTH];
                     while( !this->m_bStopped ) {
-                        if (this->m_bPause) {
+                        if (this->m_bPaused) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(500));
                             continue;
                         }
@@ -1054,7 +1055,7 @@ namespace ItSoftware
                         m_mask(mask),
                         m_fd(-1),
                         m_wd(-1),
-                        m_bPause(false),
+                        m_bPaused(false),
                         m_bStopped(false)
                 {
                     if (ItsFile::Exists(this->m_pathname) ) {
@@ -1074,10 +1075,13 @@ namespace ItSoftware
                     }
                 }
                 void Pause() {
-                    this->m_bPause = !this->m_bPause;
+                    this->m_bPaused = true;
+                }
+                void Resume() {
+                    this->m_bPaused = false;
                 }
                 bool IsPaused() {
-                    return this->m_bPause;
+                    return this->m_bPaused;
                 }
                 void Stop() {
                     this->m_bStopped = true;
@@ -1099,6 +1103,105 @@ namespace ItSoftware
 
                         this->m_pthread->detach();
                     }
+                }
+            };
+
+            //
+            // class: ItsDaemon
+            //
+            // (i): Linux daemon plugin
+            //
+            class ItsDaemon
+            {
+            private:
+                int m_deamonRetVal;
+                struct sigaction m_sa;
+                inline static bool s_sigkill;
+            protected:
+                static void SigHupHandler(int sig) {
+                    switch(sig)
+                    {
+                        case SIGKILL:
+                            ItsDaemon::s_sigkill = true;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                int BecomeDaemon(int flags)
+                {
+                    int maxfd;
+                    int fd;
+
+                    switch(fork()) {
+                        case -1: return -1;
+                        case 0: break;
+                        default: _exit(EXIT_SUCCESS);
+                    }
+
+                    if (setsid() == -1) {
+                        return -1;
+                    }
+
+                    switch(fork()) {
+                        case -1: return -1;
+                        case 0: break;
+                        default: _exit(EXIT_SUCCESS);
+                    }
+
+                    if (!(flags & 010)) {
+                        umask(0);
+                    }
+
+                    if (!(flags & 01)) {
+                        chdir("/");
+                    }
+
+                    if (!(flags & 02)) {
+                        maxfd = sysconf(_SC_OPEN_MAX);
+                        if (maxfd == -1) {
+                            maxfd = 8192;
+                        }
+                        for (fd = 0; fd < maxfd; fd++) {
+                            close(fd);
+                        }
+                    }
+
+                    if (!(flags & 04)) {
+                        close(STDIN_FILENO);
+
+                        fd = open("/dev/null", O_RDWR);
+
+                        if ( fd != STDIN_FILENO) {
+                            return -1;
+                        }
+                        if (dup2(STDIN_FILENO, STDOUT_FILENO) != STDOUT_FILENO) {
+                            return -1;
+                        }
+                        if (dup2(STDIN_FILENO, STDERR_FILENO) != STDERR_FILENO) {
+                            return -1;
+                        }
+                    }
+
+                    return 0;
+                }
+
+            public:            
+                ItsDaemon(int flags) {
+                    ItsDaemon::s_sigkill = false;
+                    this->m_deamonRetVal = this->BecomeDaemon(flags);
+                    if ( this->m_deamonRetVal == 0 ) {
+                        sigemptyset(&this->m_sa.sa_mask);
+                        this->m_sa.sa_flags = SA_RESTART;
+                        this->m_sa.sa_handler = ItsDaemon::SigHupHandler;
+                        if (sigaction(SIGHUP,&this->m_sa, NULL) == -1 ) {
+                            _exit(-1);
+                        }
+                    }
+                }
+                static bool get_SIGKILL() {
+                    return ItsDaemon::s_sigkill;
                 }
             };
         } // namespace Core
