@@ -17,6 +17,11 @@
 using ItSoftware::Linux::Core::ItsDaemon;
 using ItSoftware::Linux::Core::ItsFile;
 
+//
+// Function: main
+//
+// (i): C/C++ application entry point.
+//
 int main(int argc, char* argv[]) 
 {
     //
@@ -31,25 +36,25 @@ int main(int argc, char* argv[])
         //
         // Return daemon unsuccessfull
         //
-        return 1;
+        return EXIT_FAILURE;
     }    
 
     //
     // Implement your daemon logic here. 
-    // This is only an example: writing lines to a file.
+    // This is only an example: appending lines to a file.
     //
     while (!ItsDaemon::get_SIGKILL()) {
         ItsFile file;
         if (!file.OpenOrCreate("/home/kjetilso/daemon.txt","rwa",ItsFile::CreateMode("rw","rw","rw")))
         {
-            return 1;
+            return EXIT_FAILURE;
         }
 
         char text[] = "Cpp.Include.Linux TestDaemon 12345\n";
         size_t written(0);
         if ( !file.Write((void*)text,strlen(text), &written) )
         {
-            return 1;
+            return EXIT_FAILURE;
         }
 
         std::this_thread::sleep_for(std::chrono::seconds(5));
@@ -58,5 +63,5 @@ int main(int argc, char* argv[])
     //
     // Return all ok
     //
-    return 0;
+    return EXIT_SUCCESS;
 }
