@@ -1095,11 +1095,13 @@ namespace ItSoftware
                     this->Stop();
 
                     if ( this->m_fd != -1 && this->m_wd != -1) {
-                        close(this->m_wd);
-                        this->m_wd = -1;
-                        
-                        close(this->m_fd);
-                        this->m_fd = -1;
+                        int result = inotify_rm_watch(this->m_fd,this->m_wd);
+                        if (result == 0) {
+                            this->m_wd = -1;
+
+                            close(this->m_fd);
+                            this->m_fd = -1;
+                        }
 
                         this->m_pthread->detach();
                     }
