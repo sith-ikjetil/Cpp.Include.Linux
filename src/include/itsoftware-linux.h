@@ -58,6 +58,12 @@ namespace ItSoftware
 		#define RemoveFlag(val, flag) (val & ~flag)
 
 		//
+		// Function: as_const
+		//
+		template<typename T>
+		const T& as_const(const T& item) { return item; }
+
+		//
 		// Function: ItsAddFlag
 		//
 		template <typename T>
