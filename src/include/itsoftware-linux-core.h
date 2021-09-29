@@ -1207,7 +1207,7 @@ namespace ItSoftware
                         }
                     }
                 }
-                bool IsDaemonSuccessfull() {
+                bool WasDaemonSuccessful() {
                     return (this->m_deamonRetVal == 0);
                 }
                 static bool get_SIGKILL() {
