@@ -547,16 +547,16 @@ void TestItsGuid()
     {
         cout << "> Success" << endl;
         
-        cout << "ItsGuid::ToString(guid,ItsGuidFormat::RegistryFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::RegistryFormat) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid, ItsGuidFormat::RegistryFormatStripped)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::RegistryFormatStripped) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid,ItsGuidFormat::ConstFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::ConstFormat) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid,ItsGuidFormat::CompactFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::CompactFormat) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid,ItsGuidFormat::PrefixedCompactFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::PrefixedCompactFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::MicrosoftRegistryFormat, true)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftRegistryFormat, true) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftRegistryFormatStripped, true)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftRegistryFormatStripped, true) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::MicrosoftConstFormat, true)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftConstFormat, true) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::MicrosoftCompactFormat, true)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftCompactFormat, true) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::MicrosoftPrefixedCompactFormat, true)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftPrefixedCompactFormat, true) << R"(")" << endl;
     }
     else {
         cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
