@@ -43,20 +43,21 @@ int main(int argc, char* argv[])
     // Implement your daemon logic here. 
     // This is only an example: appending lines to a file.
     //
-    while (!ItsDaemon::get_SIGKILL()) {
-        ItsFile file;
-        if (!file.OpenOrCreate("/home/kjetilso/daemon.txt","rwa",ItsFile::CreateMode("rw","rw","rw")))
-        {
-            return EXIT_FAILURE;
-        }
+    while (!ItsDaemon::GetSIGKILL() && !ItsDaemon::GetSIGTERM()) {
+        if (!ItsDaemon::GetSIGSTOP()) {
+            ItsFile file;
+            if (!file.OpenOrCreate("/home/kjetilso/daemon.txt","rwa",ItsFile::CreateMode("rw","rw","rw")))
+            {
+                return EXIT_FAILURE;
+            }
 
-        char text[] = "Cpp.Include.Linux TestDaemon 12345\n";
-        size_t written(0);
-        if ( !file.Write((void*)text,strlen(text), &written) )
-        {
-            return EXIT_FAILURE;
+            char text[] = "Cpp.Include.Linux TestDaemon 12345\n";
+            size_t written(0);
+            if ( !file.Write((void*)text,strlen(text), &written) )
+            {
+                return EXIT_FAILURE;
+            }
         }
-
         std::this_thread::sleep_for(std::chrono::seconds(5));
     }
 

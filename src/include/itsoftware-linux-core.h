@@ -1119,12 +1119,23 @@ namespace ItSoftware
                 int m_deamonRetVal;
                 struct sigaction m_sa;
                 inline static bool s_sigkill = false;
+                inline static bool s_sigstop = false;
+                inline static bool s_sigterm = false;
             protected:
                 static void SigHupHandler(int sig) {
                     switch(sig)
                     {
                         case SIGKILL:
                             ItsDaemon::s_sigkill = true;
+                            break;
+                        case SIGSTOP:
+                            ItsDaemon::s_sigstop = true;
+                            break;
+                        case SIGTERM:
+                            ItsDaemon::s_sigterm = true;
+                            break;
+                        case SIGCONT:
+                            ItsDaemon::s_sigstop = false;
                             break;
                         default:
                             break;
@@ -1210,8 +1221,31 @@ namespace ItSoftware
                 bool WasDaemonSuccessful() {
                     return (this->m_deamonRetVal == 0);
                 }
-                static bool get_SIGKILL() {
+                //
+                // Function: GetSIGKILL
+                //
+                // (i): kill signal usually only set if SIGTERM does not work.
+                //
+                static bool GetSIGKILL() {
                     return ItsDaemon::s_sigkill;
+                }
+                //
+                // Function: GetSIGSTOP
+                //
+                // (i): pause signal. allows continue usage with SIGCONT. If 
+                //      SIGSTOP is true and SIGCONT is signaled, then GetSIGSTOP 
+                //      will return false.
+                //
+                static bool GetSIGSTOP() {
+                    return ItsDaemon::s_sigstop;
+                }
+                //
+                // Function: GetSIGTERM
+                //
+                // (i): normal daemon termination signal. should shut down daemon.
+                //
+                static bool GetSIGTERM() {
+                    return ItsDaemon::s_sigterm;
                 }
             };
         } // namespace Core
