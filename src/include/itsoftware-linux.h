@@ -1226,31 +1226,29 @@ namespace ItSoftware
 		//
 		struct ItsLogUtil
 		{
-			static string LogTypeToString(ItsLogType t)
+			static constexpr const char* LogTypeToString(ItsLogType t)
 			{
-				string type;
 				switch (t)
 				{
 				case ItsLogType::Information:
-					type = "Information";
+					return "Information";
 					break;
 				case ItsLogType::Warning:
-					type = "Warning";
+					return "Warning";
 					break;
 				case ItsLogType::Error:
-					type = "Error";
+					return "Error";
 					break;
 				case ItsLogType::Other:
-					type = "Other";
+					return "Other";
 					break;
 				case ItsLogType::Debug:
-					type = "Debug";
+					return "Debug";
 					break;
 				default:
-					type = "<UNKNOWN>";
 					break;
 				}
-				return type;
+				return "<UNKNOWN>";
 			}
 		};
 
@@ -1410,7 +1408,7 @@ namespace ItSoftware
 				stringstream ss;
 				for (auto i : this->m_items)
 				{
-					ss << i.ToFriendlyString();
+					ss << i.ToFriendlyString() << endl;
 				}
 				
 				string retVal = ss.str();

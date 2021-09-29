@@ -547,17 +547,16 @@ void TestItsGuid()
     {
         cout << "> Success" << endl;
         
-        ItsGuidFormat fmt;
-        cout << "ItsGuid::ToString(guid,fmt.RegistryFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.RegistryFormat) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid, fmt.RegistryFormatStripped)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.RegistryFormatStripped) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid,fmt.ConstFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.ConstFormat) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid,fmt.CompactFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.CompactFormat) << R"(")" << endl;
-        cout << "ItsGuid::ToString(guid,fmt.PrefixedCompactFormat)" << endl;
-        cout << R"(> ")" << ItsGuid::ToString(guid, fmt.PrefixedCompactFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::RegistryFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::RegistryFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid, ItsGuidFormat::RegistryFormatStripped)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::RegistryFormatStripped) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::ConstFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::ConstFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::CompactFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::CompactFormat) << R"(")" << endl;
+        cout << "ItsGuid::ToString(guid,ItsGuidFormat::PrefixedCompactFormat)" << endl;
+        cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::PrefixedCompactFormat) << R"(")" << endl;
     }
     else {
         cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
