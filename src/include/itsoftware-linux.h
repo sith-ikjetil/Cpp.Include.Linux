@@ -1248,7 +1248,7 @@ namespace ItSoftware
 				default:
 					break;
 				}
-				return "<UNKNOWN>";
+				return "Unknown";
 			}
 		};
 
