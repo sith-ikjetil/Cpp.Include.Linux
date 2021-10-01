@@ -593,10 +593,10 @@ namespace ItSoftware
 				return x;
 			}
 
-			static int ToIntFromHex(const string &str)
+			static int ToLongFromHex(const string &str)
 			{
 				char *p;
-				int n = strtol(str.c_str(), &p, 16);
+				long n = strtol(str.c_str(), &p, 16);
 				if (*p != 0)
 				{
 					return 0;

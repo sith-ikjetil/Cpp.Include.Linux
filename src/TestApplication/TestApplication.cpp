@@ -235,6 +235,10 @@ void TestItsConvert()
     cout << R"(ItsConvert::ToDataSizeString(size_t max, 2, ItsDataSizeStringType::IEC))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(SIZE_MAX, 2, ItsDataSizeStringType::IEC) << R"(")" << endl;
 
+    PrintTestSubHeader("ToLongFromHex");
+    cout << R"(ItsConvert::ToLongFromHex("0xFF3333"))" << endl;
+    cout << "> " << ItsConvert::ToLongFromHex("0xFF3333") << endl;
+
     cout << endl;
 }
 
