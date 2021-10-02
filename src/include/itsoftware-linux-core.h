@@ -1014,6 +1014,26 @@ namespace ItSoftware
             };
 
             //
+            // enum: ItsFileMonitorMask
+            //
+            // (i): mask for ItsFileMonitor
+            //
+            enum ItsFileMonitorMask : uint32_t {
+                Access = IN_ACCESS,
+                Attrib = IN_ATTRIB,
+                CloseWrite = IN_CLOSE_WRITE,
+                CloseNoWrite = IN_CLOSE_NOWRITE,
+                Create = IN_CREATE,
+                Delete = IN_DELETE,
+                DeleteSelf = IN_DELETE_SELF,
+                Modify = IN_MODIFY,
+                MoveSelf = IN_MOVE_SELF,
+                MovedFrom = IN_MOVED_FROM,
+                MovedTo = IN_MOVED_TO,
+                Open = IN_OPEN
+            };
+
+            //
             // class: ItsFileMonitor
             //
             // (i): Monitors a given file folder
@@ -1055,6 +1075,11 @@ namespace ItSoftware
                     }
                 }
             public:
+                ItsFileMonitor(const string pathname, function<void(inotify_event*)> func)
+                    :   ItsFileMonitor(pathname, ItsFileMonitorMask::Create, func) 
+                {
+                    
+                }
                 ItsFileMonitor(const string pathname, uint32_t mask, function<void(inotify_event*)> func)
                     :   m_pathname(pathname), 
                         m_mask(mask),

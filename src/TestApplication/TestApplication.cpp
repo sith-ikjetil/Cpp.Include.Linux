@@ -43,6 +43,7 @@ using ItSoftware::Linux::Core::ItsPath;
 using ItSoftware::Linux::Core::ItsDirectory;
 using ItSoftware::Linux::Core::ItsError;
 using ItSoftware::Linux::Core::ItsFileMonitor;
+using ItSoftware::Linux::Core::ItsFileMonitorMask;
 
 //
 // Function Prototypes
@@ -666,7 +667,7 @@ void TestItsDirectory()
 //
 void TestItsFileMonitorStart()
 {
-    fm = make_unique<ItsFileMonitor>(g_directoryRoot, IN_CREATE, HandleFileEvent);  
+    fm = make_unique<ItsFileMonitor>(g_directoryRoot, ItsFileMonitorMask::Create, HandleFileEvent);  
 
     PrintTestHeader("ItsFileMonitor Start");
     cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mode 'IN_CREATE'" << endl;
@@ -684,7 +685,7 @@ void TestItsFileMonitorStop()
     fm->Stop();
 
     PrintTestHeader("ItsFileMonitor Stop");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mode 'IN_CREATE'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileNonitorMask::Create'" << endl;
     cout << "Items found:" << endl;
     for ( auto i : g_fileMonNames ) {
         cout << ">> " << i << endl;
