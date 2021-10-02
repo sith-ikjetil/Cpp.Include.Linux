@@ -667,10 +667,10 @@ void TestItsDirectory()
 //
 void TestItsFileMonitorStart()
 {
-    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, ItsFileMonitorMask::Create, HandleFileEvent);  
+    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, ItsFileMonitorMask::Access, HandleFileEvent);  
 
     PrintTestHeader("ItsFileMonitor Start");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Create'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Access'" << endl;
     
     cout << endl;
 }
@@ -686,7 +686,7 @@ void TestItsFileMonitorStop()
     g_fm->Stop();
 
     PrintTestHeader("ItsFileMonitor Stop");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Create'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Access'" << endl;
     cout << "Files:" << endl;
     for ( auto i : g_fileMonNames ) {
         cout << ">> " << i << endl;
