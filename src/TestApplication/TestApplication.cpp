@@ -71,7 +71,7 @@ void HandleFileEvent(inotify_event* event);
 // global data
 //
 ItsTimer g_timer;
-unique_ptr<ItsFileMonitor> fm;
+unique_ptr<ItsFileMonitor> g_fm;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 string g_path1("/home");
@@ -93,9 +93,9 @@ void ExitFn()
 }
 
 //
-// Function: PrintFileEvent
+// Function: HandleFileEvent
 //
-// (i): Print file event.
+// (i): handle file event.
 //
 void HandleFileEvent(inotify_event* event)
 {
@@ -667,10 +667,10 @@ void TestItsDirectory()
 //
 void TestItsFileMonitorStart()
 {
-    fm = make_unique<ItsFileMonitor>(g_directoryRoot, ItsFileMonitorMask::Create, HandleFileEvent);  
+    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, ItsFileMonitorMask::Create, HandleFileEvent);  
 
     PrintTestHeader("ItsFileMonitor Start");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mode 'IN_CREATE'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileNonitorMask::Create'" << endl;
     
     cout << endl;
 }
@@ -682,7 +682,8 @@ void TestItsFileMonitorStart()
 //
 void TestItsFileMonitorStop()
 {
-    fm->Stop();
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    g_fm->Stop();
 
     PrintTestHeader("ItsFileMonitor Stop");
     cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileNonitorMask::Create'" << endl;
