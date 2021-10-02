@@ -670,7 +670,7 @@ void TestItsFileMonitorStart()
     g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, ItsFileMonitorMask::Create, HandleFileEvent);  
 
     PrintTestHeader("ItsFileMonitor Start");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileNonitorMask::Create'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Create'" << endl;
     
     cout << endl;
 }
@@ -686,8 +686,8 @@ void TestItsFileMonitorStop()
     g_fm->Stop();
 
     PrintTestHeader("ItsFileMonitor Stop");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileNonitorMask::Create'" << endl;
-    cout << "Items found:" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Create'" << endl;
+    cout << "Files:" << endl;
     for ( auto i : g_fileMonNames ) {
         cout << ">> " << i << endl;
     }
