@@ -1076,7 +1076,7 @@ namespace ItSoftware
                 }
             public:
                 ItsFileMonitor(const string pathname, function<void(inotify_event*)> func)
-                    :   ItsFileMonitor(pathname, ItsFileMonitorMask::Create, func) 
+                    :   ItsFileMonitor(pathname, (ItsFileMonitorMask::Modify|ItsFileMonitorMask::Open), func) 
                 {
                     
                 }

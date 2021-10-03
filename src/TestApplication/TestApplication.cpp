@@ -93,16 +93,6 @@ void ExitFn()
 }
 
 //
-// Function: HandleFileEvent
-//
-// (i): handle file event.
-//
-void HandleFileEvent(inotify_event* event)
-{
-    g_fileMonNames.push_back(event->name);
-}
-
-//
 // Function: main
 //
 // (i): Application entry point
@@ -667,10 +657,10 @@ void TestItsDirectory()
 //
 void TestItsFileMonitorStart()
 {
-    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, ItsFileMonitorMask::Access, HandleFileEvent);  
+    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open), HandleFileEvent);  
 
     PrintTestHeader("ItsFileMonitor Start");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Access'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open'" << endl;
     
     cout << endl;
 }
@@ -686,11 +676,63 @@ void TestItsFileMonitorStop()
     g_fm->Stop();
 
     PrintTestHeader("ItsFileMonitor Stop");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Access'" << endl;
-    cout << "Files:" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open'" << endl;
+    cout << "Events:" << endl;
     for ( auto i : g_fileMonNames ) {
         cout << ">> " << i << endl;
     }
 
     cout << endl;
+}
+
+//
+// Function: HandleFileEvent
+//
+// (i): handle file event.
+//
+void HandleFileEvent(inotify_event* event)
+{
+    stringstream ss;
+    ss << "Name: " << ((event->len != 0) ? event->name : ".") << ", Mask: ";
+    if ( event->mask & IN_ISDIR ) {
+        ss << "[IN_ISDIR] ";
+    }
+    if (event->mask & IN_ACCESS) {
+        ss << "[ItsFileMonitorMask::Access] ";
+    }
+    if (event->mask & IN_ATTRIB) {
+        ss << "[ItsFileMonitorMask::Attrib] ";
+    }
+    if (event->mask & IN_CLOSE_WRITE) {
+        ss << "[ItsFileMonitorMask::CloseWrite] ";
+    }
+    if (event->mask & IN_CLOSE_NOWRITE) {
+        ss << "[ItsFileMonitorMask::CloseNoWrite] ";
+    }
+    if (event->mask & IN_CREATE) {
+        ss << "[ItsFileMonitorMask::Create] ";
+    }
+    if (event->mask & IN_DELETE) {
+        ss << "[ItsFileMonitorMask::Delete] ";
+    }
+    if (event->mask & IN_DELETE_SELF) {
+        ss << "[ItsFileMonitorMask::DeleteSelf] ";
+    }
+    if (event->mask & IN_MODIFY) {
+        ss << "[ItsFileMonitorMask::Modify] ";
+    }
+    if (event->mask & IN_MOVE_SELF) {
+        ss << "[ItsFileMonitorMask::MoveSelf] ";
+    }
+    if (event->mask & IN_MOVED_FROM) {
+        ss << "[ItsFileMonitorMask::MovedFrom] ";
+    }
+    if (event->mask & IN_MOVED_TO) {
+        ss << "[ItsFileMonitorMask::MovedTo] ";
+    }
+    if (event->mask & IN_OPEN) {
+        ss << "[ItsFileMonitorMask::Open] ";
+    }
+
+    g_fileMonNames.push_back(ss.str());
 }
