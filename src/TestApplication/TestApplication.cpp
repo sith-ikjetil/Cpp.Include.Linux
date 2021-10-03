@@ -678,7 +678,7 @@ void TestItsFileMonitorStart()
 //
 // Function: TestItsFileMonitor
 //
-// (i): Tests ItsFileMonitor.
+// (i): Tests ItsFileMonitor. 
 //
 void TestItsFileMonitorStop()
 {
