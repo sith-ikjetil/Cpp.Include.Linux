@@ -65,7 +65,7 @@ void TestItsFileMonitorStart();
 void TestItsFileMonitorStop();
 void ExitFn();
 void PrintTestHeader(string txt);
-void HandleFileEvent(inotify_event* event);
+void HandleFileEvent(inotify_event& event);
 
 //
 // global data
@@ -690,47 +690,47 @@ void TestItsFileMonitorStop()
 //
 // (i): handle file event.
 //
-void HandleFileEvent(inotify_event* event)
+void HandleFileEvent(inotify_event& event)
 {
     stringstream ss;
-    ss << "Name: " << ((event->len != 0) ? event->name : ".") << ", Mask: ";
-    if ( event->mask & IN_ISDIR ) {
+    ss << "Name: " << ((event.len != 0) ? event.name : ".") << ", Mask: ";
+    if ( event.mask & IN_ISDIR ) {
         ss << "[IN_ISDIR] ";
     }
-    if (event->mask & IN_ACCESS) {
+    if (event.mask & IN_ACCESS) {
         ss << "[ItsFileMonitorMask::Access] ";
     }
-    if (event->mask & IN_ATTRIB) {
+    if (event.mask & IN_ATTRIB) {
         ss << "[ItsFileMonitorMask::Attrib] ";
     }
-    if (event->mask & IN_CLOSE_WRITE) {
+    if (event.mask & IN_CLOSE_WRITE) {
         ss << "[ItsFileMonitorMask::CloseWrite] ";
     }
-    if (event->mask & IN_CLOSE_NOWRITE) {
+    if (event.mask & IN_CLOSE_NOWRITE) {
         ss << "[ItsFileMonitorMask::CloseNoWrite] ";
     }
-    if (event->mask & IN_CREATE) {
+    if (event.mask & IN_CREATE) {
         ss << "[ItsFileMonitorMask::Create] ";
     }
-    if (event->mask & IN_DELETE) {
+    if (event.mask & IN_DELETE) {
         ss << "[ItsFileMonitorMask::Delete] ";
     }
-    if (event->mask & IN_DELETE_SELF) {
+    if (event.mask & IN_DELETE_SELF) {
         ss << "[ItsFileMonitorMask::DeleteSelf] ";
     }
-    if (event->mask & IN_MODIFY) {
+    if (event.mask & IN_MODIFY) {
         ss << "[ItsFileMonitorMask::Modify] ";
     }
-    if (event->mask & IN_MOVE_SELF) {
+    if (event.mask & IN_MOVE_SELF) {
         ss << "[ItsFileMonitorMask::MoveSelf] ";
     }
-    if (event->mask & IN_MOVED_FROM) {
+    if (event.mask & IN_MOVED_FROM) {
         ss << "[ItsFileMonitorMask::MovedFrom] ";
     }
-    if (event->mask & IN_MOVED_TO) {
+    if (event.mask & IN_MOVED_TO) {
         ss << "[ItsFileMonitorMask::MovedTo] ";
     }
-    if (event->mask & IN_OPEN) {
+    if (event.mask & IN_OPEN) {
         ss << "[ItsFileMonitorMask::Open] ";
     }
 

@@ -1050,7 +1050,7 @@ namespace ItSoftware
                 bool m_bStopped;
                 
             protected:
-                void ExecuteDispatchThread(function<void(inotify_event*)> func) {
+                void ExecuteDispatchThread(function<void(inotify_event&)> func) {
                     char buffer[FILE_MONITOR_BUFFER_LENGTH];
                     while( !this->m_bStopped ) {
                         if (this->m_bPaused) {
@@ -1069,18 +1069,18 @@ namespace ItSoftware
                         }
                         for (char *p = buffer; p < buffer + nRead;) {
                             inotify_event* event = (inotify_event*)p;
-                            func(event);
+                            func(*event);
                             p += sizeof(inotify_event) + event->len;
                         }
                     }
                 }
             public:
-                ItsFileMonitor(const string pathname, function<void(inotify_event*)> func)
+                ItsFileMonitor(const string pathname, function<void(inotify_event&)> func)
                     :   ItsFileMonitor(pathname, (ItsFileMonitorMask::Modify|ItsFileMonitorMask::Open), func) 
                 {
                     
                 }
-                ItsFileMonitor(const string pathname, uint32_t mask, function<void(inotify_event*)> func)
+                ItsFileMonitor(const string pathname, uint32_t mask, function<void(inotify_event&)> func)
                     :   m_pathname(pathname), 
                         m_mask(mask),
                         m_fd(-1),
