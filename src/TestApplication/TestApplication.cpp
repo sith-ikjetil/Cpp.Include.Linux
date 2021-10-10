@@ -65,6 +65,8 @@ void TestItsFileMonitorStart();
 void TestItsFileMonitorStop();
 void ExitFn();
 void PrintTestHeader(string txt);
+void PrintTestSubHeader(string txt);
+void PrintTestApplicationEvent(string event);
 void HandleFileEvent(inotify_event& event);
 
 //
@@ -89,7 +91,7 @@ vector<string> g_fileMonNames;
 void ExitFn()
 {
     cout << endl;
-    cout << "> Test Application - Exited <" << endl;
+    PrintTestApplicationEvent("Completed");
 }
 
 //
@@ -101,7 +103,7 @@ int main(int argc, char* argv[])
 {
     atexit(ExitFn);
 
-    cout << "> Test Application - Started <" << endl;
+    PrintTestApplicationEvent("Started");
 
 	TestItsTimerStart();
     TestItsFileMonitorStart();
@@ -120,6 +122,17 @@ int main(int argc, char* argv[])
 	TestItsTimerStop();
 
     return EXIT_SUCCESS;
+}
+
+//
+// Function: PrintTestApplicationEvent
+//
+// (i): prints application event string.
+//
+void PrintTestApplicationEvent(string event)
+{
+    cout << std::setw(80) << std::setfill('#') << std::left << "## Test Application " << endl;
+    cout << "> "<< event << " <" << endl;
 }
 
 //
