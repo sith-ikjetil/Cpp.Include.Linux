@@ -929,7 +929,7 @@ namespace ItSoftware
                     else
                     {
                         int mode = 0;
-                        ItsFile::Mode(sourceFilename, &mode);
+                        ItsFile::GetMode(sourceFilename, &mode);
                         target.OpenOrCreate(targetFilename.c_str(), "wt", mode);
                     }
 
@@ -950,7 +950,7 @@ namespace ItSoftware
                     return true;
                 }
 
-                static bool Mode(string filename, int *mode)
+                static bool GetMode(string filename, int *mode)
                 {
                     if (!ItsFile::Exists(filename))
                     {
@@ -963,6 +963,21 @@ namespace ItSoftware
                         return false;
                     }
                     *mode = stat1.st_mode;
+                    return true;
+                }
+
+                static bool SetMode(string filename, int mode)
+                {
+                    if (!ItsFile::Exists(filename))
+                    {
+                        return false;
+                    }
+
+                    struct stat stat1;
+                    if (chmod(filename.c_str(), mode) != 0)
+                    {
+                        return false;
+                    }
                     return true;
                 }
 

@@ -421,7 +421,6 @@ void TestItsFile()
     }
     cout << "> Success" << endl;
 
-
     cout << "ItsFile::Copy(g_filename, g_copyToFilename, true)" << endl;
     if (!ItsFile::Copy(g_filename, g_copyToFilename, true)) {
         cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
