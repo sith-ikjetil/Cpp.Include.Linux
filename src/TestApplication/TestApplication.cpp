@@ -445,7 +445,7 @@ void TestItsFile()
     else {
         cout << "> File " << g_copyToFilename << " exists" << endl;
     }
-/*
+
     cout << "ItsFile::Delete(g_copyToFilename)" << endl;
     if (!ItsFile::Delete(g_copyToFilename)) {
         cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
@@ -453,7 +453,7 @@ void TestItsFile()
         return;
     }
     cout << "> Success. File " << g_copyToFilename << " deleted" << endl;
-*/
+
     cout << "ItsFile::Shred(g_shredFilename, false)" << endl;
     if (!ItsFile::Shred(g_shredFilename, false)) {
         cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
