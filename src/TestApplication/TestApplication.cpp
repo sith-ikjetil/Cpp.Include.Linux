@@ -76,6 +76,7 @@ ItsTimer g_timer;
 unique_ptr<ItsFileMonitor> g_fm;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
+char g_shredFilename[] = "/home/kjetilso/test2shred.txt";
 string g_path1("/home");
 string g_path2("/kjetilso/test.txt");
 string g_invalidPath("home\0/kjetilso");
@@ -421,6 +422,14 @@ void TestItsFile()
     }
     cout << "> Success" << endl;
 
+    cout << "ItsFile::Copy(g_filename, g_shredFilename, true)" << endl;
+    if (!ItsFile::Copy(g_filename, g_shredFilename, true)) {
+        cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
+        cout << endl;
+        return;
+    }
+    cout << "> Success. File " << g_filename << " successfully copied to " << g_shredFilename << endl;
+    
     cout << "ItsFile::Copy(g_filename, g_copyToFilename, true)" << endl;
     if (!ItsFile::Copy(g_filename, g_copyToFilename, true)) {
         cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
@@ -436,7 +445,7 @@ void TestItsFile()
     else {
         cout << "> File " << g_copyToFilename << " exists" << endl;
     }
-
+/*
     cout << "ItsFile::Delete(g_copyToFilename)" << endl;
     if (!ItsFile::Delete(g_copyToFilename)) {
         cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
@@ -444,6 +453,15 @@ void TestItsFile()
         return;
     }
     cout << "> Success. File " << g_copyToFilename << " deleted" << endl;
+*/
+    cout << "ItsFile::Shred(g_shredFilename, false)" << endl;
+    if (!ItsFile::Shred(g_shredFilename, false)) {
+        cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
+        cout << endl;
+        return;
+    }
+    cout << "> Success. File " << g_shredFilename << " shreded" << endl;
+
 
 	cout << endl;
 }
