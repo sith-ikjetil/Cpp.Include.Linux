@@ -297,7 +297,7 @@ namespace ItSoftware
                         return string("");
                     }
 
-                    if (path.find(ItsPath::PathSeparator) == -1) {
+                    if (path.find(ItsPath::PathSeparator) == string::npos) {
                         return string("");
                     }
 
@@ -313,7 +313,7 @@ namespace ItSoftware
                         return string("");
                     }
                     
-                    if (path.find(ItsPath::PathSeparator) == -1) {
+                    if (path.find(ItsPath::PathSeparator) == string::npos) {
                         return string("");
                     }
 
@@ -329,7 +329,7 @@ namespace ItSoftware
                         return string("");
                     }
 
-                    if (path.find(ItsPath::PathSeparator) == -1) {
+                    if (path.find(ItsPath::PathSeparator) == string::npos) {
                         return string("");
                     }
 
