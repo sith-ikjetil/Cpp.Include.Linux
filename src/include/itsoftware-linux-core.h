@@ -425,6 +425,8 @@ namespace ItSoftware
                     if (path.size() == 0) {
 						return string("");
 					}
+
+                    path = ItsPath::GetDirectory(path);
 					
 					size_t pos1 = path.rfind(ItsPath::PathSeparator);
 					if (pos1 == string::npos) {
