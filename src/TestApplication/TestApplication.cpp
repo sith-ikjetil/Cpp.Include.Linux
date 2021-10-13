@@ -624,6 +624,8 @@ void TestItsPath()
     cout << R"(> )" << ((ItsPath::IsPathValid(path)) ? "true" : "false") << endl;
     cout << R"(ItsPath::IsPathValid(g_invalidPath))" << endl; 
     cout << R"(> )" << ((ItsPath::IsPathValid(g_invalidPath)) ? "true" : "false") << endl;
+    cout << R"(ItsPath::GetParentDirectory("/home/kjetilso/scripts/node-value/"))" << endl;
+    cout << R"(> )" << ItsPath::GetParentDirectory("/home/kjetilso/scripts/node-value/") << endl;
 
     cout << endl;
 }
