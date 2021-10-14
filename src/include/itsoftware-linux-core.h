@@ -472,15 +472,15 @@ namespace ItSoftware
             struct ItsDirectory
             {
             public:
-                static bool Exists(string path)
+                static bool Exists(string dirname)
                 {
-                    DIR *dir;
-                    struct dirent *entry;
-                    if ((dir = opendir(path.c_str())) == nullptr) {
-                        return false;
+                    struct stat sb;
+
+                    if (stat(dirname.c_str(), &sb) == 0 && S_ISDIR(sb.st_mode))
+                    {
+                        return true;
                     }
-                    closedir(dir);
-                    return true;
+                    return false;
                 }
 
                 static string GetCurrentDirectory() 
@@ -937,7 +937,14 @@ namespace ItSoftware
 
                 static bool Exists(string filename)
                 {
-                    return (!access(filename.c_str(), F_OK));
+                    struct stat sb;
+
+                    if (stat(filename.c_str(), &sb) == 0 && S_ISREG(sb.st_mode))
+                    {
+                        return true;
+                    }
+                    
+                    return false;
                 }
 
                 static bool Move(string sourceFilename, string targetFilename)

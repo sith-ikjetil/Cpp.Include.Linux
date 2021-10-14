@@ -639,6 +639,14 @@ void TestItsDirectory()
 {
     PrintTestHeader("ItsDirectory");
 
+    cout << R"(ItsDirectory::Exists(g_directoryRoot))" << endl;
+    if (!ItsDirectory::Exists(g_directoryRoot)) {
+        cout << "> NOT EXISTS" << endl;
+    }
+    else {
+        cout << "> Directory " << g_directoryRoot << " EXISTS" << endl;
+    }
+
     cout << R"(ItsDirectory::GetDirectories(g_directoryRoot))" << endl;
     auto result = ItsDirectory::GetDirectories(g_directoryRoot);
     if (result.size() > 0) {
