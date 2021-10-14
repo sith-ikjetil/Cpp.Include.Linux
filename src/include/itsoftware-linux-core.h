@@ -238,215 +238,6 @@ namespace ItSoftware
             };
 
             //
-            // struct: ItsPath
-            // 
-            // (i): Path routines.
-            //
-            struct ItsPath
-            {
-            public:
-                static const char PathSeparator = '/';
-                static const char ExtensionSeparator = '.';
-               
-                static const vector<char> GetInvalidPathCharacters()
-                {
-                    vector<char> chars {'\0'};
-                    return chars;
-                }
-                static const vector<char> GetInvalidFilenameCharacters()
-                {
-                    vector<char> chars = ItsPath::GetInvalidPathCharacters();
-                    chars.push_back('/');
-                    return chars;
-                }
-                static string Combine(string path1, string path2)
-                {
-                    if (path1.size() == 0 && path2.size() == 0) {
-                        return string("");
-                    }
-
-                    if (path1.size() == 0) {
-                        return path2;
-                    }
-
-                    if (path2.size() == 0) {
-                        return path1;
-                    }
-
-                    stringstream path;
-                    path << path1;
-                    if (path1[path1.size() - 1] != ItsPath::PathSeparator &&
-                       path2[0] != ItsPath::PathSeparator ) {
-                        path << ItsPath::PathSeparator;
-                    }
-                    path << path2;
-                    
-                    string retVal = path.str();
-                    return retVal;
-                }
-                static bool Exists(string path)
-                {
-                    if (access(path.c_str(), F_OK) == 0) {
-                        return true;
-                    }
-                    return false;
-                }
-                static string GetDirectory(string path) 
-                {
-                    if (path.size() == 0) {
-                        return string("");
-                    }
-
-                    if (path.find(ItsPath::PathSeparator) == string::npos) {
-                        return string("");
-                    }
-
-                    auto i = path.find_last_of(ItsPath::PathSeparator);
-                    if (i == std::string::npos) {
-                        return string("");
-                    }
-                    return path.substr(0, i+1);
-                }
-                static string GetFilename(string path) 
-                {
-                    if (path.size() == 0) {
-                        return string("");
-                    }
-                    
-                    if (path.find(ItsPath::PathSeparator) == string::npos) {
-                        return string("");
-                    }
-
-                    auto i = path.rfind(ItsPath::PathSeparator);
-                    if (i == std::string::npos) {
-                        return string("");
-                    }
-                    return path.substr(i+1, path.size()-i-1);
-                }
-                static string GetExtension(string path)
-                {
-                    if (path.size() == 0) {
-                        return string("");
-                    }
-
-                    if (path.find(ItsPath::PathSeparator) == string::npos) {
-                        return string("");
-                    }
-
-                    auto i = path.rfind(ItsPath::ExtensionSeparator);
-                    if (i == std::wstring::npos) {
-                        return string("");
-                    }
-                    return path.substr(i, path.size() - i);
-                }
-                static bool IsPathValid(string path)
-                {
-                    if (path.size() == 0) {
-                        return false;
-                    }
-
-                    string directory = ItsPath::GetDirectory(path);
-                    string filename = ItsPath::GetFilename(path);
-                    
-                    auto invalidPathChars = ItsPath::GetInvalidPathCharacters();
-                    auto invalidFileChars = ItsPath::GetInvalidFilenameCharacters();
-                    
-                    
-                    if ( directory[directory.size()-1] != ItsPath::PathSeparator ) {
-                        return false;
-                    }
-
-                    for (auto d : directory) {
-                        for (auto i : invalidPathChars) {
-                            if (d == i) {
-                                return false;
-                            }
-                        }
-                    }
-
-                    for (auto f : filename) {
-                        for (auto i : invalidFileChars) {
-                            if (f == i) {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-                static bool HasExtension(string path, string extension)
-                {
-                    if (path.size() == 0) {
-                        return false;
-                    }
-
-                    string ext = ItsPath::GetExtension(path);
-                    if (ext.size() == 0) {
-                        return false;
-                    }
-
-                    return (strcmp(ext.c_str(), extension.c_str()) == 0);
-                }
-                static string ChangeExtension(string path, string newExtension) 
-                {
-                    if (path.size() == 0) {
-                        return string("");
-                    }
-
-                    if (newExtension.size() == 0) {
-                        return path;
-                    }
-
-                    if (path[path.size() - 1] == ItsPath::PathSeparator) {
-                        return path;
-                    }
-
-                    string ext = ItsPath::GetExtension(path);
-                    if (ext.size() == 0) {
-                        if (newExtension[0] == ItsPath::ExtensionSeparator) {
-                            return path + newExtension;
-                        }
-                        else {
-                            return path + ItsPath::ExtensionSeparator + newExtension;
-                        }
-                    }
-
-                    auto pe = path.rfind(ext);
-                    if (pe == string::npos) {
-                        return path;
-                    }
-
-                    string retVal = path.replace(pe, path.size()-pe, newExtension);
-                    return retVal;
-                }
-
-                static string GetParentDirectory(string path) 
-                {
-                    if (path.size() == 0) {
-						return string("");
-					}
-
-                    path = ItsPath::GetDirectory(path);
-					
-					size_t pos1 = path.rfind(ItsPath::PathSeparator);
-					if (pos1 == string::npos) {
-						return string("");
-					}
-
-					size_t pos2 = pos1;
-					if (pos1 == (path.size() - 1)) {
-						pos2 = path.rfind(ItsPath::PathSeparator, pos1 - 1);
-						if (pos2 == string::npos) {
-							pos2 = pos1;
-						}
-					}
-
-					return path.substr(0, pos2+1);
-                }
-
-            };
-
-            //
             // struct: ItsError
             //
             // (i): Linux error messages
@@ -1123,6 +914,223 @@ namespace ItSoftware
                 {
                     return ItsFile::Shred(filename,true);
                 }
+            };
+
+            //
+            // struct: ItsPath
+            // 
+            // (i): Path routines.
+            //
+            struct ItsPath
+            {
+            public:
+                static const char PathSeparator = '/';
+                static const char ExtensionSeparator = '.';
+               
+                static const vector<char> GetInvalidPathCharacters()
+                {
+                    vector<char> chars {'\0'};
+                    return chars;
+                }
+                static const vector<char> GetInvalidFilenameCharacters()
+                {
+                    vector<char> chars = ItsPath::GetInvalidPathCharacters();
+                    chars.push_back('/');
+                    return chars;
+                }
+                static string Combine(string path1, string path2)
+                {
+                    if (path1.size() == 0 && path2.size() == 0) {
+                        return string("");
+                    }
+
+                    if (path1.size() == 0) {
+                        return path2;
+                    }
+
+                    if (path2.size() == 0) {
+                        return path1;
+                    }
+
+                    stringstream path;
+                    path << path1;
+                    if (path1[path1.size() - 1] != ItsPath::PathSeparator &&
+                       path2[0] != ItsPath::PathSeparator ) {
+                        path << ItsPath::PathSeparator;
+                    }
+                    path << path2;
+                    
+                    string retVal = path.str();
+                    return retVal;
+                }
+                static bool Exists(string path)
+                {
+                    if (access(path.c_str(), F_OK) == 0) {
+                        return true;
+                    }
+                    return false;
+                }
+                static bool IsFile(string path)
+                {
+                    return ItsFile::Exists(path);
+                }
+                static bool IsDirectory(string path)
+                {
+                    return ItsDirectory::Exists(path);
+                }
+                static string GetDirectory(string path) 
+                {
+                    if (path.size() == 0) {
+                        return string("");
+                    }
+
+                    if (path.find(ItsPath::PathSeparator) == string::npos) {
+                        return string("");
+                    }
+
+                    auto i = path.find_last_of(ItsPath::PathSeparator);
+                    if (i == std::string::npos) {
+                        return string("");
+                    }
+                    return path.substr(0, i+1);
+                }
+                static string GetFilename(string path) 
+                {
+                    if (path.size() == 0) {
+                        return string("");
+                    }
+                    
+                    if (path.find(ItsPath::PathSeparator) == string::npos) {
+                        return string("");
+                    }
+
+                    auto i = path.rfind(ItsPath::PathSeparator);
+                    if (i == std::string::npos) {
+                        return string("");
+                    }
+                    return path.substr(i+1, path.size()-i-1);
+                }
+                static string GetExtension(string path)
+                {
+                    if (path.size() == 0) {
+                        return string("");
+                    }
+
+                    if (path.find(ItsPath::PathSeparator) == string::npos) {
+                        return string("");
+                    }
+
+                    auto i = path.rfind(ItsPath::ExtensionSeparator);
+                    if (i == std::wstring::npos) {
+                        return string("");
+                    }
+                    return path.substr(i, path.size() - i);
+                }
+                static bool IsPathValid(string path)
+                {
+                    if (path.size() == 0) {
+                        return false;
+                    }
+
+                    string directory = ItsPath::GetDirectory(path);
+                    string filename = ItsPath::GetFilename(path);
+                    
+                    auto invalidPathChars = ItsPath::GetInvalidPathCharacters();
+                    auto invalidFileChars = ItsPath::GetInvalidFilenameCharacters();
+                    
+                    
+                    if ( directory[directory.size()-1] != ItsPath::PathSeparator ) {
+                        return false;
+                    }
+
+                    for (auto d : directory) {
+                        for (auto i : invalidPathChars) {
+                            if (d == i) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    for (auto f : filename) {
+                        for (auto i : invalidFileChars) {
+                            if (f == i) {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+                static bool HasExtension(string path, string extension)
+                {
+                    if (path.size() == 0) {
+                        return false;
+                    }
+
+                    string ext = ItsPath::GetExtension(path);
+                    if (ext.size() == 0) {
+                        return false;
+                    }
+
+                    return (strcmp(ext.c_str(), extension.c_str()) == 0);
+                }
+                static string ChangeExtension(string path, string newExtension) 
+                {
+                    if (path.size() == 0) {
+                        return string("");
+                    }
+
+                    if (newExtension.size() == 0) {
+                        return path;
+                    }
+
+                    if (path[path.size() - 1] == ItsPath::PathSeparator) {
+                        return path;
+                    }
+
+                    string ext = ItsPath::GetExtension(path);
+                    if (ext.size() == 0) {
+                        if (newExtension[0] == ItsPath::ExtensionSeparator) {
+                            return path + newExtension;
+                        }
+                        else {
+                            return path + ItsPath::ExtensionSeparator + newExtension;
+                        }
+                    }
+
+                    auto pe = path.rfind(ext);
+                    if (pe == string::npos) {
+                        return path;
+                    }
+
+                    string retVal = path.replace(pe, path.size()-pe, newExtension);
+                    return retVal;
+                }
+
+                static string GetParentDirectory(string path) 
+                {
+                    if (path.size() == 0) {
+						return string("");
+					}
+
+                    path = ItsPath::GetDirectory(path);
+					
+					size_t pos1 = path.rfind(ItsPath::PathSeparator);
+					if (pos1 == string::npos) {
+						return string("");
+					}
+
+					size_t pos2 = pos1;
+					if (pos1 == (path.size() - 1)) {
+						pos2 = path.rfind(ItsPath::PathSeparator, pos1 - 1);
+						if (pos2 == string::npos) {
+							pos2 = pos1;
+						}
+					}
+
+					return path.substr(0, pos2+1);
+                }
+
             };
 
             //
