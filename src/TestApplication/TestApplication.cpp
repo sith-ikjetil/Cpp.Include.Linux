@@ -363,9 +363,6 @@ void TestItsLog()
     log.LogOther("This is an other log item");
     log.LogDebug("This is an debug log item");
 
-    PrintTestSubHeader("ToFriendlyString");
-    cout << log.ToFriendlyString() << endl;
-
     PrintTestSubHeader("ToString");
     cout << log.ToString() << endl;
 

@@ -1263,16 +1263,6 @@ namespace ItSoftware
 			string Description;
 			tm When;
 
-			string ToFriendlyString()
-			{
-				stringstream ss;
-				
-				ss << std::setiosflags(std::ios::left) << std::setw(12) << ItsLogUtil::LogTypeToString(this->Type) << ItsDateTime(this->When).ToString() << " " << this->Description;
-				
-				string retVal = ss.str();
-				return retVal;
-			}
-
 			string ToString()
 			{
 				stringstream ss;
@@ -1285,7 +1275,7 @@ namespace ItSoftware
 				auto description = ItsString::Replace(this->Description, nl1, rep_nl);
 				description = ItsString::Replace(description, nl2, rep_nl);
 				description = ItsString::Replace(description, s1, rep_s);
-				ss << ItsLogUtil::LogTypeToString(this->Type) << " : " << ItsDateTime(this->When).ToString("s") << " : " << description;
+				ss << "Type=" << ItsLogUtil::LogTypeToString(this->Type) << " " << "When=" << ItsDateTime(this->When).ToString("s") << " " << "Description=" << description;
 
 				string retVal = ss.str();
 				return retVal;
@@ -1403,26 +1393,9 @@ namespace ItSoftware
 				this->m_items.clear();
 			}
 
-			string ToFriendlyString()
-			{
-				stringstream ss;
-				for (auto i : this->m_items)
-				{
-					ss << i.ToFriendlyString() << endl;
-				}
-				
-				string retVal = ss.str();
-				return retVal;
-			}
-
 			string ToString()
 			{
 				stringstream ss;
-				string nl1("\r\n");
-				string nl2("\n");
-				string s1(":");
-				string rep_nl(" ");
-				string rep_s(" - ");
 				for (auto i : this->m_items)
 				{
 					ss << i.ToString() << endl;
@@ -1435,11 +1408,6 @@ namespace ItSoftware
 			string ToString(uint32_t tailN)
 			{
 				stringstream ss;
-				string nl1("\r\n");
-				string nl2("\n");
-				string s1(":");
-				string rep_nl(" ");
-				string rep_s(" - ");
 				if ( this->m_items.size() > tailN ) {
 					auto ptr = this->m_items.end();
 					ptr -= tailN;
