@@ -1164,7 +1164,7 @@ namespace ItSoftware
                 int m_fd;
                 int m_wd;
                 uint32_t m_mask;
-                unique_ptr<thread> m_pthread;
+                thread m_thread;
                 string m_pathname;
                 bool m_bPaused;
                 bool m_bStopped;
@@ -1183,7 +1183,6 @@ namespace ItSoftware
                             continue;
                         }
                         if (nRead == -1) {
-                            std::cerr << "ItsFileMonitor::ExecuteDispatchThread.read returned -1" << endl;
                             this->m_bStopped = true;
                             break;
                         }
@@ -1208,20 +1207,20 @@ namespace ItSoftware
                         m_bPaused(false),
                         m_bStopped(false)
                 {
-                    if (ItsFile::Exists(this->m_pathname) ) {
+                    if (ItsDirectory::Exists(this->m_pathname) ) {
                         this->m_fd = inotify_init();
                         if (this->m_fd == -1) {
-                            std::cerr << "inotify_init" << endl;
+                            //std::cerr << "inotify_init" << endl;
                             return;
                         }
 
                         this->m_wd = inotify_add_watch(this->m_fd, pathname.c_str(), mask);
                         if (this->m_wd == -1) {
-                            std::cerr << "inotify_add_watch" << endl;
+                            //std::cerr << "inotify_add_watch" << endl;
                             return;
                         }
                     
-                        this->m_pthread = make_unique<thread>(&ItsFileMonitor::ExecuteDispatchThread, this, func);
+                        this->m_thread = thread(&ItsFileMonitor::ExecuteDispatchThread, this, func);
                     }
                 }
                 void Pause() {
@@ -1244,6 +1243,10 @@ namespace ItSoftware
                 {
                     this->Stop();
 
+                    if ( this->m_thread.joinable()) {
+                        this->m_thread.join();
+                    }
+                    
                     if ( this->m_fd != -1 && this->m_wd != -1) {
                         int result = inotify_rm_watch(this->m_fd,this->m_wd);
                         if (result == 0) {
@@ -1252,8 +1255,6 @@ namespace ItSoftware
                             close(this->m_fd);
                             this->m_fd = -1;
                         }
-
-                        this->m_pthread->detach();
                     }
                 }
             };
