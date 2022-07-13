@@ -1192,7 +1192,6 @@ namespace ItSoftware
                             p += sizeof(inotify_event) + event->len;
                         }
                     }
-                    std::cout << endl << "end thread" << endl;
                 }
             public:
                 ItsFileMonitor(const string pathname, function<void(inotify_event&)> func)
