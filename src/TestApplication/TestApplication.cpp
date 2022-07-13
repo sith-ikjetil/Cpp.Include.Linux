@@ -70,6 +70,13 @@ void PrintTestApplicationEvent(string event);
 void HandleFileEvent(inotify_event& event);
 
 //
+// #define
+//
+#define CLR_GREEN      "\033[32m"
+#define CLR_WHITE      "\033[37;1m"
+#define CLR_RESET      "\033[0m"
+
+//
 // global data
 //
 ItsTimer g_timer;
@@ -132,7 +139,12 @@ int main(int argc, char* argv[])
 //
 void PrintTestApplicationEvent(string event)
 {
+    cout << CLR_RESET << CLR_GREEN;
+    
     cout << std::setw(80) << std::setfill('#') << std::left << "## Test Application " << endl;
+    
+    cout << CLR_RESET << CLR_WHITE;
+    
     cout << "> "<< event << " <" << endl;
 }
 
@@ -143,11 +155,15 @@ void PrintTestApplicationEvent(string event)
 //
 void PrintTestHeader(string txt)
 {
+    cout << CLR_RESET << CLR_GREEN;
+
     cout << endl;
 
     stringstream ss;
     ss << " " << txt << " ";
     cout << ItsString::WidthExpand(ss.str(), 80, '_', ItsExpandDirection::Middle) << endl;
+
+    cout << CLR_RESET << CLR_WHITE;
 }
 
 //
@@ -157,8 +173,12 @@ void PrintTestHeader(string txt)
 //
 void PrintTestSubHeader(string txt)
 {
+    cout << CLR_RESET << CLR_GREEN;
+
     cout << endl;
     cout << "__ " << txt << " __" << endl;
+
+    cout << CLR_RESET << CLR_WHITE;
 }
 
 //
