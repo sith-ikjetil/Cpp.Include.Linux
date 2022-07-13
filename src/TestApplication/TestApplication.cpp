@@ -731,7 +731,7 @@ void TestItsFileMonitorStop()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     g_fm->Stop();
-
+    
     PrintTestHeader("ItsFileMonitor Stop");
     cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open'" << endl;
     cout << "Events:" << endl;

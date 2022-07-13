@@ -1172,12 +1172,12 @@ namespace ItSoftware
             protected:
                 void ExecuteDispatchThread(function<void(inotify_event&)> func) {
                     char buffer[FILE_MONITOR_BUFFER_LENGTH];
-                    while( !this->m_bStopped ) {
+                    while ( !this->m_bStopped ) {
                         if (this->m_bPaused) {
                             std::this_thread::sleep_for(std::chrono::milliseconds(500));
                             continue;
                         }
-
+                        
                         ssize_t nRead = read(this->m_fd, buffer, FILE_MONITOR_BUFFER_LENGTH);
                         if (nRead == 0) {
                             continue;
@@ -1192,6 +1192,7 @@ namespace ItSoftware
                             p += sizeof(inotify_event) + event->len;
                         }
                     }
+                    std::cout << endl << "end thread" << endl;
                 }
             public:
                 ItsFileMonitor(const string pathname, function<void(inotify_event&)> func)
@@ -1213,6 +1214,7 @@ namespace ItSoftware
                             //std::cerr << "inotify_init" << endl;
                             return;
                         }
+                        fcntl(this->m_fd, F_SETFL, O_NONBLOCK);
 
                         this->m_wd = inotify_add_watch(this->m_fd, pathname.c_str(), mask);
                         if (this->m_wd == -1) {
@@ -1242,11 +1244,11 @@ namespace ItSoftware
                 ~ItsFileMonitor()
                 {
                     this->Stop();
-
+                    
                     if ( this->m_thread.joinable()) {
                         this->m_thread.join();
                     }
-                    
+
                     if ( this->m_fd != -1 && this->m_wd != -1) {
                         int result = inotify_rm_watch(this->m_fd,this->m_wd);
                         if (result == 0) {
