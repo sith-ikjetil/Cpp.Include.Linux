@@ -119,15 +119,15 @@ int main(int argc, char* argv[])
     TestItsRandom();
     TestItsTime();
     TestItsString();
-	TestItsLog();
-	TestItsFile();
+    TestItsLog();
+    TestItsFile();
     TestItsDateTime();
     TestItsID();
     TestItsGuid();
     TestItsPath();
     TestItsDirectory();
     TestItsFileMonitorStop();
-	TestItsTimerStop();
+    TestItsTimerStop();
 
     return EXIT_SUCCESS;
 }
