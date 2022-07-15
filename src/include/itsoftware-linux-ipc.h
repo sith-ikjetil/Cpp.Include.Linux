@@ -63,6 +63,10 @@ namespace ItSoftware::Linux::IPC
     protected:
     public:
         //
+        // Default backdrop for this class.
+        //
+        inline static const int DefaultBackdrop = 5;
+        //
         // Constructor: ItsNetPassive
         //
         // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.

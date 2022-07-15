@@ -820,7 +820,7 @@ void TestItsSocketPassiveActiveStart()
 
     g_addr.sun_family = AF_UNIX;
     
-    g_socket_passive = make_unique<ItsSocketPassive>(ItsSocketDomain::UNIX, ItsSocketConType::STREAM, (struct sockaddr*)&g_addr, sizeof(g_addr), 5);
+    g_socket_passive = make_unique<ItsSocketPassive>(ItsSocketDomain::UNIX, ItsSocketConType::STREAM, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketPassive::DefaultBackdrop);
     if ( g_socket_passive->GetInitWithError()) {
         cout << "ItsNetPassive, Init with error" << endl;
     }
