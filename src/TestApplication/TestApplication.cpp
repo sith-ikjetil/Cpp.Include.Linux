@@ -10,9 +10,13 @@
 //
 #include <iostream>
 #include <string>
+#include <chrono>
 #include <vector>
+#include <thread>
+#include <memory>
 #include "../include/itsoftware-linux.h"
 #include "../include/itsoftware-linux-core.h"
+#include "../include/itsoftware-linux-ipc.h"
 
 //
 // using
@@ -20,8 +24,10 @@
 using std::cout;
 using std::endl;
 using std::vector;
+using std::thread;
 using std::string;
 using std::stringstream;
+using std::to_string;
 using std::unique_ptr;
 using std::make_unique;
 using ItSoftware::Linux::ItsString;
@@ -44,10 +50,15 @@ using ItSoftware::Linux::Core::ItsDirectory;
 using ItSoftware::Linux::Core::ItsError;
 using ItSoftware::Linux::Core::ItsFileMonitor;
 using ItSoftware::Linux::Core::ItsFileMonitorMask;
+using ItSoftware::Linux::IPC::ItsSocketPassive;
+using ItSoftware::Linux::IPC::ItsSocketActive;
+using ItSoftware::Linux::IPC::ItsSocketConType;
+using ItSoftware::Linux::IPC::ItsSocketDomain;
 
 //
 // Function Prototypes
 //
+void TestItsSocketPassiveActiveStart();
 void TestItsConvert();
 void TestItsRandom();
 void TestItsTime();
@@ -68,6 +79,7 @@ void PrintTestHeader(string txt);
 void PrintTestSubHeader(string txt);
 void PrintTestApplicationEvent(string event);
 void HandleFileEvent(inotify_event& event);
+void TestItsSocketPassiveActiveStop();
 
 //
 // #define
@@ -81,6 +93,8 @@ void HandleFileEvent(inotify_event& event);
 //
 ItsTimer g_timer;
 unique_ptr<ItsFileMonitor> g_fm;
+unique_ptr<ItsSocketPassive> g_socket_passive;
+unique_ptr<ItsSocketActive>  g_socket_active;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 char g_shredFilename[] = "/home/kjetilso/test2shred.txt";
@@ -90,6 +104,10 @@ string g_invalidPath("home\0/kjetilso");
 string g_directoryRoot("/home/kjetilso");
 string g_creatDir("/home/kjetilso/testdir");
 vector<string> g_fileMonNames;
+vector<string> g_socket_traffic;
+unique_ptr<thread> g_socket_thread1;
+unique_ptr<thread> g_socket_thread2;
+struct sockaddr_un g_addr{0};
 
 //
 // Function: ExitFn
@@ -113,6 +131,7 @@ int main(int argc, char* argv[])
 
     PrintTestApplicationEvent("Started");
 
+    TestItsSocketPassiveActiveStart();
 	TestItsTimerStart();
     TestItsFileMonitorStart();
     TestItsConvert();
@@ -128,6 +147,7 @@ int main(int argc, char* argv[])
     TestItsDirectory();
     TestItsFileMonitorStop();
     TestItsTimerStop();
+    TestItsSocketPassiveActiveStop();
 
     return EXIT_SUCCESS;
 }
@@ -792,4 +812,88 @@ void HandleFileEvent(inotify_event& event)
     }
 
     g_fileMonNames.push_back(ss.str());
+}
+
+void TestItsSocketPassiveActiveStart()
+{
+    PrintTestHeader("ItsNet[Passive/Active] Start");
+
+    g_addr.sun_family = AF_UNIX;
+    
+    g_socket_passive = make_unique<ItsSocketPassive>(ItsSocketDomain::UNIX, ItsSocketConType::STREAM, (struct sockaddr*)&g_addr, sizeof(g_addr), 5);
+    if ( g_socket_passive->GetInitWithError()) {
+        cout << "ItsNetPassive, Init with error" << endl;
+    }
+    cout << "ItsNetPassive, Init Ok!" << endl;
+
+    g_socket_active = make_unique<ItsSocketActive>(ItsSocketDomain::UNIX, ItsSocketConType::STREAM, (struct sockaddr*)&g_addr, sizeof(g_addr));
+    if ( g_socket_active->GetInitWithError()) {
+        cout << "ItsNetActive, Init with error" << endl;
+    }
+    cout << "ItsNetActive, Init Ok!" << endl;
+
+    if ( g_socket_passive->GetInitWithError() || g_socket_active->GetInitWithError() ) {
+        return;
+    }
+
+    g_socket_thread1 = make_unique<thread>([] () {
+        struct sockaddr_un accept_addr{0};
+        socklen_t accept_addr_len(0);
+        char buf[1000];
+        bool quit = false;
+        while (!quit) {
+            auto fd = g_socket_passive->Accept((struct sockaddr*)&accept_addr,&accept_addr_len);
+            if ( fd >= 0 ) {
+                g_socket_traffic.push_back("g_socket_passive.Accept OK");
+                
+                auto nr = g_socket_passive->Read(fd, buf, 1000);
+                g_socket_traffic.push_back("g_socket_passive.Read " + to_string(nr) + " bytes, " + buf);
+                
+                strcpy(buf, "This is a response ECHO ONE!");
+                auto nw = g_socket_passive->Write(fd, buf, strlen(buf)+1);
+                g_socket_traffic.push_back("g_socket_passive.Write " + to_string(nw) + " bytes, " + buf);
+                quit = true;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+    });
+    g_socket_thread2 = make_unique<thread>([] () {   
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        if (g_socket_active->Connect((struct sockaddr*)&g_addr, sizeof(g_addr)) == 0) {
+            g_socket_traffic.push_back("g_socket_active.Connect OK");
+
+            char buf[1001] = "This is a test string.";
+            auto nw = g_socket_active->Write(buf, strlen(buf)+1);
+            g_socket_traffic.push_back("g_socket_active.Write " + to_string(nw) + " bytes, " + buf);
+            auto nr = g_socket_active->Read(buf, 1001);
+            g_socket_traffic.push_back("g_socket_active.Read " + to_string(nr) + " bytes, " + buf);
+        
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        else {
+            g_socket_traffic.push_back("ItsSocketActive, failed to connect.");
+        }
+    });
+}
+
+void TestItsSocketPassiveActiveStop()
+{
+    PrintTestHeader("ItsSocket[Passive/Active] Stop");
+
+    for ( auto s : g_socket_traffic) {
+        cout << s << endl;
+    }
+
+    cout << "Closing net..." << endl;
+    g_socket_active->Close();
+    g_socket_passive->Close();
+    cout << "... net closed" << endl;
+
+    if ( g_socket_thread1 != nullptr ) {
+        cout << "Thread joining..." << endl;
+        g_socket_thread1->join();
+        g_socket_thread2->join();
+        cout << "... threads joined" << endl;
+    }
 }
