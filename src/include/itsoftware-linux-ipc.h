@@ -65,7 +65,7 @@ namespace ItSoftware::Linux::IPC
         //
         // Default backdrop for this class.
         //
-        inline static const int DefaultBackdrop = 5;
+        constexpr static int DefaultBackdrop = 5;
         //
         // Constructor: ItsNetPassive
         //
