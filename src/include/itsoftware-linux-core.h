@@ -1273,21 +1273,37 @@ namespace ItSoftware
                 inline static bool s_sigkill = false;
                 inline static bool s_sigstop = false;
                 inline static bool s_sigterm = false;
+                inline static function<void(void)> s_fnSigKill;
+                inline static function<void(void)> s_fnSigTerm;
+                inline static function<void(void)> s_fnSigStop;
+                inline static function<void(void)> s_fnSigCont;
             protected:
                 static void SigHupHandler(int sig) {
                     switch(sig)
                     {
                         case SIGKILL:
                             ItsDaemon::s_sigkill = true;
+                            if (ItsDaemon::s_fnSigKill != nullptr) {
+                                ItsDaemon::s_fnSigKill();
+                            }
                             break;
                         case SIGSTOP:
                             ItsDaemon::s_sigstop = true;
+                            if (ItsDaemon::s_fnSigStop != nullptr) {
+                                ItsDaemon::s_fnSigStop();
+                            }
                             break;
                         case SIGTERM:
                             ItsDaemon::s_sigterm = true;
+                            if (ItsDaemon::s_fnSigTerm != nullptr) {
+                                ItsDaemon::s_fnSigTerm();
+                            }
                             break;
                         case SIGCONT:
                             ItsDaemon::s_sigstop = false;
+                            if (ItsDaemon::s_fnSigCont != nullptr) {
+                                ItsDaemon::s_fnSigCont();
+                            }
                             break;
                         default:
                             break;
@@ -1374,30 +1390,66 @@ namespace ItSoftware
                     return (this->m_deamonRetVal == 0);
                 }
                 //
-                // Function: GetSIGKILL
+                // Function: GetSigKill
                 //
                 // (i): kill signal usually only set if SIGTERM does not work.
                 //
-                static bool GetSIGKILL() {
+                static bool GetSigKill() {
                     return ItsDaemon::s_sigkill;
                 }
                 //
-                // Function: GetSIGSTOP
+                // Function: GetSigStop
                 //
                 // (i): pause signal. allows continue usage with SIGCONT. If 
                 //      SIGSTOP is true and SIGCONT is signaled, then GetSIGSTOP 
                 //      will return false.
                 //
-                static bool GetSIGSTOP() {
+                static bool GetSigStop() {
                     return ItsDaemon::s_sigstop;
                 }
                 //
-                // Function: GetSIGTERM
+                // Function: GetSigTerm
                 //
                 // (i): normal daemon termination signal. should shut down daemon.
                 //
-                static bool GetSIGTERM() {
+                static bool GetSigTerm() {
                     return ItsDaemon::s_sigterm;
+                }
+                //
+                // Function: SetSigKill
+                //
+                // (i): set handler for SIGKILL
+                //
+                static void SetSigKill(function<void(void)> fn)
+                {
+                    ItsDaemon::s_fnSigKill = fn;
+                }
+                                //
+                // Function: SetSigKill
+                //
+                // (i): set handler for SIGKILL
+                //
+                static void SetSigTerm(function<void(void)> fn)
+                {
+                    ItsDaemon::s_fnSigTerm = fn;
+                }
+                //
+                // Function: SetSigKill
+                //
+                // (i): set handler for SIGKILL
+                //
+                static void SetSigStop(function<void(void)> fn)
+                {
+                    ItsDaemon::s_fnSigStop = fn;
+                }
+                //
+                // Function: SetSigKill
+                //
+                // (i): set handler for SIGCONT
+                //
+                static void SetSigCont(function<void(void)> fn)
+                {
+                    ItsDaemon::s_fnSigCont = fn;
                 }
             };
         } // namespace Core

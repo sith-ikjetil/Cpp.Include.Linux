@@ -37,14 +37,19 @@ int main(int argc, char* argv[])
         // Return daemon unsuccessfull
         //
         return EXIT_FAILURE;
-    }    
+    }
 
+    //
+    // Set handlers for important signals
+    //
+    ItsDaemon::SetSigKill( [] (void) { _exit(1); } );
+    
     //
     // Implement your daemon logic here. 
     // This is only an example: appending lines to a file.
     //
-    while (!ItsDaemon::GetSIGKILL() && !ItsDaemon::GetSIGTERM()) {
-        if (!ItsDaemon::GetSIGSTOP()) {
+    while (!ItsDaemon::GetSigKill() && !ItsDaemon::GetSigTerm()) {
+        if (!ItsDaemon::GetSigStop()) {
             ItsFile file;
             if (!file.OpenOrCreate("/home/kjetilso/daemon.txt","rwa",ItsFile::CreateMode("rw","rw","rw")))
             {
