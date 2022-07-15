@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/un.h>
+#include <sys/types.h>
 #include <sys/socket.h>
 
 //
@@ -44,12 +45,12 @@ namespace ItSoftware::Linux::IPC
     };
 
     //
-    // class: ItsSocketPassive
+    // class: ItsSocketStreamServer
     //
     // (i): Class for passive socket communications.
     //      Allows for listen and response.
     //
-    class ItsSocketPassive
+    class ItsSocketStreamServer
     {
     private:
         ItsSocketDomain m_domain;
@@ -67,13 +68,13 @@ namespace ItSoftware::Linux::IPC
         //
         constexpr static int DefaultBackdrop = 5;
         //
-        // Constructor: ItsNetPassive
+        // Constructor: ItsSocketStreamServer
         //
         // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.
         //
-        ItsSocketPassive(ItsSocketDomain domain, ItsSocketConType type, const struct sockaddr *addr, socklen_t addrlen, int backlog)
+        ItsSocketStreamServer(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen, int backlog)
             : m_domain(domain),
-            m_type(type),
+            m_type(ItsSocketConType::STREAM),
             m_addr(addr),
             m_backlog(backlog),
             m_addrlen(addrlen),
@@ -102,11 +103,11 @@ namespace ItSoftware::Linux::IPC
             }
         }
         //
-        // Destructor: ~ItsNetPassive
+        // Destructor: ~ItsSocketStreamServer
         //
         // (i): Destructor.
         //
-        ~ItsSocketPassive()
+        ~ItsSocketStreamServer()
         {
             this->Close();
         }
@@ -178,7 +179,7 @@ namespace ItSoftware::Linux::IPC
     //
     // (i): Class for active socket communication.
     //
-    class ItsSocketActive
+    class ItsSocketStreamClient
     {
     private:
         ItsSocketDomain m_domain;
@@ -196,9 +197,9 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.
         //
-        ItsSocketActive(ItsSocketDomain domain, ItsSocketConType type, const struct sockaddr *addr, socklen_t addrlen)
+        ItsSocketStreamClient(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen)
             : m_domain(domain),
-            m_type(type),
+            m_type(ItsSocketConType::STREAM),
             m_addr(addr),
             m_addrlen(addrlen),
             m_bInitWithError(true),
@@ -217,7 +218,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Destructor.
         //
-        ~ItsSocketActive()
+        ~ItsSocketStreamClient()
         {
             this->Close();
         }
@@ -262,6 +263,222 @@ namespace ItSoftware::Linux::IPC
         ssize_t Write(const void* buf, size_t n)
         {
             return write(this->m_socketfd, buf, n);
+        }
+        //
+        // Method: GetInitWithError
+        //
+        // (i): Returnes bool if initialization errored.
+        //
+        bool GetInitWithError()
+        {
+            return this->m_bInitWithError;
+        }
+        //
+        // Method: GetIsClosed
+        //
+        // (i): Returnes bool if class is closed.
+        //
+        bool GetIsClosed()
+        {
+            return this->m_bIsClosed;
+        }
+    };
+    //
+    // class: ItsSocketDatagramServer
+    //
+    // (i): Class for datagram socket communications.
+    //      Allows for listen and response.
+    //
+    class ItsSocketDatagramServer
+    {
+    private:
+        ItsSocketDomain m_domain;
+        ItsSocketConType m_type;
+        const struct sockaddr* m_addr;
+        socklen_t m_addrlen;
+        int m_socketfd;
+        bool m_bInitWithError;
+        bool m_bIsClosed;
+    protected:
+    public:
+        //
+        // Constructor: ItsSocketDatagramServer
+        //
+        // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.
+        //
+        ItsSocketDatagramServer(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen)
+            : m_domain(domain),
+            m_type(ItsSocketConType::DGRAM),
+            m_addr(addr),
+            m_addrlen(addrlen),
+            m_bInitWithError(true),
+            m_bIsClosed(false)
+        {
+            this->m_socketfd = socket(this->m_domain, this->m_type, 0);
+            if (this->m_socketfd >= 0) {
+                fcntl(this->m_socketfd, F_SETFL, O_NONBLOCK);
+                int retval = bind(this->m_socketfd, addr, addrlen);
+                if (retval == 0) {
+                    this->m_bInitWithError = false;
+                }
+                else {
+                    this->Close();
+                }
+            }
+            else {
+                this->Close();
+            }
+        }
+        //
+        // Destructor: ~ItsNetPassive
+        //
+        // (i): Destructor.
+        //
+        ~ItsSocketDatagramServer()
+        {
+            this->Close();
+        }
+        //
+        // Method: Close
+        //
+        // (i): Cleans up resources consumed by this class instance.
+        //
+        void Close()
+        {
+            if ( !this->m_bIsClosed ) {
+                if (this->m_socketfd >= 0) {
+                    close(this->m_socketfd);
+                    this->m_socketfd = -1;
+                }
+                this->m_bIsClosed = true;
+            }
+        }
+        //
+        // Method: Read
+        //
+        // (i): Reads from client.
+        //
+        ssize_t RecvFrom(void* buf, size_t n, int flags, struct sockaddr* src_addr, socklen_t* addrlen)
+        {
+            return recvfrom(this->m_socketfd, buf, n, flags, src_addr, addrlen);
+        }
+        //
+        // Method: Write
+        //
+        // (i): Writes to client.
+        //
+        ssize_t SendTo(const void* buf, size_t n, int flags, const struct sockaddr* dest_addr, socklen_t addrlen)
+        {
+            return sendto(this->m_socketfd, buf, n, flags, dest_addr, addrlen);
+        }
+        //
+        // Method: GetInitWithError
+        //
+        // (i): Return if ItsNetPassive initialized with or without error.
+        //      If with error, then object not usable.
+        //
+        bool GetInitWithError()
+        {
+            return this->m_bInitWithError;
+        }
+        //
+        // Method: GetIsClosed
+        //
+        // (i): Returnes bool if class instance is closed or not. If closed cannot be used.
+        //
+        bool GetIsClosed()
+        {
+            return this->m_bIsClosed;
+        }
+    };// ItsNetPassive
+
+    //
+    // class: ItsSocketActive
+    //
+    // (i): Class for active socket communication.
+    //
+    class ItsSocketDatagramClient
+    {
+    private:
+        ItsSocketDomain m_domain;
+        ItsSocketConType m_type;
+        const struct sockaddr* m_addr;
+        socklen_t m_addrlen;
+        int m_backlog;
+        int m_socketfd;
+        bool m_bInitWithError;
+        bool m_bIsClosed;
+    protected:
+    public:
+        //
+        // Constructor: ItsNetPassive
+        //
+        // (i): Datagram socket constructor. After constructor check GetInitWithError if all is well.
+        //
+        ItsSocketDatagramClient(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen)
+            : m_domain(domain),
+            m_type(ItsSocketConType::DGRAM),
+            m_addr(addr),
+            m_addrlen(addrlen),
+            m_bInitWithError(true),
+            m_bIsClosed(false)
+        {
+            this->m_socketfd = socket(this->m_domain, this->m_type, 0);
+            if (this->m_socketfd >= 0) {
+                fcntl(this->m_socketfd, F_SETFL, O_NONBLOCK);
+                int retval = bind(this->m_socketfd, addr, addrlen);
+                if (retval == 0) {
+                    this->m_bInitWithError = false;
+                }
+                else {
+                    this->Close();
+                }
+            }
+            else {
+                this->Close();
+            }
+        }
+        //
+        // Destructor: ~ItsNetPassive
+        //
+        // (i): Destructor.
+        //
+        ~ItsSocketDatagramClient()
+        {
+            this->Close();
+        }
+        //
+        // Method: Close
+        //
+        // (i): Cleans up resources consumed by this class instance.
+        //
+        void Close()
+        {
+            if ( !this->m_bIsClosed ) {
+                if (this->m_socketfd >= 0) {
+                    close(this->m_socketfd);
+                    this->m_socketfd = -1;
+                }
+                this->m_bIsClosed = true;
+            }
+        }
+        //
+        // Method: Read
+        //
+        // (i): Reads from client.
+        //
+        ssize_t RecvFrom(void* buf, size_t n, int flags, struct sockaddr* src_addr, socklen_t* addrlen)
+        {
+            return recvfrom(this->m_socketfd, buf, n, flags, src_addr, addrlen);
+        }
+        //
+        // Method: Write
+        //
+        // (i): Writes to client.
+        //
+        ssize_t SendTo(const void* buf, size_t n, int flags, const struct sockaddr* dest_addr, socklen_t addrlen)
+        {
+            return sendto(this->m_socketfd, buf, n, flags, dest_addr, addrlen);
         }
         //
         // Method: GetInitWithError

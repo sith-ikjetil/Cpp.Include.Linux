@@ -50,15 +50,18 @@ using ItSoftware::Linux::Core::ItsDirectory;
 using ItSoftware::Linux::Core::ItsError;
 using ItSoftware::Linux::Core::ItsFileMonitor;
 using ItSoftware::Linux::Core::ItsFileMonitorMask;
-using ItSoftware::Linux::IPC::ItsSocketPassive;
-using ItSoftware::Linux::IPC::ItsSocketActive;
+using ItSoftware::Linux::IPC::ItsSocketStreamServer;
+using ItSoftware::Linux::IPC::ItsSocketStreamClient;
 using ItSoftware::Linux::IPC::ItsSocketConType;
 using ItSoftware::Linux::IPC::ItsSocketDomain;
+using ItSoftware::Linux::IPC::ItsSocketDatagramServer;
+using ItSoftware::Linux::IPC::ItsSocketDatagramClient;
 
 //
 // Function Prototypes
 //
-void TestItsSocketPassiveActiveStart();
+void TestItsSocketStreamClientServerStart();
+void TestItsSocketDatagramClientServerStart();
 void TestItsConvert();
 void TestItsRandom();
 void TestItsTime();
@@ -79,7 +82,8 @@ void PrintTestHeader(string txt);
 void PrintTestSubHeader(string txt);
 void PrintTestApplicationEvent(string event);
 void HandleFileEvent(inotify_event& event);
-void TestItsSocketPassiveActiveStop();
+void TestItsSocketStreamClientServerStop();
+void TestItsSocketDatagramClientServerStop();
 
 //
 // #define
@@ -93,8 +97,10 @@ void TestItsSocketPassiveActiveStop();
 //
 ItsTimer g_timer;
 unique_ptr<ItsFileMonitor> g_fm;
-unique_ptr<ItsSocketPassive> g_socket_passive;
-unique_ptr<ItsSocketActive>  g_socket_active;
+unique_ptr<ItsSocketStreamServer> g_socket_passive;
+unique_ptr<ItsSocketStreamClient>  g_socket_active;
+unique_ptr<ItsSocketDatagramServer> g_socket_dg_server;
+unique_ptr<ItsSocketDatagramClient>  g_socket_dg_client;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 char g_shredFilename[] = "/home/kjetilso/test2shred.txt";
@@ -105,9 +111,14 @@ string g_directoryRoot("/home/kjetilso");
 string g_creatDir("/home/kjetilso/testdir");
 vector<string> g_fileMonNames;
 vector<string> g_socket_traffic;
+vector<string> g_socket_dg_traffic;
 unique_ptr<thread> g_socket_thread1;
 unique_ptr<thread> g_socket_thread2;
 struct sockaddr_un g_addr{0};
+struct sockaddr_un g_saddr{0};
+struct sockaddr_un g_caddr{0};
+unique_ptr<thread> g_socket_dg_thread1;
+unique_ptr<thread> g_socket_dg_thread2;
 
 //
 // Function: ExitFn
@@ -131,7 +142,8 @@ int main(int argc, char* argv[])
 
     PrintTestApplicationEvent("Started");
 
-    TestItsSocketPassiveActiveStart();
+    TestItsSocketStreamClientServerStart();
+    TestItsSocketDatagramClientServerStart();
 	TestItsTimerStart();
     TestItsFileMonitorStart();
     TestItsConvert();
@@ -147,7 +159,8 @@ int main(int argc, char* argv[])
     TestItsDirectory();
     TestItsFileMonitorStop();
     TestItsTimerStop();
-    TestItsSocketPassiveActiveStop();
+    TestItsSocketDatagramClientServerStop();
+    TestItsSocketStreamClientServerStop();
 
     return EXIT_SUCCESS;
 }
@@ -814,19 +827,24 @@ void HandleFileEvent(inotify_event& event)
     g_fileMonNames.push_back(ss.str());
 }
 
-void TestItsSocketPassiveActiveStart()
+//
+// Function: TestItsSocketStreamClientServerStart
+//
+// (i): Starts testing socket stream client server.
+//
+void TestItsSocketStreamClientServerStart()
 {
-    PrintTestHeader("ItsNet[Passive/Active] Start");
+    PrintTestHeader("ItsSocketStream[Client/Server] Start");
 
     g_addr.sun_family = AF_UNIX;
     
-    g_socket_passive = make_unique<ItsSocketPassive>(ItsSocketDomain::UNIX, ItsSocketConType::STREAM, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketPassive::DefaultBackdrop);
+    g_socket_passive = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop);
     if ( g_socket_passive->GetInitWithError()) {
         cout << "ItsNetPassive, Init with error" << endl;
     }
     cout << "ItsNetPassive, Init Ok!" << endl;
 
-    g_socket_active = make_unique<ItsSocketActive>(ItsSocketDomain::UNIX, ItsSocketConType::STREAM, (struct sockaddr*)&g_addr, sizeof(g_addr));
+    g_socket_active = make_unique<ItsSocketStreamClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr));
     if ( g_socket_active->GetInitWithError()) {
         cout << "ItsNetActive, Init with error" << endl;
     }
@@ -863,10 +881,10 @@ void TestItsSocketPassiveActiveStart()
         if (g_socket_active->Connect((struct sockaddr*)&g_addr, sizeof(g_addr)) == 0) {
             g_socket_traffic.push_back("g_socket_active.Connect OK");
 
-            char buf[1001] = "This is a test string.";
+            char buf[1000] = "This is a test string.";
             auto nw = g_socket_active->Write(buf, strlen(buf)+1);
             g_socket_traffic.push_back("g_socket_active.Write " + to_string(nw) + " bytes, " + buf);
-            auto nr = g_socket_active->Read(buf, 1001);
+            auto nr = g_socket_active->Read(buf, 1000);
             g_socket_traffic.push_back("g_socket_active.Read " + to_string(nr) + " bytes, " + buf);
         
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -877,9 +895,14 @@ void TestItsSocketPassiveActiveStart()
     });
 }
 
-void TestItsSocketPassiveActiveStop()
+//
+// Function: TestItsSocketStreamClientServerStop
+//
+// (i): Stop testing socket stream client server.
+//
+void TestItsSocketStreamClientServerStop()
 {
-    PrintTestHeader("ItsSocket[Passive/Active] Stop");
+    PrintTestHeader("ItsSocketStream[Client/Server] Stop");
 
     for ( auto s : g_socket_traffic) {
         cout << s << endl;
@@ -894,6 +917,118 @@ void TestItsSocketPassiveActiveStop()
         cout << "Thread joining..." << endl;
         g_socket_thread1->join();
         g_socket_thread2->join();
+        cout << "... threads joined" << endl;
+    }
+}
+
+//
+// Function: TestItsSocketDatagramClientServerStart
+//
+// (i): Starts testing socket datagram client server.
+//
+void TestItsSocketDatagramClientServerStart()
+{
+    PrintTestHeader("ItsSocketDatagram[Client/Server] Start");
+
+    const char SV_SOCK_PATH[] = "/tmp/its-server";
+    remove(SV_SOCK_PATH);
+    g_saddr.sun_family = AF_UNIX;
+    strcpy(g_saddr.sun_path, SV_SOCK_PATH);
+    
+    const char CL_SOCK_PATH[] = "/tmp/its-client";
+    remove(CL_SOCK_PATH);
+    g_caddr.sun_family = AF_UNIX;
+    strcpy(g_caddr.sun_path, CL_SOCK_PATH);
+
+    g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_saddr, sizeof(g_saddr));
+    if ( g_socket_dg_server->GetInitWithError()) {
+        cout << "ItsSocketDatagramServer, Init with error" << endl;
+    }
+    else {
+        cout << "ItsSocketDatagramServer, Init Ok!" << endl;
+    }
+
+    g_socket_dg_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_caddr, sizeof(g_caddr));
+    if ( g_socket_dg_client->GetInitWithError()) {
+        cout << "ItsSocketDatagramClient, Init with error" << endl;
+    }
+    else {
+        cout << "ItsSocketDatagramClient, Init Ok!" << endl;
+    }
+
+    if ( g_socket_dg_server->GetInitWithError() || g_socket_dg_client->GetInitWithError() ) {
+        return;
+    }
+
+    g_socket_dg_thread1 = make_unique<thread>([] () {
+        struct sockaddr_un accept_addr{0};
+        socklen_t accept_addr_len(0);
+        char buf[1000];
+        bool quit = false;
+        while (!quit) {
+            auto nr = g_socket_dg_server->RecvFrom(buf, 1000, 0, (struct sockaddr*)&accept_addr,&accept_addr_len);
+            if ( nr > 0 ) {
+                g_socket_dg_traffic.push_back("g_socket_dg_server.RecvFrom " + to_string(nr) + " bytes, " + buf);
+            
+                strcpy(buf, "This is a response ECHO ONE!");
+                auto nw = g_socket_dg_server->SendTo(buf, strlen(buf)+1, 0, (struct sockaddr*)&g_caddr, sizeof(g_caddr));
+                g_socket_dg_traffic.push_back("g_socket_dg_server.SendTo " + to_string(nw) + " bytes, " + buf);
+                
+                quit = true;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+    });
+
+    g_socket_dg_thread2 = make_unique<thread>([] () {   
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        struct sockaddr_un accept_addr{0};
+        socklen_t accept_addr_len(0);
+
+        char buf[1000] = "This is a test string.";
+        auto nw = g_socket_dg_client->SendTo(buf, strlen(buf)+1, 0, (struct sockaddr*)&g_saddr, sizeof(g_saddr));
+        g_socket_dg_traffic.push_back("g_socket_dg_client.SendTo " + to_string(nw) + " bytes, " + buf);
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+        bool quit = false;
+        while (!quit)
+        { 
+            auto nr = g_socket_dg_client->RecvFrom(buf, 1000, 0, (struct sockaddr*)&accept_addr,&accept_addr_len);
+            if ( nr > 0 ) {
+                g_socket_dg_traffic.push_back("g_socket_dg_client.RecvFrom " + to_string(nr) + " bytes, " + buf);
+                quit = true;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+    });
+}
+
+//
+// Function: TestItsSocketDatagramClientServerStop
+//
+// (i): Stop testing socket datagram client server.
+//
+void TestItsSocketDatagramClientServerStop()
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+    PrintTestHeader("ItsSocketDatagram[Client/Server] Stop");
+
+    for ( auto s : g_socket_dg_traffic) {
+        cout << s << endl;
+    }
+
+    cout << "Closing net..." << endl;
+    g_socket_dg_client->Close();
+    g_socket_dg_server->Close();
+    cout << "... net closed" << endl;
+
+    if ( g_socket_thread1 != nullptr ) {
+        cout << "Thread joining..." << endl;
+        g_socket_dg_thread1->join();
+        g_socket_dg_thread2->join();
         cout << "... threads joined" << endl;
     }
 }
