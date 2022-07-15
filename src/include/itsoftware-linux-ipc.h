@@ -262,11 +262,20 @@ namespace ItSoftware::Linux::IPC
         //
         // Method: GetInitWithError
         //
-        // (i): Returnes flag if initialization errored.
+        // (i): Returnes bool if initialization errored.
         //
         bool GetInitWithError()
         {
             return this->m_bInitWithError;
+        }
+        //
+        // Method: GetIsClosed
+        //
+        // (i): Returnes bool if class is closed.
+        //
+        bool GetIsClosed()
+        {
+            return this->m_bIsClosed;
         }
     };
 }// ItSoftware::Linux::IPC
