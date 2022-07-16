@@ -15,6 +15,7 @@
 #include <sys/un.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/msg.h>
 
 //
 // namespace
@@ -686,6 +687,145 @@ namespace ItSoftware::Linux::IPC
                 return read(this->m_fd[0], buf, n);
             }
             return -1;
+        }
+    };
+    //
+    // enum ItsSvMsgQueueFlags
+    //
+    // (i): 
+    //
+    enum ItsSvMsgQueueFlags : unsigned int
+    {
+        MQF_NONE = 0,
+        MQF_CREAT = IPC_CREAT, // if queue not exist, create one.
+        MQF_EXCL = IPC_EXCL    // if IPC_CREAT is set, and queue exist, fail with EEXIST.
+    };
+    //
+    // enum ItsSvMsgFlags
+    //
+    // (i): 
+    //
+    enum ItsSvMsgFlags : unsigned int
+    {
+        MF_NONE = 0,
+        MF_NOWAIT = IPC_NOWAIT // do not block
+    };
+    //
+    //
+    //
+    //
+    //struct ItsSvMsg {
+    //    ItsSvMsg(size_t n)
+    //    : mtext(n)
+    //  {}
+    //
+    //   long mtype;
+    //   vector<char> mtext;
+    //};
+    //
+    // class: ItsSvMsgQueue
+    //
+    // (i): System V IPC Message Queue
+    //
+    class ItsSvMessageQueue
+    {
+    private:
+        key_t m_key;
+        int m_msqid;
+        bool m_bIsDeleted;
+        bool m_bInitWithError;
+        int m_errno;
+    protected:
+    public:
+        //
+        // Method: Constructor
+        //
+        // (i): Constructor.
+        //
+        ItsSvMessageQueue(key_t key, ItsSvMsgQueueFlags flags)
+            : m_key(key),
+            m_msqid(-1),
+            m_bIsDeleted(false), 
+            m_bInitWithError(true),
+            m_errno(0)
+        {
+            this->m_msqid = msgget(this->m_key, flags | S_IRUSR | S_IWUSR);
+            if ( this->m_msqid != -1) {
+                this->m_bInitWithError = false;
+            }
+            else {
+                this->m_errno = errno;
+            }
+        }
+        //
+        // Method: GetInitWithError
+        //
+        // (i): Returnes true if initialization failed.
+        //
+        bool GetInitWithError()
+        {
+            return this->m_bInitWithError;
+        }
+        //
+        // Method: GetInitWithErrorErrnum
+        //
+        // (i): Returns initialization error code.
+        //
+        int GetInitWithErrorErrno()
+        {
+            return this->m_errno;
+        }
+        //
+        // Method: MsgSnd
+        //
+        // (i): Sends a message.
+        //
+        int MsgSnd(const void* msg, size_t msgsz, ItsSvMsgFlags msgflags)
+        {
+            return msgsnd(this->m_msqid, (const void*)msg, msgsz, msgflags);
+        }
+        //
+        // Method: MsgRcv
+        //
+        // (i): Sends a message.
+        //
+        ssize_t MsgRcv(void* msg, size_t maxmsgsz, long msgtype, ItsSvMsgFlags msgflags)
+        {
+            return msgrcv(this->m_msqid, (void*)msg, maxmsgsz, msgtype, msgflags);
+        }
+        //
+        // Method: Delete
+        //
+        // (i): Deletes message queue.
+        //
+        int Delete()
+        {
+            if (!this->m_bIsDeleted) {
+                int retval = msgctl(this->m_msqid, IPC_RMID, 0);
+                if (retval != -1) {
+                    this->m_bIsDeleted = true;
+                } 
+                return retval;
+            }
+            return -1;
+        }
+        //
+        // Method: GetIsDelted
+        //
+        // (i): Gets flag if queue has been deleted.
+        //
+        bool GetIsDeleted()
+        {
+            return this->m_bIsDeleted;
+        }
+        //
+        // Method: GetMessageQueueId
+        //
+        // (i): Returnes message queue id.
+        //
+        int GetMessageQueueId()
+        {
+            return this->m_msqid;
         }
     };
 }// ItSoftware::Linux::IPC

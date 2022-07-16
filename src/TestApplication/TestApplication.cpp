@@ -57,6 +57,9 @@ using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramServer;
 using ItSoftware::Linux::IPC::ItsSocketDatagramClient;
 using ItSoftware::Linux::IPC::ItsPipe;
+using ItSoftware::Linux::IPC::ItsSvMessageQueue;
+using ItSoftware::Linux::IPC::ItsSvMsgQueueFlags;
+using ItSoftware::Linux::IPC::ItsSvMsgFlags;
 
 //
 // Function Prototypes
@@ -86,6 +89,7 @@ void HandleFileEvent(inotify_event& event);
 void TestItsSocketStreamClientServerStop();
 void TestItsSocketDatagramClientServerStop();
 void TestItsPipe();
+void TestItsSvMessageQueue();
 
 //
 // #define
@@ -168,6 +172,7 @@ int main(int argc, char* argv[])
     TestItsSocketDatagramClientServerStop();
     TestItsSocketStreamClientServerStop();
     TestItsPipe();
+    TestItsSvMessageQueue();
 
     return EXIT_SUCCESS;
 }
@@ -1101,6 +1106,77 @@ void TestItsPipe()
             }
 
             pipe.Close();
+        }
+    }
+}
+
+void TestItsSvMessageQueue()
+{
+    PrintTestHeader("ItsSvMessageQueue");
+    
+    ItsSvMessageQueue queue(IPC_PRIVATE, ItsSvMsgQueueFlags::MQF_CREAT);
+    if ( queue.GetInitWithError() ) {
+        cout << "ItsSvMessageQueue, Init with error: " << strerror(queue.GetInitWithErrorErrno()) << endl;
+        return;
+    }
+    cout << "ItsSvMessageQueue, Init Ok with id: " << to_string(queue.GetMessageQueueId()) << endl;
+
+    cout << "ItsSvMessageQueue, fork() called" << endl;
+    switch(fork()) {
+        case -1:
+        {
+            cout << "ItsSvMessageQueue fork call failed with error: " << strerror(errno) << endl;
+            break;
+        }
+        case 0:
+        {
+            // child
+            struct msg_buf {
+                long mtype;
+                char mtext[1024];
+            };
+
+            msg_buf tmp{0};
+            tmp.mtype = 1;
+            strcpy(tmp.mtext, "This is a test message queue message!");
+
+            auto nw = queue.MsgSnd(&tmp, sizeof(tmp), ItsSvMsgFlags::MF_NOWAIT);
+            if ( nw == 0 ) {
+                cout << "ItsSvMessageQueue, Child::MsgSnd Ok: " << tmp.mtext << endl;
+            }
+            else {
+                cout << "ItsSvMessageQueue, Child::MsgSnd with error: " << strerror(errno) << endl;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            _exit(0);
+            break;
+        }
+        default:
+        {
+            // parent
+            struct msg_buf {
+                long mtype;
+                char mtext[1024];
+            };
+
+            msg_buf tmp{0};
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+            auto nr = queue.MsgRcv(&tmp, sizeof(tmp), 0, ItsSvMsgFlags::MF_NOWAIT);
+            if ( nr < 0 ) {
+                cout << "ItsSvMessageQueue, Parent::MsgRcv with error: " << strerror(errno) << endl;
+            }
+            else {
+                cout << "ItsSvMessageQueue, Parent::MsgRcv Ok: " << to_string(nr) << " bytes: " << tmp.mtext << endl;
+            }
+
+            if ( queue.Delete() == 0 ) {
+                cout << "ItsSvMessageQueue, Parent::Delete Ok" << endl;
+            }
+            else {
+                cout << "ItsSvMessageQueue, Parent::Delete with error: " << strerror(errno) << endl;
+            }
         }
     }
 }
