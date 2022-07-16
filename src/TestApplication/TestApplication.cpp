@@ -1053,23 +1053,38 @@ void TestItsPipe()
     }
     cout << "ItsPipe, Init Ok" << endl;
 
-    char wbuf[ItsPipe::MaxBufferSize] = "This is a testing message!";
-    auto nw = pipe.Write(wbuf, strlen(wbuf)+1);
-    if ( nw < 0 ) {
-        cout << "Write Error, " << strerror(errno) << endl;
+    auto pid = fork();
+    if ( pid == 0 ) {
+        // child
+        pipe.CloseRead();
+        
+        char wbuf[ItsPipe::MaxBufferSize] = "This is a testing message!";
+        auto nw = pipe.Write(wbuf, strlen(wbuf)+1);
+        if ( nw < 0 ) {
+            cout << "Write Error, " << strerror(errno) << endl;
+        }
+        else {
+            cout << "Just wrote " << to_string(nw) << " bytes, " << wbuf << endl;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        pipe.Close();
+        _exit(0);
     }
     else {
-        cout << "Just wrote " << to_string(nw) << " bytes, " << wbuf << endl;
-    }
+        // parent
+        pipe.CloseWrite();
 
-    char rbuf[ItsPipe::MaxBufferSize];
-    auto nr = pipe.Read(rbuf, ItsPipe::MaxBufferSize);
-    if ( nr < 0 ) {
-        cout << "Read Error, " << strerror(errno) << endl;
-    }
-    else {
-        cout << "Just read " << to_string(nr) << " bytes, " << rbuf << endl;
-    }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 
-    pipe.Close();
+        char rbuf[ItsPipe::MaxBufferSize];
+        auto nr = pipe.Read(rbuf, ItsPipe::MaxBufferSize);
+        if ( nr < 0 ) {
+            cout << "Read Error, " << strerror(errno) << endl;
+        }
+        else {
+            cout << "Just read " << to_string(nr) << " bytes, " << rbuf << endl;
+        }
+
+        pipe.Close();
+    }
 }
