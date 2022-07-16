@@ -58,8 +58,8 @@ using ItSoftware::Linux::IPC::ItsSocketDatagramServer;
 using ItSoftware::Linux::IPC::ItsSocketDatagramClient;
 using ItSoftware::Linux::IPC::ItsPipe;
 using ItSoftware::Linux::IPC::ItsSvMsgQueue;
-using ItSoftware::Linux::IPC::ItsSvMsgQueueFlags;
 using ItSoftware::Linux::IPC::ItsSvMsgFlags;
+using ItSoftware::Linux::IPC::ItsSvMsg1k;
 
 //
 // Function Prototypes
@@ -1114,9 +1114,7 @@ void TestItsSvMsgQueue()
 {
     PrintTestHeader("ItsSvMessageQueue");
 
-    ItsSvMsgQueue queue(IPC_PRIVATE, static_cast<int>(ItsSvMsgQueueFlags::MQF_IPC_CREAT) |
-                                     static_cast<int>(ItsSvMsgQueueFlags::MQF_S_IRUSR)   |
-                                     static_cast<int>(ItsSvMsgQueueFlags::MQF_S_IWUSR));
+    ItsSvMsgQueue queue(IPC_PRIVATE, ItsSvMsgQueue::CreateQueueFlags(true, false, "rw", "rw", "rw"));
     if ( queue.GetInitWithError() ) {
         cout << "ItsSvMsgQueue, Init with error: " << strerror(queue.GetInitWithErrorErrno()) << endl;
         return;
@@ -1133,12 +1131,7 @@ void TestItsSvMsgQueue()
         case 0:
         {
             // child
-            struct msg_buf {
-                long mtype;
-                char mtext[1024];
-            };
-
-            msg_buf tmp{0};
+            ItsSvMsg1k tmp{0};
             tmp.mtype = 1;
             strcpy(tmp.mtext, "This is a test message queue message!");
 
@@ -1156,12 +1149,7 @@ void TestItsSvMsgQueue()
         default:
         {
             // parent
-            struct msg_buf {
-                long mtype;
-                char mtext[1024];
-            };
-
-            msg_buf tmp{0};
+            ItsSvMsg1k tmp{0};
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 

@@ -690,21 +690,6 @@ namespace ItSoftware::Linux::IPC
         }
     };
     //
-    // enum ItsSvMsgQueueFlags
-    //
-    // (i): 
-    //
-    enum class ItsSvMsgQueueFlags : int
-    {
-        MQF_NONE = 0,
-        MQF_IPC_CREAT = IPC_CREAT, // if queue not exist, create one.
-        MQF_IPC_EXCL = IPC_EXCL,   // if IPC_CREAT is set, and queue exist, fail with EEXIST.
-        MQF_S_IRUSR = S_IRUSR,     // user read permissions
-        MQF_S_IWUSR = S_IWUSR,     // user write permissions
-        MQF_S_IRGRP = S_IRGRP,     // group read permissions
-        MQF_S_IWGRP = S_IWGRP      // group write permissions
-    };
-    //
     // enum ItsSvMsgFlags
     //
     // (i): 
@@ -715,7 +700,7 @@ namespace ItSoftware::Linux::IPC
         MF_IPC_NOWAIT = IPC_NOWAIT // do not block
     };
     //
-    // struct: ItsSvMsg[1,2,4]k
+    // struct: ItsSvMsg[1,2,4,8]k
     // 
     // (i): default message structs for some given sizes.
     //
@@ -730,6 +715,10 @@ namespace ItSoftware::Linux::IPC
     struct ItsSvMsg4k {
        long mtype;
        char mtext[4096];
+    };
+    struct ItsSvMsg8k {
+       long mtype;
+       char mtext[8192];
     };
     //
     // class: ItsSvMsgQueue
@@ -845,6 +834,59 @@ namespace ItSoftware::Linux::IPC
         int GetMessageQueueId()
         {
             return this->m_msqid;
+        }
+        //
+        // Function: CreateFlags
+        //
+        // (i): Creates constructor flags.
+        //
+        static int CreateQueueFlags(bool ipc_creat, bool ipc_excl, string user, string group, string other)
+        {
+            int flags(0);
+
+            if ( ipc_creat ) { flags |= IPC_CREAT; }
+            if ( ipc_excl ) { flags |= IPC_EXCL; }
+
+            if (user.size() > 0)
+            {
+                if (user.find('r',0) != string::npos) {
+                    flags |= S_IRUSR;
+                }
+                if (user.find('w',0) != string::npos) {
+                    flags |= S_IWUSR;
+                }
+                if (user.find('x',0) != string::npos) {
+                    flags |= S_IXUSR;
+                }
+            }
+
+            if (group.size() > 0)
+            {
+                if (group.find('r',0) != string::npos) {
+                    flags |= S_IRGRP;
+                }
+                if (group.find('w',0) != string::npos) {
+                    flags |= S_IWGRP;
+                }
+                if (group.find('x',0) != string::npos) {
+                    flags |= S_IXGRP;
+                }
+            }
+
+            if (other.size() > 0)
+            {
+                if (other.find('r',0) != string::npos) {
+                    flags |= S_IROTH;
+                }
+                if (other.find('w',0) != string::npos) {
+                    flags |= S_IWOTH;
+                }
+                if (other.find('x',0) != string::npos) {
+                    flags |= S_IXOTH;
+                }
+            }
+
+            return flags;
         }
     };
 }// ItSoftware::Linux::IPC
