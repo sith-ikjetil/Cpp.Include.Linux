@@ -843,13 +843,13 @@ void TestItsSocketStreamClientServerStart()
     
     g_socket_stream_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop);
     if ( g_socket_stream_server->GetInitWithError()) {
-        cout << "ItsSocketStreamServer, Init with error, " << strerror(g_socket_stream_server->GetInitWithErrorErrno()) << endl;
+        cout << "ItsSocketStreamServer, Init with error: " << strerror(g_socket_stream_server->GetInitWithErrorErrno()) << endl;
     }
     cout << "ItsSocketStreamServer, Init Ok!" << endl;
 
     g_socket_stream_client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr));
     if ( g_socket_stream_client->GetInitWithError()) {
-        cout << "ItsSocketStreamClient, Init with error, " << strerror(g_socket_stream_client->GetInitWithErrorErrno()) << endl;
+        cout << "ItsSocketStreamClient, Init with error: " << strerror(g_socket_stream_client->GetInitWithErrorErrno()) << endl;
     }
     cout << "ItsSocketStreamClient, Init Ok!" << endl;
 
@@ -947,7 +947,7 @@ void TestItsSocketDatagramClientServerStart()
     
     g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_saddr, sizeof(g_saddr));
     if ( g_socket_dg_server->GetInitWithError()) {
-        cout << "ItsSocketDatagramServer, Init with error" << endl;
+        cout << "ItsSocketDatagramServer, Init with error: " << strerror(g_socket_dg_server->GetInitWithErrorErrno()) << endl;
     }
     else {
         cout << "ItsSocketDatagramServer, Init Ok!" << endl;
@@ -955,7 +955,7 @@ void TestItsSocketDatagramClientServerStart()
 
     g_socket_dg_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_caddr, sizeof(g_caddr));
     if ( g_socket_dg_client->GetInitWithError()) {
-        cout << "ItsSocketDatagramClient, Init with error" << endl;
+        cout << "ItsSocketDatagramClient, Init with error: " << strerror(g_socket_dg_client->GetInitWithErrorErrno()) << endl;
     }
     else {
         cout << "ItsSocketDatagramClient, Init Ok!" << endl;
@@ -1050,43 +1050,52 @@ void TestItsPipe()
     ItsPipe pipe;
 
     if ( pipe.GetInitWithError() ) {
-        cout << "ItsPipe, Init Error, " << strerror(pipe.GetInitWithErrorErrno()) << endl;
+        cout << "ItsPipe, Init with error: " << strerror(pipe.GetInitWithErrorErrno()) << endl;
         return;
     }
     cout << "ItsPipe, Init Ok" << endl;
 
-    auto pid = fork();
-    if ( pid == 0 ) {
-        // child
-        pipe.CloseRead();
-        
-        char wbuf[ItsPipe::MaxBufferSize] = "This is a testing message!";
-        auto nw = pipe.Write(wbuf, strlen(wbuf)+1);
-        if ( nw < 0 ) {
-            cout << "Write Error, " << strerror(errno) << endl;
+    switch(fork()) {
+        case -1:
+        {
+            cout << "ItsPipe fork call failed with error: " << strerror(errno) << endl;
+            break;
         }
-        else {
-            cout << "Just wrote " << to_string(nw) << " bytes, " << wbuf << endl;
+        case 0:
+        {
+            // child
+            pipe.CloseRead();
+            
+            char wbuf[ItsPipe::MaxBufferSize] = "This is a testing message!";
+            auto nw = pipe.Write(wbuf, strlen(wbuf)+1);
+            if ( nw < 0 ) {
+                cout << "Write Error, " << strerror(errno) << endl;
+            }
+            else {
+                cout << "Just wrote " << to_string(nw) << " bytes, " << wbuf << endl;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            pipe.Close();
+            _exit(0);
+            break;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-        pipe.Close();
-        _exit(0);
-    }
-    else {
-        // parent
-        pipe.CloseWrite();
+        default:
+        {
+            // parent
+            pipe.CloseWrite();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 
-        char rbuf[ItsPipe::MaxBufferSize];
-        auto nr = pipe.Read(rbuf, ItsPipe::MaxBufferSize);
-        if ( nr < 0 ) {
-            cout << "Read Error, " << strerror(errno) << endl;
-        }
-        else {
-            cout << "Just read " << to_string(nr) << " bytes, " << rbuf << endl;
-        }
+            char rbuf[ItsPipe::MaxBufferSize];
+            auto nr = pipe.Read(rbuf, ItsPipe::MaxBufferSize);
+            if ( nr < 0 ) {
+                cout << "Read Error, " << strerror(errno) << endl;
+            }
+            else {
+                cout << "Just read " << to_string(nr) << " bytes, " << rbuf << endl;
+            }
 
-        pipe.Close();
+            pipe.Close();
+        }
     }
 }
