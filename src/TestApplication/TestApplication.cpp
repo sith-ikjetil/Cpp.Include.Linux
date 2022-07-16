@@ -99,10 +99,7 @@ void TestItsPipe();
 //
 ItsTimer g_timer;
 unique_ptr<ItsFileMonitor> g_fm;
-unique_ptr<ItsSocketStreamServer> g_socket_stream_server;
-unique_ptr<ItsSocketStreamClient>  g_socket_stream_client;
-unique_ptr<ItsSocketDatagramServer> g_socket_dg_server;
-unique_ptr<ItsSocketDatagramClient>  g_socket_dg_client;
+vector<string> g_fileMonNames;
 char g_filename[] = "/home/kjetilso/test.txt";
 char g_copyToFilename[] = "/home/kjetilso/test2.txt";
 char g_shredFilename[] = "/home/kjetilso/test2shred.txt";
@@ -111,16 +108,23 @@ string g_path2("/kjetilso/test.txt");
 string g_invalidPath("home\0/kjetilso");
 string g_directoryRoot("/home/kjetilso");
 string g_creatDir("/home/kjetilso/testdir");
-vector<string> g_fileMonNames;
+
+//
+// global data, IPC
+//
+unique_ptr<ItsSocketStreamServer> g_socket_stream_server;
+unique_ptr<ItsSocketStreamClient>  g_socket_stream_client;
+unique_ptr<ItsSocketDatagramServer> g_socket_dg_server;
+unique_ptr<ItsSocketDatagramClient>  g_socket_dg_client;
 vector<string> g_socket_stream_traffic;
 vector<string> g_socket_dg_traffic;
 unique_ptr<thread> g_socket_stream_thread1;
 unique_ptr<thread> g_socket_stream_thread2;
+unique_ptr<thread> g_socket_dg_thread1;
+unique_ptr<thread> g_socket_dg_thread2;
 struct sockaddr_un g_addr{0};
 struct sockaddr_un g_saddr{0};
 struct sockaddr_un g_caddr{0};
-unique_ptr<thread> g_socket_dg_thread1;
-unique_ptr<thread> g_socket_dg_thread2;
 
 //
 // Function: ExitFn
@@ -1055,6 +1059,7 @@ void TestItsPipe()
     }
     cout << "ItsPipe, Init Ok" << endl;
 
+    cout << "ItsPipe, fork() called" << endl;
     switch(fork()) {
         case -1:
         {
@@ -1069,10 +1074,10 @@ void TestItsPipe()
             char wbuf[ItsPipe::MaxBufferSize] = "This is a testing message!";
             auto nw = pipe.Write(wbuf, strlen(wbuf)+1);
             if ( nw < 0 ) {
-                cout << "Write Error, " << strerror(errno) << endl;
+                cout << "ItsPipe, Child::Write Error, " << strerror(errno) << endl;
             }
             else {
-                cout << "Just wrote " << to_string(nw) << " bytes, " << wbuf << endl;
+                cout << "ItsPipe, Child::Wrote " << to_string(nw) << " bytes, " << wbuf << endl;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             pipe.Close();
@@ -1089,10 +1094,10 @@ void TestItsPipe()
             char rbuf[ItsPipe::MaxBufferSize];
             auto nr = pipe.Read(rbuf, ItsPipe::MaxBufferSize);
             if ( nr < 0 ) {
-                cout << "Read Error, " << strerror(errno) << endl;
+                cout << "ItsPipe, Parent::Read Error, " << strerror(errno) << endl;
             }
             else {
-                cout << "Just read " << to_string(nr) << " bytes, " << rbuf << endl;
+                cout << "ItsPipe, Parent::Read " << to_string(nr) << " bytes, " << rbuf << endl;
             }
 
             pipe.Close();
