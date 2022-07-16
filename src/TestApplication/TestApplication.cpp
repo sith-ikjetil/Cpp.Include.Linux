@@ -932,17 +932,19 @@ void TestItsSocketStreamClientServerStop()
 void TestItsSocketDatagramClientServerStart()
 {
     PrintTestHeader("ItsSocketDatagram[Client/Server] Start");
+    
+    auto pid = getpid();
 
     const char SV_SOCK_PATH[] = "/tmp/its-server";
     remove(SV_SOCK_PATH);
     g_saddr.sun_family = AF_UNIX;
-    strcpy(g_saddr.sun_path, SV_SOCK_PATH);
+    snprintf(g_saddr.sun_path, sizeof(g_saddr.sun_path), "%s.%i", SV_SOCK_PATH, pid);
     
     const char CL_SOCK_PATH[] = "/tmp/its-client";
     remove(CL_SOCK_PATH);
     g_caddr.sun_family = AF_UNIX;
-    strcpy(g_caddr.sun_path, CL_SOCK_PATH);
-
+    snprintf(g_caddr.sun_path, sizeof(g_caddr.sun_path), "%s.%i", CL_SOCK_PATH, pid);
+    
     g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_saddr, sizeof(g_saddr));
     if ( g_socket_dg_server->GetInitWithError()) {
         cout << "ItsSocketDatagramServer, Init with error" << endl;
