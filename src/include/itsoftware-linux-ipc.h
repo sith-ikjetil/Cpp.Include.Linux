@@ -694,40 +694,49 @@ namespace ItSoftware::Linux::IPC
     //
     // (i): 
     //
-    enum ItsSvMsgQueueFlags : unsigned int
+    enum class ItsSvMsgQueueFlags : int
     {
         MQF_NONE = 0,
-        MQF_CREAT = IPC_CREAT, // if queue not exist, create one.
-        MQF_EXCL = IPC_EXCL    // if IPC_CREAT is set, and queue exist, fail with EEXIST.
+        MQF_IPC_CREAT = IPC_CREAT, // if queue not exist, create one.
+        MQF_IPC_EXCL = IPC_EXCL,   // if IPC_CREAT is set, and queue exist, fail with EEXIST.
+        MQF_S_IRUSR = S_IRUSR,     // user read permissions
+        MQF_S_IWUSR = S_IWUSR,     // user write permissions
+        MQF_S_IRGRP = S_IRGRP,     // group read permissions
+        MQF_S_IWGRP = S_IWGRP      // group write permissions
     };
     //
     // enum ItsSvMsgFlags
     //
     // (i): 
     //
-    enum ItsSvMsgFlags : unsigned int
+    enum class ItsSvMsgFlags : int
     {
         MF_NONE = 0,
-        MF_NOWAIT = IPC_NOWAIT // do not block
+        MF_IPC_NOWAIT = IPC_NOWAIT // do not block
     };
     //
+    // struct: ItsSvMsg[1,2,4]k
+    // 
+    // (i): default message structs for some given sizes.
     //
-    //
-    //
-    //struct ItsSvMsg {
-    //    ItsSvMsg(size_t n)
-    //    : mtext(n)
-    //  {}
-    //
-    //   long mtype;
-    //   vector<char> mtext;
-    //};
+    struct ItsSvMsg1k {
+       long mtype;
+       char mtext[1024];
+    };
+    struct ItsSvMsg2k {
+       long mtype;
+       char mtext[2048];
+    };
+    struct ItsSvMsg4k {
+       long mtype;
+       char mtext[4096];
+    };
     //
     // class: ItsSvMsgQueue
     //
     // (i): System V IPC Message Queue
     //
-    class ItsSvMessageQueue
+    class ItsSvMsgQueue
     {
     private:
         key_t m_key;
@@ -738,18 +747,28 @@ namespace ItSoftware::Linux::IPC
     protected:
     public:
         //
+        // Function: CreateQueueKey
+        //
+        // (i): Creates a queue key from path and project id.
+        //      Return value of -1 means failure. errno indicates error.
+        //
+        static key_t CreateQueueKey(const char* path, char projid)
+        {
+            return ftok(path, (int)projid);
+        } 
+        //
         // Method: Constructor
         //
         // (i): Constructor.
         //
-        ItsSvMessageQueue(key_t key, ItsSvMsgQueueFlags flags)
+        ItsSvMsgQueue(key_t key, int flags)
             : m_key(key),
             m_msqid(-1),
             m_bIsDeleted(false), 
             m_bInitWithError(true),
             m_errno(0)
         {
-            this->m_msqid = msgget(this->m_key, flags | S_IRUSR | S_IWUSR);
+            this->m_msqid = msgget(this->m_key, flags);
             if ( this->m_msqid != -1) {
                 this->m_bInitWithError = false;
             }
@@ -782,7 +801,7 @@ namespace ItSoftware::Linux::IPC
         //
         int MsgSnd(const void* msg, size_t msgsz, ItsSvMsgFlags msgflags)
         {
-            return msgsnd(this->m_msqid, (const void*)msg, msgsz, msgflags);
+            return msgsnd(this->m_msqid, (const void*)msg, msgsz, static_cast<int>(msgflags));
         }
         //
         // Method: MsgRcv
@@ -791,7 +810,7 @@ namespace ItSoftware::Linux::IPC
         //
         ssize_t MsgRcv(void* msg, size_t maxmsgsz, long msgtype, ItsSvMsgFlags msgflags)
         {
-            return msgrcv(this->m_msqid, (void*)msg, maxmsgsz, msgtype, msgflags);
+            return msgrcv(this->m_msqid, (void*)msg, maxmsgsz, msgtype, static_cast<int>(msgflags));
         }
         //
         // Method: Delete
