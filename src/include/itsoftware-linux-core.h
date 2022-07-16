@@ -1273,10 +1273,12 @@ namespace ItSoftware
                 inline static bool s_sigkill = false;
                 inline static bool s_sigstop = false;
                 inline static bool s_sigterm = false;
+                inline static bool s_sighup = false;
                 inline static function<void(void)> s_fnSigKill;
                 inline static function<void(void)> s_fnSigTerm;
                 inline static function<void(void)> s_fnSigStop;
                 inline static function<void(void)> s_fnSigCont;
+                inline static function<void(void)> s_fnSigHup;
             protected:
                 static void SigHupHandler(int sig) {
                     switch(sig)
@@ -1303,6 +1305,12 @@ namespace ItSoftware
                             ItsDaemon::s_sigstop = false;
                             if (ItsDaemon::s_fnSigCont != nullptr) {
                                 ItsDaemon::s_fnSigCont();
+                            }
+                            break;
+                        case SIGHUP:
+                            ItsDaemon::s_sighup = true;
+                            if (ItsDaemon::s_fnSigHup != nullptr) {
+                                ItsDaemon::s_fnSigHup();
                             }
                             break;
                         default:
@@ -1369,11 +1377,20 @@ namespace ItSoftware
                 }
 
             public:            
+                //
+                // Method: Constructor.
+                //
+                // (i): Constructor.
+                //
                 ItsDaemon()
                 : ItsDaemon(0) {
 
                 }
-                
+                //
+                // Method: Constructor
+                //
+                // (i): Constructor.
+                //
                 ItsDaemon(int flags) {
                     ItsDaemon::s_sigkill = false;
                     this->m_deamonRetVal = this->BecomeDaemon(flags);
@@ -1386,6 +1403,11 @@ namespace ItSoftware
                         }
                     }
                 }
+                //
+                // Method: WasDaemonSuccessful
+                //
+                // (i): Returnes true is daemon was correctly set up. false otherwise.
+                //
                 bool WasDaemonSuccessful() {
                     return (this->m_deamonRetVal == 0);
                 }
@@ -1414,6 +1436,26 @@ namespace ItSoftware
                 //
                 static bool GetSigTerm() {
                     return ItsDaemon::s_sigterm;
+                }
+                //
+                // Function: GetSigHup
+                //
+                // (i): normal reload of configuration data signal for daemons.
+                //
+                static bool GetSigHup() {
+                    return ItsDaemon::s_sighup;
+                }
+                //
+                // Function: ClearSignals
+                //
+                // (i): Resets signal flags to not set.
+                //
+                static void ClearSignalFlags()
+                {
+                    s_sigkill = false;
+                    s_sigstop = false;
+                    s_sigterm = false;
+                    s_sighup = false;
                 }
                 //
                 // Function: SetSigKill
@@ -1450,6 +1492,15 @@ namespace ItSoftware
                 static void SetSigCont(function<void(void)> fn)
                 {
                     ItsDaemon::s_fnSigCont = fn;
+                }
+                //
+                // Function: SetSigHup
+                //
+                // (i): set handler for SIGHUP
+                //
+                static void SetSigHup(function<void(void)> fn)
+                {
+                    ItsDaemon::s_fnSigHup = fn;
                 }
             };
         } // namespace Core
