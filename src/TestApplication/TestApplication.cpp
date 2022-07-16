@@ -56,12 +56,13 @@ using ItSoftware::Linux::IPC::ItsSocketConType;
 using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramServer;
 using ItSoftware::Linux::IPC::ItsSocketDatagramClient;
+using ItSoftware::Linux::IPC::ItsPipe;
 
 //
 // Function Prototypes
 //
-void TestItsSocketStreamClientServerStart();
 void TestItsSocketDatagramClientServerStart();
+void TestItsSocketStreamClientServerStart();
 void TestItsConvert();
 void TestItsRandom();
 void TestItsTime();
@@ -84,6 +85,7 @@ void PrintTestApplicationEvent(string event);
 void HandleFileEvent(inotify_event& event);
 void TestItsSocketStreamClientServerStop();
 void TestItsSocketDatagramClientServerStop();
+void TestItsPipe();
 
 //
 // #define
@@ -97,8 +99,8 @@ void TestItsSocketDatagramClientServerStop();
 //
 ItsTimer g_timer;
 unique_ptr<ItsFileMonitor> g_fm;
-unique_ptr<ItsSocketStreamServer> g_socket_passive;
-unique_ptr<ItsSocketStreamClient>  g_socket_active;
+unique_ptr<ItsSocketStreamServer> g_socket_stream_server;
+unique_ptr<ItsSocketStreamClient>  g_socket_stream_client;
 unique_ptr<ItsSocketDatagramServer> g_socket_dg_server;
 unique_ptr<ItsSocketDatagramClient>  g_socket_dg_client;
 char g_filename[] = "/home/kjetilso/test.txt";
@@ -110,10 +112,10 @@ string g_invalidPath("home\0/kjetilso");
 string g_directoryRoot("/home/kjetilso");
 string g_creatDir("/home/kjetilso/testdir");
 vector<string> g_fileMonNames;
-vector<string> g_socket_traffic;
+vector<string> g_socket_stream_traffic;
 vector<string> g_socket_dg_traffic;
-unique_ptr<thread> g_socket_thread1;
-unique_ptr<thread> g_socket_thread2;
+unique_ptr<thread> g_socket_stream_thread1;
+unique_ptr<thread> g_socket_stream_thread2;
 struct sockaddr_un g_addr{0};
 struct sockaddr_un g_saddr{0};
 struct sockaddr_un g_caddr{0};
@@ -161,6 +163,7 @@ int main(int argc, char* argv[])
     TestItsTimerStop();
     TestItsSocketDatagramClientServerStop();
     TestItsSocketStreamClientServerStop();
+    TestItsPipe();
 
     return EXIT_SUCCESS;
 }
@@ -838,59 +841,59 @@ void TestItsSocketStreamClientServerStart()
 
     g_addr.sun_family = AF_UNIX;
     
-    g_socket_passive = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop);
-    if ( g_socket_passive->GetInitWithError()) {
-        cout << "ItsNetPassive, Init with error" << endl;
+    g_socket_stream_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop);
+    if ( g_socket_stream_server->GetInitWithError()) {
+        cout << "ItsSocketStreamServer, Init with error, " << strerror(g_socket_stream_server->GetInitWithErrorErrno()) << endl;
     }
-    cout << "ItsNetPassive, Init Ok!" << endl;
+    cout << "ItsSocketStreamServer, Init Ok!" << endl;
 
-    g_socket_active = make_unique<ItsSocketStreamClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr));
-    if ( g_socket_active->GetInitWithError()) {
-        cout << "ItsNetActive, Init with error" << endl;
+    g_socket_stream_client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr));
+    if ( g_socket_stream_client->GetInitWithError()) {
+        cout << "ItsSocketStreamClient, Init with error, " << strerror(g_socket_stream_client->GetInitWithErrorErrno()) << endl;
     }
-    cout << "ItsNetActive, Init Ok!" << endl;
+    cout << "ItsSocketStreamClient, Init Ok!" << endl;
 
-    if ( g_socket_passive->GetInitWithError() || g_socket_active->GetInitWithError() ) {
+    if ( g_socket_stream_server->GetInitWithError() || g_socket_stream_client->GetInitWithError() ) {
         return;
     }
 
-    g_socket_thread1 = make_unique<thread>([] () {
+    g_socket_stream_thread1 = make_unique<thread>([] () {
         struct sockaddr_un accept_addr{0};
         socklen_t accept_addr_len(0);
         char buf[1000];
         bool quit = false;
         while (!quit) {
-            auto fd = g_socket_passive->Accept((struct sockaddr*)&accept_addr,&accept_addr_len);
+            auto fd = g_socket_stream_server->Accept((struct sockaddr*)&accept_addr,&accept_addr_len);
             if ( fd >= 0 ) {
-                g_socket_traffic.push_back("g_socket_passive.Accept OK");
+                g_socket_stream_traffic.push_back("g_socket_stream_server.Accept OK");
                 
-                auto nr = g_socket_passive->Read(fd, buf, 1000);
-                g_socket_traffic.push_back("g_socket_passive.Read " + to_string(nr) + " bytes, " + buf);
+                auto nr = g_socket_stream_server->Read(fd, buf, 1000);
+                g_socket_stream_traffic.push_back("g_socket_stream_server.Read " + to_string(nr) + " bytes, " + buf);
                 
                 strcpy(buf, "This is a response ECHO ONE!");
-                auto nw = g_socket_passive->Write(fd, buf, strlen(buf)+1);
-                g_socket_traffic.push_back("g_socket_passive.Write " + to_string(nw) + " bytes, " + buf);
+                auto nw = g_socket_stream_server->Write(fd, buf, strlen(buf)+1);
+                g_socket_stream_traffic.push_back("g_socket_stream_server.Write " + to_string(nw) + " bytes, " + buf);
                 quit = true;
             }
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
     });
-    g_socket_thread2 = make_unique<thread>([] () {   
+    g_socket_stream_thread2 = make_unique<thread>([] () {   
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        if (g_socket_active->Connect((struct sockaddr*)&g_addr, sizeof(g_addr)) == 0) {
-            g_socket_traffic.push_back("g_socket_active.Connect OK");
+        if (g_socket_stream_client->Connect((struct sockaddr*)&g_addr, sizeof(g_addr)) == 0) {
+            g_socket_stream_traffic.push_back("g_socket_stream_client.Connect OK");
 
             char buf[1000] = "This is a test string.";
-            auto nw = g_socket_active->Write(buf, strlen(buf)+1);
-            g_socket_traffic.push_back("g_socket_active.Write " + to_string(nw) + " bytes, " + buf);
-            auto nr = g_socket_active->Read(buf, 1000);
-            g_socket_traffic.push_back("g_socket_active.Read " + to_string(nr) + " bytes, " + buf);
+            auto nw = g_socket_stream_client->Write(buf, strlen(buf)+1);
+            g_socket_stream_traffic.push_back("g_socket_stream_client.Write " + to_string(nw) + " bytes, " + buf);
+            auto nr = g_socket_stream_client->Read(buf, 1000);
+            g_socket_stream_traffic.push_back("g_socket_stream_client.Read " + to_string(nr) + " bytes, " + buf);
         
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
         else {
-            g_socket_traffic.push_back("ItsSocketActive, failed to connect.");
+            g_socket_stream_traffic.push_back("ItsSocketStreamClient, failed to connect.");
         }
     });
 }
@@ -904,19 +907,19 @@ void TestItsSocketStreamClientServerStop()
 {
     PrintTestHeader("ItsSocketStream[Client/Server] Stop");
 
-    for ( auto s : g_socket_traffic) {
+    for ( auto s : g_socket_stream_traffic) {
         cout << s << endl;
     }
 
     cout << "Closing net..." << endl;
-    g_socket_active->Close();
-    g_socket_passive->Close();
+    g_socket_stream_client->Close();
+    g_socket_stream_server->Close();
     cout << "... net closed" << endl;
 
-    if ( g_socket_thread1 != nullptr ) {
+    if ( g_socket_stream_thread1 != nullptr ) {
         cout << "Thread joining..." << endl;
-        g_socket_thread1->join();
-        g_socket_thread2->join();
+        g_socket_stream_thread1->join();
+        g_socket_stream_thread2->join();
         cout << "... threads joined" << endl;
     }
 }
@@ -1025,10 +1028,48 @@ void TestItsSocketDatagramClientServerStop()
     g_socket_dg_server->Close();
     cout << "... net closed" << endl;
 
-    if ( g_socket_thread1 != nullptr ) {
+    if ( g_socket_dg_thread1 != nullptr ) {
         cout << "Thread joining..." << endl;
         g_socket_dg_thread1->join();
         g_socket_dg_thread2->join();
         cout << "... threads joined" << endl;
     }
+}
+
+//
+// Function: TestItsPipe
+//
+// (i): Test ItsPipe
+//
+void TestItsPipe()
+{
+    PrintTestHeader("ItsPipe");
+
+    ItsPipe pipe;
+
+    if ( pipe.GetInitWithError() ) {
+        cout << "ItsPipe, Init Error, " << strerror(pipe.GetInitWithErrorErrno()) << endl;
+        return;
+    }
+    cout << "ItsPipe, Init Ok" << endl;
+
+    char wbuf[ItsPipe::MaxBufferSize] = "This is a testing message!";
+    auto nw = pipe.Write(wbuf, strlen(wbuf)+1);
+    if ( nw < 0 ) {
+        cout << "Write Error, " << strerror(errno) << endl;
+    }
+    else {
+        cout << "Just wrote " << to_string(nw) << " bytes, " << wbuf << endl;
+    }
+
+    char rbuf[ItsPipe::MaxBufferSize];
+    auto nr = pipe.Read(rbuf, ItsPipe::MaxBufferSize);
+    if ( nr < 0 ) {
+        cout << "Read Error, " << strerror(errno) << endl;
+    }
+    else {
+        cout << "Just read " << to_string(nr) << " bytes, " << rbuf << endl;
+    }
+
+    pipe.Close();
 }
