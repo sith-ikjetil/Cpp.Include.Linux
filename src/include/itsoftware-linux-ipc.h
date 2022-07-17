@@ -906,29 +906,153 @@ namespace ItSoftware::Linux::IPC
         }
     };
     //
+    // struct: ItsFifoHeader
+    //
+    // (i): Predetermined header for each read/write.
+    //
+    struct ItsFifoHeader {
+        pid_t  pid;
+        size_t length;
+    };
+    //
     // class: ItsFifoServer
     //
     // (i): Implementation of FIFO Server IPC.
     //
-    class ItsFifoServer
+    class ItsFifo
     {
     private:
-        int m_serverfd;
-        int m_dummyfd;
+        int m_fd;
+        int m_errno;
+        string m_filename;
+        bool m_bInitWithError;
     protected:
     public:
-    };
-    //
-    // class: ItsFifoClient
-    //
-    // (i): Implementation of FIFO Client IPC.
-    //
-    class ItsFifoClient
-    {
-    private:
-        int m_serverfd;
-        int m_clientfd;
-    protected:
-    public:
+        ItsFifo(const string filename, int flags)
+            : m_fd(-1),
+            m_filename(filename),
+            m_bInitWithError(true)
+        {
+            umask(0);
+            this->m_errno = mkfifo(this->m_filename.c_str(), flags);
+            if (this->m_errno != -1) {
+                this->m_fd = open(this->m_filename.c_str(), O_RDWR | O_NONBLOCK);
+                if (this->m_fd != -1) {
+                    this->m_bInitWithError = false;
+                }
+                else {
+                    this->Close();
+                }
+            }
+            else {
+                this->Close();
+            }
+        }
+        //
+        // Method: Close
+        //
+        // (i): Closes open handles.
+        //
+        void Close()
+        {
+            if ( this->m_fd != -1 ) {
+                close(this->m_fd);
+            }
+            remove(this->m_filename.c_str());
+        }
+        //
+        // Function: CreateServerFlags
+        //
+        // (i): Create flags for server creation.
+        //
+        static int CreateFifoFlags(string user, string group, string other)
+        {
+            int flags(0);
+
+            if (user.size() > 0)
+            {
+                if (user.find('r',0) != string::npos) {
+                    flags |= S_IRUSR;
+                }
+                if (user.find('w',0) != string::npos) {
+                    flags |= S_IWUSR;
+                }
+                if (user.find('x',0) != string::npos) {
+                    flags |= S_IXUSR;
+                }
+            }
+
+            if (group.size() > 0)
+            {
+                if (group.find('r',0) != string::npos) {
+                    flags |= S_IRGRP;
+                }
+                if (group.find('w',0) != string::npos) {
+                    flags |= S_IWGRP;
+                }
+                if (group.find('x',0) != string::npos) {
+                    flags |= S_IXGRP;
+                }
+            }
+
+            if (other.size() > 0)
+            {
+                if (other.find('r',0) != string::npos) {
+                    flags |= S_IROTH;
+                }
+                if (other.find('w',0) != string::npos) {
+                    flags |= S_IWOTH;
+                }
+                if (other.find('x',0) != string::npos) {
+                    flags |= S_IXOTH;
+                }
+            }
+
+            return flags;
+        }
+        //
+        // Method: GetInitWithError
+        //
+        // (i): Returnes true if initialization failed.
+        //
+        bool GetInitWithError()
+        {
+            return this->m_bInitWithError;
+        }
+        //
+        // Method: GetInitWithErrorErrnum
+        //
+        // (i): Returns initialization error code.
+        //
+        int GetInitWithErrorErrno()
+        {
+            return this->m_errno;
+        }
+        //
+        // Method: Read
+        //
+        // (i): Reads from fifo file.
+        //
+        ssize_t Read(void *buf, ItsFifoHeader* header)
+        {
+            auto nr = read(this->m_fd, header, sizeof(ItsFifoHeader));
+            if ( nr == sizeof(ItsFifoHeader) ) {
+                return read(this->m_fd, buf, header->length);
+            }
+            return 0;
+        }
+        //
+        // Method: Write
+        //
+        // (i): Writes to fifo file.
+        //
+        ssize_t Write(const void *buf, ItsFifoHeader* header)
+        {
+            auto nw = write(this->m_fd, header, sizeof(ItsFifoHeader));
+            if ( nw == sizeof(ItsFifoHeader) ) {
+                return write(this->m_fd, buf, header->length);
+            }
+            return 0;
+        }
     };
 }// ItSoftware::Linux::IPC

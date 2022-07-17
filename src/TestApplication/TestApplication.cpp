@@ -60,6 +60,8 @@ using ItSoftware::Linux::IPC::ItsPipe;
 using ItSoftware::Linux::IPC::ItsSvMsgQueue;
 using ItSoftware::Linux::IPC::ItsSvMsgFlags;
 using ItSoftware::Linux::IPC::ItsSvMsg1k;
+using ItSoftware::Linux::IPC::ItsFifo;
+using ItSoftware::Linux::IPC::ItsFifoHeader;
 
 //
 // Function Prototypes
@@ -90,6 +92,7 @@ void TestItsSocketStreamClientServerStop();
 void TestItsSocketDatagramClientServerStop();
 void TestItsPipe();
 void TestItsSvMsgQueue();
+void TestItsFifo();
 
 //
 // #define
@@ -173,6 +176,7 @@ int main(int argc, char* argv[])
     TestItsSocketStreamClientServerStop();
     TestItsPipe();
     TestItsSvMsgQueue();
+    TestItsFifo();
 
     return EXIT_SUCCESS;
 }
@@ -1172,6 +1176,79 @@ void TestItsSvMsgQueue()
             else {
                 cout << "ItsSvMessageQueue, Parent::Delete with error: " << strerror(errno) << endl;
             }
+        }
+    }
+}
+
+//
+// Function: TestItsFifo
+//
+// (i): Tests ItsFifo.
+//
+void TestItsFifo()
+{
+    PrintTestHeader("ItsFifo");
+
+    ItsFifo fifo("/tmp/its-fifo", ItsFifo::CreateFifoFlags("rw","rw","rw"));
+    if ( fifo.GetInitWithError() ) {
+        cout << "ItsFifo, Init with error: " << strerror(fifo.GetInitWithErrorErrno()) << endl;
+        return;
+    }
+    cout << "ItsFifo, Init Ok" << endl;
+
+    cout << "ItsFifo, fork() called" << endl;
+    switch(fork()) {
+        case -1:
+        {
+            cout << "ItsSvMsgQueue fork call failed with error: " << strerror(errno) << endl;
+            break;
+        }
+        case 0:
+        {
+            // child
+            char buf[] = "This is a sample message for fifo transmission!";
+            ItsFifoHeader tmp{0};
+            tmp.length = strlen(buf)+1;
+            tmp.pid = getpid();
+            
+            auto nw = fifo.Write(buf, &tmp);
+            if ( nw > 0 ) {
+                cout << "ItsFifo, Child::Write Ok: " << buf << endl;
+            }
+            else if (nw == 0)
+            {
+                cout << "ItsFifo, Child::Read with return 0" << endl;
+            }
+            else {
+                cout << "ItsFifo, Child::Read with error: " << strerror(errno) << endl;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            _exit(0);
+            break;
+        }
+        default:
+        {
+            // parent
+            char buf[200];
+
+            ItsFifoHeader tmp{0};
+            tmp.length = 200;
+            tmp.pid = getpid();
+            
+            std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+            auto nr = fifo.Read(buf, &tmp);
+            if ( nr < 0 ) {
+                cout << "ItsFifo, Parent::Read with error: " << strerror(errno) << endl;
+            }
+            else if ( nr == 0 ) {
+                cout << "ItsFifo, Parent::Read with return 0" << endl;
+            }
+            else {
+                cout << "ItsFifo, Parent::Read Ok: pid=" << to_string(tmp.pid) << ", content=" << buf << endl;
+            }
+
+            fifo.Close();
         }
     }
 }
