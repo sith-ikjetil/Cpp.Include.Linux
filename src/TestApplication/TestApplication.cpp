@@ -1110,10 +1110,15 @@ void TestItsPipe()
     }
 }
 
+//
+// Function: TesTItsSvMsgQueue
+//
+// (i): Tests ItsSvMsgQueue.
+//
 void TestItsSvMsgQueue()
 {
     PrintTestHeader("ItsSvMessageQueue");
-
+    
     ItsSvMsgQueue queue(IPC_PRIVATE, ItsSvMsgQueue::CreateQueueFlags(true, false, "rw", "rw", "rw"));
     if ( queue.GetInitWithError() ) {
         cout << "ItsSvMsgQueue, Init with error: " << strerror(queue.GetInitWithErrorErrno()) << endl;
@@ -1135,7 +1140,7 @@ void TestItsSvMsgQueue()
             tmp.mtype = 1;
             strcpy(tmp.mtext, "This is a test message queue message!");
 
-            auto nw = queue.MsgSnd(&tmp, sizeof(tmp), ItsSvMsgFlags::MF_IPC_NOWAIT);
+            auto nw = queue.MsgSnd(&tmp, sizeof(tmp), ItsSvMsgQueue::CreateMsgFlags(true,false,false,false));
             if ( nw == 0 ) {
                 cout << "ItsSvMsgQueue, Child::MsgSnd Ok: " << tmp.mtext << endl;
             }
@@ -1153,7 +1158,7 @@ void TestItsSvMsgQueue()
 
             std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 
-            auto nr = queue.MsgRcv(&tmp, sizeof(tmp), 0, ItsSvMsgFlags::MF_IPC_NOWAIT);
+            auto nr = queue.MsgRcv(&tmp, sizeof(tmp), 0, ItsSvMsgQueue::CreateMsgFlags(true,false,false,false));
             if ( nr < 0 ) {
                 cout << "ItsSvMsgQueue, Parent::MsgRcv with error: " << strerror(errno) << endl;
             }

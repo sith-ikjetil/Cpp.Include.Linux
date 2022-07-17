@@ -788,18 +788,18 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Sends a message.
         //
-        int MsgSnd(const void* msg, size_t msgsz, ItsSvMsgFlags msgflags)
+        int MsgSnd(const void* msg, size_t msgsz, int msgflags)
         {
-            return msgsnd(this->m_msqid, (const void*)msg, msgsz, static_cast<int>(msgflags));
+            return msgsnd(this->m_msqid, (const void*)msg, msgsz, msgflags);
         }
         //
         // Method: MsgRcv
         //
         // (i): Sends a message.
         //
-        ssize_t MsgRcv(void* msg, size_t maxmsgsz, long msgtype, ItsSvMsgFlags msgflags)
+        ssize_t MsgRcv(void* msg, size_t maxmsgsz, long msgtype, int msgflags)
         {
-            return msgrcv(this->m_msqid, (void*)msg, maxmsgsz, msgtype, static_cast<int>(msgflags));
+            return msgrcv(this->m_msqid, (void*)msg, maxmsgsz, msgtype, msgflags);
         }
         //
         // Method: Delete
@@ -885,6 +885,22 @@ namespace ItSoftware::Linux::IPC
                     flags |= S_IXOTH;
                 }
             }
+
+            return flags;
+        }
+        //
+        // Function: CreateMsgFlags
+        //
+        // (i): Create flags used in msgsnd and msgrcv.
+        //
+        static int CreateMsgFlags(bool ipc_nowait, bool msg_copy, bool msg_except, bool msg_noerror) 
+        {
+            int flags(0);
+
+            if (ipc_nowait) { flags |= IPC_NOWAIT; }
+            if (msg_copy) { flags |= MSG_COPY; }
+            if (msg_except) { flags |= MSG_EXCEPT; }
+            if (msg_noerror) { flags |= MSG_NOERROR; }
 
             return flags;
         }
