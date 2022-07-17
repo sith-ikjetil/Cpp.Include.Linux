@@ -86,7 +86,7 @@ namespace ItSoftware::Linux::IPC
         {
             this->m_socketfd = socket(this->m_domain, this->m_type, 0);
             if (this->m_socketfd >= 0) {
-                fcntl(this->m_socketfd, F_SETFL, O_NONBLOCK);
+                fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
                 this->m_errno = bind(this->m_socketfd, addr, addrlen);
                 if (this->m_errno == 0) {
                     this->m_errno = listen(this->m_socketfd,backlog);
@@ -343,7 +343,7 @@ namespace ItSoftware::Linux::IPC
         {
             this->m_socketfd = socket(this->m_domain, this->m_type, 0);
             if (this->m_socketfd >= 0) {
-                fcntl(this->m_socketfd, F_SETFL, O_NONBLOCK);
+                fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
                 this->m_errno = bind(this->m_socketfd, addr, addrlen);
                 if (this->m_errno == 0) {
                     this->m_bInitWithError = false;
@@ -464,7 +464,7 @@ namespace ItSoftware::Linux::IPC
         {
             this->m_socketfd = socket(this->m_domain, this->m_type, 0);
             if (this->m_socketfd >= 0) {
-                fcntl(this->m_socketfd, F_SETFL, O_NONBLOCK);
+                fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
                 this->m_errno = bind(this->m_socketfd, addr, addrlen);
                 if (this->m_errno == 0) {
                     this->m_bInitWithError = false;
@@ -904,5 +904,31 @@ namespace ItSoftware::Linux::IPC
 
             return flags;
         }
+    };
+    //
+    // class: ItsFifoServer
+    //
+    // (i): Implementation of FIFO Server IPC.
+    //
+    class ItsFifoServer
+    {
+    private:
+        int m_serverfd;
+        int m_dummyfd;
+    protected:
+    public:
+    };
+    //
+    // class: ItsFifoClient
+    //
+    // (i): Implementation of FIFO Client IPC.
+    //
+    class ItsFifoClient
+    {
+    private:
+        int m_serverfd;
+        int m_clientfd;
+    protected:
+    public:
     };
 }// ItSoftware::Linux::IPC
