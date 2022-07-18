@@ -987,14 +987,16 @@ namespace ItSoftware::Linux::IPC
         //
         void Close()
         {
-            if ( this->m_dummyfd != -1 ) {
-                close(this->m_dummyfd);
+            if ( !this->m_bIsClosed ) {
+                if ( this->m_dummyfd != -1 ) {
+                    close(this->m_dummyfd);
+                }
+                if ( this->m_serverfd != -1 ) {
+                    close(this->m_serverfd);
+                }
+                remove(this->m_server_filename.c_str());
+                this->m_bIsClosed = true;
             }
-            if ( this->m_serverfd != -1 ) {
-                close(this->m_serverfd);
-            }
-            remove(this->m_server_filename.c_str());
-            this->m_bIsClosed = true;
         }
         //
         // Method: IsClosed
@@ -1180,14 +1182,16 @@ namespace ItSoftware::Linux::IPC
         //
         void Close()
         {
-            if ( this->m_dummyfd != -1 ) {
-                close(this->m_dummyfd);
+            if ( !this->m_bIsClosed ) {
+                if ( this->m_dummyfd != -1 ) {
+                    close(this->m_dummyfd);
+                }
+                if ( this->m_clientfd != -1 ) {
+                    close(this->m_clientfd);
+                }
+                remove(this->m_client_filename.c_str());
+                this->m_bIsClosed = true;
             }
-            if ( this->m_clientfd != -1 ) {
-                close(this->m_clientfd);
-            }
-            remove(this->m_client_filename.c_str());
-            this->m_bIsClosed = true;
         }
         //
         // Method: IsClosed

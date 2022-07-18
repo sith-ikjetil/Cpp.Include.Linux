@@ -950,14 +950,14 @@ void TestItsSocketDatagramClientServerStart()
     auto pid = getpid();
 
     const char SV_SOCK_PATH[] = "/tmp/its-server";
-    remove(SV_SOCK_PATH);
     g_saddr.sun_family = AF_UNIX;
-    snprintf(g_saddr.sun_path, sizeof(g_saddr.sun_path), "%s.%i", SV_SOCK_PATH, pid);
-    
+    snprintf(g_saddr.sun_path, sizeof(g_saddr.sun_path), "%s", SV_SOCK_PATH);
+    remove(g_saddr.sun_path);
+
     const char CL_SOCK_PATH[] = "/tmp/its-client";
-    remove(CL_SOCK_PATH);
     g_caddr.sun_family = AF_UNIX;
     snprintf(g_caddr.sun_path, sizeof(g_caddr.sun_path), "%s.%i", CL_SOCK_PATH, pid);
+    remove(g_caddr.sun_path);
     
     g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_saddr, sizeof(g_saddr));
     if ( g_socket_dg_server->GetInitWithError()) {
@@ -1050,6 +1050,9 @@ void TestItsSocketDatagramClientServerStop()
         g_socket_dg_thread2->join();
         cout << "... threads joined" << endl;
     }
+
+    remove(g_saddr.sun_path);
+    remove(g_caddr.sun_path);
 }
 
 //
