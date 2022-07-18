@@ -760,6 +760,23 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Constructor.
         //
+        // The  msgget() system call returns the System V message queue identifier
+        // associated with the value of the key argument.  It may be  used  either
+        // to  obtain  the  identifier of a previously created message queue (when
+        // msgflg is zero and key does not have the value IPC_PRIVATE), or to cre‐
+        // ate a new set.
+        //
+        // A  new message queue is created if key has the value IPC_PRIVATE or key
+        // isn't IPC_PRIVATE, no message queue with the given key key exists,  and
+        // IPC_CREAT is specified in msgflg.
+        //
+        // If msgflg specifies both IPC_CREAT and IPC_EXCL and a message queue al‐
+        // ready exists for key, then msgget() fails with  errno  set  to  EEXIST.
+        // (This  is  analogous  to the effect of the combination O_CREAT | O_EXCL
+        // for open(2).)
+        //
+        // (a): key=IPC_PRIVATE or ItsSvMsgQueue::CreateQueueKey.
+        //
         ItsSvMsgQueue(key_t key, int flags)
             : m_key(key),
             m_msqid(-1),
