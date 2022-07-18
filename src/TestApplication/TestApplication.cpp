@@ -60,7 +60,8 @@ using ItSoftware::Linux::IPC::ItsPipe;
 using ItSoftware::Linux::IPC::ItsSvMsgQueue;
 using ItSoftware::Linux::IPC::ItsSvMsgFlags;
 using ItSoftware::Linux::IPC::ItsSvMsg1k;
-using ItSoftware::Linux::IPC::ItsFifo;
+using ItSoftware::Linux::IPC::ItsFifoServer;
+using ItSoftware::Linux::IPC::ItsFifoClient;
 using ItSoftware::Linux::IPC::ItsFifoHeader;
 
 //
@@ -1189,14 +1190,14 @@ void TestItsFifo()
 {
     PrintTestHeader("ItsFifo");
 
-    ItsFifo fifo("/tmp/its-fifo", ItsFifo::CreateFifoFlags("rw","rw","rw"));
-    if ( fifo.GetInitWithError() ) {
-        cout << "ItsFifo, Init with error: " << strerror(fifo.GetInitWithErrorErrno()) << endl;
+    ItsFifoServer fifoServer("/tmp/its-fifo-src", "/tmp/its-fifo_cl", ItsFifoServer::CreateFifoFlags("rw","rw","rw"));
+    if ( fifoServer.GetInitWithError() ) {
+        cout << "ItsFifoServer, Init with error: " << strerror(fifoServer.GetInitWithErrorErrno()) << endl;
         return;
     }
-    cout << "ItsFifo, Init Ok" << endl;
+    cout << "ItsFifoServer, Init Ok" << endl;
 
-    cout << "ItsFifo, fork() called" << endl;
+    cout << "ItsFifo[Server/Client], fork() called" << endl;
     switch(fork()) {
         case -1:
         {
@@ -1205,50 +1206,60 @@ void TestItsFifo()
         }
         case 0:
         {
+            ItsFifoClient fifoClient("/tmp/its-fifo-src", "/tmp/its-fifo_cl", ItsFifoClient::CreateFifoFlags("rw","rw","rw"));
+            if ( fifoClient.GetInitWithError() ) {
+                cout << "ItsFifoClient, Init with error: " << strerror(fifoClient.GetInitWithErrorErrno()) << endl;
+                return;
+            }
+            cout << "ItsFifoClient, Init Ok" << endl;
+
             // child
             char buf[] = "This is a sample message for fifo transmission!";
             ItsFifoHeader tmp{0};
             tmp.length = strlen(buf)+1;
             tmp.pid = getpid();
             
-            auto nw = fifo.Write(buf, &tmp);
+            auto nw = fifoClient.Write(buf, &tmp);
             if ( nw > 0 ) {
-                cout << "ItsFifo, Child::Write Ok: " << buf << endl;
+                cout << "ItsFifoClient, Child::Write Ok: pid=" << to_string(tmp.pid) << ", content=" << buf << endl;
             }
             else if (nw == 0)
             {
-                cout << "ItsFifo, Child::Read with return 0" << endl;
+                cout << "ItsFifoClient, Child::Write with return 0" << endl;
             }
             else {
-                cout << "ItsFifo, Child::Read with error: " << strerror(errno) << endl;
+                cout << "ItsFifoClient, Child::Write with error: " << strerror(errno) << endl;
             }
+
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            fifoClient.Close();
             _exit(0);
             break;
         }
         default:
         {
+            const int bufSize = 200;
             // parent
-            char buf[200];
+            char buf[bufSize];
 
             ItsFifoHeader tmp{0};
-            tmp.length = 200;
+            tmp.length = bufSize;
             tmp.pid = getpid();
             
             std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 
-            auto nr = fifo.Read(buf, &tmp);
+            auto nr = fifoServer.Read(buf, &tmp, bufSize);
             if ( nr < 0 ) {
-                cout << "ItsFifo, Parent::Read with error: " << strerror(errno) << endl;
+                cout << "ItsFifoServer, Parent::Read with error: " << strerror(errno) << endl;
             }
             else if ( nr == 0 ) {
-                cout << "ItsFifo, Parent::Read with return 0" << endl;
+                cout << "ItsFifoServer, Parent::Read with return 0" << endl;
             }
             else {
-                cout << "ItsFifo, Parent::Read Ok: pid=" << to_string(tmp.pid) << ", content=" << buf << endl;
+                cout << "ItsFifoServer, Parent::Read Ok: pid=" << to_string(tmp.pid) << ", content=" << buf << endl;
             }
 
-            fifo.Close();
+            fifoServer.Close();
         }
     }
 }
