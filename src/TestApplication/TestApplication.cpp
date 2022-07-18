@@ -156,9 +156,9 @@ int main(int argc, char* argv[])
 
     PrintTestApplicationEvent("Started");
 
+    TestItsTimerStart();
     TestItsSocketStreamClientServerStart();
     TestItsSocketDatagramClientServerStart();
-	TestItsTimerStart();
     TestItsFileMonitorStart();
     TestItsConvert();
     TestItsRandom();
@@ -172,12 +172,12 @@ int main(int argc, char* argv[])
     TestItsPath();
     TestItsDirectory();
     TestItsFileMonitorStop();
-    TestItsTimerStop();
     TestItsSocketDatagramClientServerStop();
     TestItsSocketStreamClientServerStop();
     TestItsPipe();
     TestItsSvMsgQueue();
     TestItsFifo();
+    TestItsTimerStop();
 
     return EXIT_SUCCESS;
 }
