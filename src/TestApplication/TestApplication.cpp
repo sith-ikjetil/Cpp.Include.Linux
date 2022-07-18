@@ -1238,17 +1238,17 @@ void TestItsFifo()
         }
         default:
         {
-            const int bufSize = 200;
             // parent
-            char buf[bufSize];
+            unique_ptr<unsigned char[]> buf;
 
             ItsFifoHeader tmp{0};
-            tmp.length = bufSize;
+            tmp.length = 0;
             tmp.pid = getpid();
             
             std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 
-            auto nr = fifoServer.Read(buf, &tmp, bufSize);
+            auto nr = fifoServer.Read(&buf, &tmp);
+            
             if ( nr < 0 ) {
                 cout << "ItsFifoServer, Parent::Read with error: " << strerror(errno) << endl;
             }
@@ -1256,7 +1256,7 @@ void TestItsFifo()
                 cout << "ItsFifoServer, Parent::Read with return 0" << endl;
             }
             else {
-                cout << "ItsFifoServer, Parent::Read Ok: pid=" << to_string(tmp.pid) << ", content=" << buf << endl;
+                cout << "ItsFifoServer, Parent::Read Ok: pid=" << to_string(tmp.pid) << ", content=" << buf.get() << endl;
             }
 
             fifoServer.Close();

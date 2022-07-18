@@ -11,6 +11,7 @@
 // #include
 //
 #include <string>
+#include <memory>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/un.h>
@@ -23,6 +24,8 @@
 //
 using std::string;
 using std::to_string;
+using std::unique_ptr;
+using std::make_unique;
 
 //
 // namespace
@@ -935,12 +938,14 @@ namespace ItSoftware::Linux::IPC
         string m_server_filename;
         string m_client_filename;
         bool m_bInitWithError;
+        bool m_bIsClosed;
     protected:
     public:
         ItsFifoServer(const string server_filename, const string client_filename, int flags)
             : m_serverfd(-1),
             m_dummyfd(-1),
             m_errno(0),
+            m_bIsClosed(false),
             m_server_filename(server_filename),
             m_client_filename(client_filename),
             m_bInitWithError(true)
@@ -967,6 +972,15 @@ namespace ItSoftware::Linux::IPC
             }
         }
         //
+        // Method: ~ItsFifoServer
+        //
+        // (i): Destructor.
+        //
+        ~ItsFifoServer()
+        {
+            this->Close();
+        }
+        //
         // Method: Close
         //
         // (i): Closes open handles.
@@ -980,6 +994,16 @@ namespace ItSoftware::Linux::IPC
                 close(this->m_serverfd);
             }
             remove(this->m_server_filename.c_str());
+            this->m_bIsClosed = true;
+        }
+        //
+        // Method: IsClosed
+        //
+        // (i): Returnes if object is closed.
+        //
+        bool GetIsClosed()
+        {
+            return this->m_bIsClosed;
         }
         //
         // Function: CreateServerFlags
@@ -1054,12 +1078,14 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Reads from fifo file.
         //
-        ssize_t Read(void *buf, ItsFifoHeader* header, size_t n)
+        ssize_t Read(unique_ptr<unsigned char[]> *buf, ItsFifoHeader* header)
         {
             auto nr = read(this->m_serverfd, header, sizeof(ItsFifoHeader));
-            if ( nr == sizeof(ItsFifoHeader) && n >= header->length) {
-                return read(this->m_serverfd, buf, header->length);
+            if ( nr == sizeof(ItsFifoHeader) ) {
+                *buf = make_unique<unsigned char[]>(header->length);
+                return read(this->m_serverfd, (*buf).get(), header->length);
             }
+
             return 0;
         }
         //
@@ -1102,12 +1128,14 @@ namespace ItSoftware::Linux::IPC
         string m_server_filename;
         string m_client_filename;
         bool m_bInitWithError;
+        bool m_bIsClosed;
     protected:
     public:
         ItsFifoClient(const string server_filename, const string client_filename, int flags)
             : m_clientfd(-1),
             m_dummyfd(-1),
             m_errno(0),
+            m_bIsClosed(false),
             m_server_filename(server_filename),
             m_client_filename(client_filename),
             m_bInitWithError(true)
@@ -1137,6 +1165,15 @@ namespace ItSoftware::Linux::IPC
             }
         }
         //
+        // Method: ~ItsFifoClient
+        //
+        // (i): Destructor.
+        //
+        ~ItsFifoClient()
+        {
+            this->Close();
+        }
+        //
         // Method: Close
         //
         // (i): Closes open handles.
@@ -1150,6 +1187,16 @@ namespace ItSoftware::Linux::IPC
                 close(this->m_clientfd);
             }
             remove(this->m_client_filename.c_str());
+            this->m_bIsClosed = true;
+        }
+        //
+        // Method: IsClosed
+        //
+        // (i): Returnes if object is closed.
+        //
+        bool GetIsClosed()
+        {
+            return this->m_bIsClosed;
         }
         //
         // Function: CreateServerFlags
@@ -1224,12 +1271,14 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Reads from fifo file.
         //
-        ssize_t Read(void *buf, ItsFifoHeader* header, size_t n)
+        ssize_t Read(unique_ptr<unsigned char[]> *buf, ItsFifoHeader* header)
         {
             auto nr = read(this->m_clientfd, header, sizeof(ItsFifoHeader));
-            if ( nr == sizeof(ItsFifoHeader) && n >= header->length) {
-                return read(this->m_clientfd, buf, header->length);
+            if ( nr == sizeof(ItsFifoHeader) ) {
+                *buf = make_unique<unsigned char[]>(header->length);
+                return read(this->m_clientfd, (*buf).get(), header->length);
             }
+
             return 0;
         }
         //
