@@ -13,6 +13,12 @@
 #include <string>
 #include <cstring>
 #include <memory>
+#include <algorithm>
+#include <thread>
+#include <functional>
+#include <iostream>
+#include <vector>
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/time.h>
@@ -20,14 +26,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
-#include <iostream>
-#include <vector>
 #include <uuid/uuid.h>
-#include "itsoftware-linux.h"
-#include <thread>
-#include <functional>
 #include <sys/inotify.h>
 #include <signal.h>
+
+#include "itsoftware-linux.h"
 
 
 //
@@ -54,6 +57,9 @@ namespace ItSoftware
             using std::vector;
             using std::thread;
             using std::function;
+            using std::begin;
+            using std::end;
+            using std::any_of;
             using ItSoftware::Linux::ItsString;
             
             //
@@ -1043,18 +1049,15 @@ namespace ItSoftware
                     }
 
                     for (auto d : directory) {
-                        for (auto i : invalidPathChars) {
-                            if (d == i) {
-                                return false;
-                            }
+                        if (any_of(begin(invalidPathChars), end(invalidPathChars), [&d] (char ch){ return ch==d; }))
+                        {
+                            return false;
                         }
                     }
 
                     for (auto f : filename) {
-                        for (auto i : invalidFileChars) {
-                            if (f == i) {
-                                return false;
-                            }
+                        if (any_of(begin(invalidFileChars), end(invalidFileChars), [&f] (char ch){ return ch==f; })) {
+                            return false;
                         }
                     }
 
