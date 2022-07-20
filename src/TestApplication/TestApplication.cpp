@@ -85,9 +85,9 @@ void TestItsDirectory();
 void TestItsFileMonitorStart();
 void TestItsFileMonitorStop();
 void ExitFn();
-void PrintTestHeader(string txt);
-void PrintTestSubHeader(string txt);
-void PrintTestApplicationEvent(string event);
+void PrintTestHeader(const string& txt);
+void PrintTestSubHeader(const string& txt);
+void PrintTestApplicationEvent(const string& event);
 void HandleFileEvent(inotify_event& event);
 void TestItsSocketStreamClientServerStop();
 void TestItsSocketDatagramClientServerStop();
@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
 //
 // (i): prints application event string.
 //
-void PrintTestApplicationEvent(string event)
+void PrintTestApplicationEvent(const string& event)
 {
     cout << CLR_RESET << CLR_GREEN;
     
@@ -203,7 +203,7 @@ void PrintTestApplicationEvent(string event)
 //
 // (i): Prints a tests header.
 //
-void PrintTestHeader(string txt)
+void PrintTestHeader(const string& txt)
 {
     cout << CLR_RESET << CLR_GREEN;
 
@@ -221,7 +221,7 @@ void PrintTestHeader(string txt)
 //
 // (i): Prints a tests sub header.
 //
-void PrintTestSubHeader(string txt)
+void PrintTestSubHeader(const string& txt)
 {
     cout << CLR_RESET << CLR_GREEN;
 

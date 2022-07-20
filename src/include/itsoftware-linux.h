@@ -248,7 +248,7 @@ namespace ItSoftware
 				{
 					return string("");
 				}
-				if (width <= 0)
+				if (width == 0)
 				{
 					return string("");
 				}
@@ -299,7 +299,7 @@ namespace ItSoftware
 				return retVal;
 			}
 
-			static vector<string> Split(string data, string token)
+			static vector<string> Split(string data, const string& token)
 			{
 				vector<string> output;
 				size_t pos = string::npos; // size_t to avoid improbable overflow
@@ -342,7 +342,7 @@ namespace ItSoftware
 			}
 
 			// trim from left & right
-			static string Trim(string s, const char *t = " \t\n\r\f\v")
+			static string Trim(const string& s, const char *t = " \t\n\r\f\v")
 			{
 				auto val = TrimRight(s, t);
 				return TrimLeft(val, t);
@@ -351,7 +351,7 @@ namespace ItSoftware
 			// left count chars
 			static string Left(string s, uint32_t count)
 			{
-				if (s.size() == 0 || count <= 0)
+				if (s.size() == 0 || count == 0)
 				{
 					return string("");
 				}
@@ -374,7 +374,7 @@ namespace ItSoftware
 			// mid index, count chars
 			static string Mid(string s, uint32_t index, uint32_t count)
 			{
-				if (s.size() == 0 || count <= 0 || index < 0 || index >= s.size())
+				if (s.size() == 0 || count == 0 || index >= s.size())
 				{
 					return string("");
 				}
@@ -403,7 +403,7 @@ namespace ItSoftware
 			// right count chars
 			static string Right(string s, uint32_t count)
 			{
-				if (s.size() == 0 || count <= 0)
+				if (s.size() == 0 || count == 0)
 				{
 					return string("");
 				}
@@ -423,7 +423,7 @@ namespace ItSoftware
 				return str;
 			}
 
-			static string Replace(string s, string replace, string replace_with)
+			static string Replace(string s, const string& replace, const string& replace_with)
 			{
 				if (s.size() == 0 || replace.size() == 0 || replace.size() > s.size())
 				{
@@ -680,7 +680,7 @@ namespace ItSoftware
 				return retVal;
 			}
 
-			static string ToString(tm &dateTime)
+			static string ToString(const tm &dateTime)
 			{
 				stringstream ss;
 				ss << std::setfill('0') << std::setw(4) << (dateTime.tm_year + 1900);
@@ -767,7 +767,7 @@ namespace ItSoftware
 				return false;
 			}
 
-			static string ToString(vector<uint64_t> &pks)
+			static string ToString(const vector<uint64_t> &pks)
 			{
 				stringstream ss;
 				bool bAddSep = false;
@@ -814,12 +814,12 @@ namespace ItSoftware
 			tm m_tm;
 
 		public:
-			ItsDateTime(tm timeDate)
+			explicit ItsDateTime(tm timeDate)
 			{
 				this->m_tm = timeDate;
 			}
 
-			ItsDateTime(ItsDateTime &dateTime)
+			ItsDateTime(const ItsDateTime &dateTime)
 			{
 				this->m_tm = dateTime.m_tm;
 			}
@@ -1294,7 +1294,7 @@ namespace ItSoftware
 			string m_ident;
 			bool m_bLogToSyslog;
 		public:
-			ItsLog(string ident, bool log_to_syslog)
+			ItsLog(const string& ident, bool log_to_syslog)
 			:	m_ident(ident),
 				m_bLogToSyslog(log_to_syslog)
 			{
@@ -1308,7 +1308,7 @@ namespace ItSoftware
 					closelog();
 				}
 			}
-			void LogInformation(string description)
+			void LogInformation(const string& description)
 			{
 				ItsLogItem item;
 				item.When = ItsDateTime::Now().TM();
@@ -1322,7 +1322,7 @@ namespace ItSoftware
 				}
 			}
 
-			void LogWarning(string description)
+			void LogWarning(const string& description)
 			{
 				ItsLogItem item;
 				item.When = ItsDateTime::Now().TM();
@@ -1336,7 +1336,7 @@ namespace ItSoftware
 				}
 			}
 
-			void LogError(string description)
+			void LogError(const string& description)
 			{
 				ItsLogItem item;
 				item.When = ItsDateTime::Now().TM();
@@ -1350,7 +1350,7 @@ namespace ItSoftware
 				}
 			}
 
-			void LogOther(string description)
+			void LogOther(const string& description)
 			{
 				ItsLogItem item;
 				item.When = ItsDateTime::Now().TM();
@@ -1364,7 +1364,7 @@ namespace ItSoftware
 				}
 			}
 
-			void LogDebug(string description)
+			void LogDebug(const string& description)
 			{
 				ItsLogItem item;
 				item.When = ItsDateTime::Now().TM();
@@ -1451,7 +1451,7 @@ namespace ItSoftware
 		public:
 			static string CreateID(size_t count, ItsCreateIDOptions options, bool includeNumbers)
 			{
-				if (count <= 0)
+				if (count == 0)
 				{
 					count = 16;
 				}

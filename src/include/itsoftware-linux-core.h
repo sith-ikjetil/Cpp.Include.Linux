@@ -219,7 +219,7 @@ namespace ItSoftware
                 static string ToString(uuid_t guid) {
                     return ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftRegistryFormat, true);
                 }
-                static string ToString(uuid_t guid, string format, bool isMicrosoftGuidFormat) {
+                static string ToString(uuid_t guid, const string& format, bool isMicrosoftGuidFormat) {
                     char szBuffer[100];
                     memset(szBuffer, 0, 100);
 
@@ -263,7 +263,7 @@ namespace ItSoftware
             struct ItsDirectory
             {
             public:
-                static bool Exists(string dirname)
+                static bool Exists(const string& dirname)
                 {
                     struct stat sb;
 
@@ -282,19 +282,19 @@ namespace ItSoftware
                     }
                     return string(path);
                 }
-                static bool CreateDirectory(string path, int mode)
+                static bool CreateDirectory(const string& path, int mode)
                 {
                     return (mkdir(path.c_str(), mode) == 0);
                 }
-                static bool RemoveDirectory(string path)
+                static bool RemoveDirectory(const string& path)
                 {
                     return (rmdir(path.c_str()) == 0);
                 }
-                static bool SetCurrentDirectory(string path)
+                static bool SetCurrentDirectory(const string& path)
                 {
                     return (chdir(path.c_str()) == 0);
                 }
-                static vector<string> GetDirectories(string path) {
+                static vector<string> GetDirectories(const string& path) {
                     if (path.size() == 0) {
                         return vector<string>();
                     }
@@ -317,7 +317,7 @@ namespace ItSoftware
                     
                     return directories;
                 }
-                static vector<string> GetFiles(string path) {
+                static vector<string> GetFiles(const string& path) {
                     if (path.size() == 0) {
                         return vector<string>();
                     }
@@ -357,7 +357,7 @@ namespace ItSoftware
                     this->m_fd = -1;
                 }
 
-                unique_file_descriptor(int fd)
+                explicit unique_file_descriptor(int fd)
                 {
                     this->m_fd = fd;
                 }
@@ -435,7 +435,7 @@ namespace ItSoftware
                 //
                 // Method: OpenExisting
                 //
-                bool OpenExisting(string filename, string flags)
+                bool OpenExisting(string filename, const string& flags)
                 {
                     if (this->m_fd.IsValid())
                     {
@@ -503,7 +503,7 @@ namespace ItSoftware
                 //
                 // (i) mode = "rwta" (read, write, trunc, append)
                 //
-                bool OpenOrCreate(string filename, string flags, int mode)
+                bool OpenOrCreate(const string& filename, const string& flags, int mode)
                 {
                     if (this->m_fd.IsValid())
                     {
@@ -712,7 +712,7 @@ namespace ItSoftware
                 //
                 // GetFileSize
                 //
-                static size_t GetFileSize(string filename)
+                static size_t GetFileSize(const string& filename)
                 {
                     struct stat statbuf;
                     if ( stat(filename.c_str(), &statbuf) == -1 ) {
@@ -721,12 +721,12 @@ namespace ItSoftware
                     return statbuf.st_size;
                 }
 
-                static bool Delete(string filename)
+                static bool Delete(const string& filename)
                 {
                     return (!unlink(filename.c_str()));
                 }
 
-                static bool Exists(string filename)
+                static bool Exists(const string& filename)
                 {
                     struct stat sb;
 
@@ -738,7 +738,7 @@ namespace ItSoftware
                     return false;
                 }
 
-                static bool Move(string sourceFilename, string targetFilename)
+                static bool Move(const string& sourceFilename, const string& targetFilename)
                 {
                     return (!rename(sourceFilename.c_str(), targetFilename.c_str()));
                 }
@@ -751,7 +751,7 @@ namespace ItSoftware
                     }
 
                     ItsFile source;
-                    source.OpenExisting(sourceFilename.c_str(), "r");
+                    source.OpenExisting(sourceFilename, "r");
                     if (source.IsInvalid())
                     {
                         return false;
@@ -771,7 +771,7 @@ namespace ItSoftware
                     {
                         int mode = 0;
                         ItsFile::GetMode(sourceFilename, &mode);
-                        target.OpenOrCreate(targetFilename.c_str(), "wt", mode);
+                        target.OpenOrCreate(targetFilename, "wt", mode);
                     }
 
                     if (target.IsInvalid())
@@ -822,7 +822,7 @@ namespace ItSoftware
                     return true;
                 }
 
-                static int CreateMode(string user, string group, string other)
+                static int CreateMode(const string& user, const string& group, const string& other)
                 {
                 	int mode(0);
 
@@ -963,7 +963,7 @@ namespace ItSoftware
                     string retVal = path.str();
                     return retVal;
                 }
-                static bool Exists(string path)
+                static bool Exists(const string& path)
                 {
                     if (access(path.c_str(), F_OK) == 0) {
                         return true;
@@ -1037,8 +1037,7 @@ namespace ItSoftware
                     
                     auto invalidPathChars = ItsPath::GetInvalidPathCharacters();
                     auto invalidFileChars = ItsPath::GetInvalidFilenameCharacters();
-                    
-                    
+                                        
                     if ( directory[directory.size()-1] != ItsPath::PathSeparator ) {
                         return false;
                     }
@@ -1061,7 +1060,7 @@ namespace ItSoftware
 
                     return true;
                 }
-                static bool HasExtension(string path, string extension)
+                static bool HasExtension(const string& path, const string& extension)
                 {
                     if (path.size() == 0) {
                         return false;
@@ -1194,12 +1193,12 @@ namespace ItSoftware
                     }
                 }
             public:
-                ItsFileMonitor(const string pathname, function<void(inotify_event&)> func)
+                ItsFileMonitor(const string& pathname, function<void(inotify_event&)> func)
                     :   ItsFileMonitor(pathname, (ItsFileMonitorMask::Modify|ItsFileMonitorMask::Open), func) 
                 {
                     
                 }
-                ItsFileMonitor(const string pathname, uint32_t mask, function<void(inotify_event&)> func)
+                ItsFileMonitor(const string& pathname, uint32_t mask, function<void(inotify_event&)> func)
                     :   m_pathname(pathname), 
                         m_mask(mask),
                         m_fd(-1),
@@ -1320,7 +1319,6 @@ namespace ItSoftware
 
                 int BecomeDaemon(int flags)
                 {
-                    int maxfd;
                     int fd;
 
                     switch(fork()) {
@@ -1348,7 +1346,7 @@ namespace ItSoftware
                     }
 
                     if (!(flags & 02)) {
-                        maxfd = sysconf(_SC_OPEN_MAX);
+                        int maxfd = sysconf(_SC_OPEN_MAX);
                         if (maxfd == -1) {
                             maxfd = 8192;
                         }
@@ -1391,7 +1389,7 @@ namespace ItSoftware
                 //
                 // (i): Constructor.
                 //
-                ItsDaemon(int flags) {
+                explicit ItsDaemon(int flags) {
                     ItsDaemon::s_sigkill = false;
                     this->m_deamonRetVal = this->BecomeDaemon(flags);
                     if ( this->m_deamonRetVal == 0 ) {
