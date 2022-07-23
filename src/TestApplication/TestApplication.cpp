@@ -50,6 +50,7 @@ using ItSoftware::Linux::Core::ItsDirectory;
 using ItSoftware::Linux::Core::ItsError;
 using ItSoftware::Linux::Core::ItsFileMonitor;
 using ItSoftware::Linux::Core::ItsFileMonitorMask;
+using ItSoftware::Linux::IPC::ItsSocket;
 using ItSoftware::Linux::IPC::ItsSocketStreamServer;
 using ItSoftware::Linux::IPC::ItsSocketStreamClient;
 using ItSoftware::Linux::IPC::ItsSocketConType;
@@ -1297,7 +1298,7 @@ void TestItsSocketStreamClientServerINETStart()
 {
     PrintTestHeader("ItsSocketStream[Client/Server]INET Start");
 
-    auto ptr = ItsSocketStreamServer::CreateSockAddrHostInet(5500, "192.168.0.100");
+    auto ptr = ItsSocket::CreateSockAddrHostInet4(5500, "192.168.0.100");
     g_inaddr = *ptr;
 
     g_socket_stream_in_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr, sizeof(g_inaddr), ItsSocketStreamServer::DefaultBackdrop);
@@ -1394,7 +1395,7 @@ void TestItsSocketDatagramClientServerINETStart()
 {
     PrintTestHeader("ItsSocketDatagram[Client/Server]INET Start");
     
-    auto ptrs = ItsSocketDatagramServer::CreateSockAddrHostInet(5502, "192.168.0.100");
+    auto ptrs = ItsSocket::CreateSockAddrHostInet4(5502, "192.168.0.100");
     g_inaddr2s = *ptrs;
     
     g_socket_dg_in_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr2s, sizeof(g_inaddr2s));
@@ -1405,7 +1406,7 @@ void TestItsSocketDatagramClientServerINETStart()
         cout << "ItsSocketDatagramServer INET, Init Ok!" << endl;
     }
 
-    auto ptrc = ItsSocketDatagramClient::CreateSockAddrHostInet(5501, "192.168.0.100");
+    auto ptrc = ItsSocket::CreateSockAddrHostInet4(5501, "192.168.0.100");
     g_inaddr2c = *ptrc;
 
     g_socket_dg_in_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr2c, sizeof(g_inaddr2c));

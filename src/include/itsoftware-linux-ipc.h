@@ -58,6 +58,44 @@ namespace ItSoftware::Linux::IPC
     };
 
     //
+    // class: ItsSocket
+    //
+    // (i): Static method for use with ItsSocket[Stream/Datagram][Client/Server].
+    //
+    class ItsSocket
+    {
+    public:
+        //
+        // Method: CreateSockAddrHostUnix
+        //
+        // (i): Creates the sockaddr_un for a Unix local connection.
+        //
+        static unique_ptr<sockaddr_un> CreateSockAddrHostUnix()
+        {
+            unique_ptr<sockaddr_un> retVal = make_unique<sockaddr_un>();
+            if ( retVal != nullptr ) {
+                retVal->sun_family = AF_UNIX;
+            }
+            return retVal;
+        }
+        //
+        // Method: CreateSockAddrHostInet
+        //
+        // (i): Creates the sockaddr_in for a internet connection.
+        //
+        static unique_ptr<sockaddr_in> CreateSockAddrHostInet4(unsigned short port, const string& ip)
+        {
+            unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
+            if ( retVal != nullptr ) {
+                retVal->sin_family = AF_INET;
+                retVal->sin_port = port;
+                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
+            }
+            return retVal;
+        }
+    };
+
+    //
     // class: ItsSocketStreamServer
     //
     // (i): Class for passive socket communications.
@@ -197,34 +235,6 @@ namespace ItSoftware::Linux::IPC
         {
             return this->m_bIsClosed;
         }
-        //
-        // Method: CreateSockAddrHostUnix
-        //
-        // (i): Creates the sockaddr_un for a Unix local connection.
-        //
-        static unique_ptr<sockaddr_un> CreateSockAddrHostUnix()
-        {
-            unique_ptr<sockaddr_un> retVal = make_unique<sockaddr_un>();
-            if ( retVal != nullptr ) {
-                retVal->sun_family = AF_UNIX;
-            }
-            return retVal;
-        }
-        //
-        // Method: CreateSockAddrHostInet
-        //
-        // (i): Creates the sockaddr_in for a internet connection.
-        //
-        static unique_ptr<sockaddr_in> CreateSockAddrHostInet(unsigned short port, const string& ip)
-        {
-            unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
-            if ( retVal != nullptr ) {
-                retVal->sin_family = AF_INET;
-                retVal->sin_port = port;
-                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
-            }
-            return retVal;
-        }
     };// ItsSocketStreamServer
 
     //
@@ -347,34 +357,6 @@ namespace ItSoftware::Linux::IPC
         {
             return this->m_bIsClosed;
         }
-        //
-        // Method: CreateSockAddrHostUnix
-        //
-        // (i): Creates the sockaddr_un for a Unix local connection.
-        //
-        static unique_ptr<sockaddr_un> CreateSockAddrHostUnix()
-        {
-            unique_ptr<sockaddr_un> retVal = make_unique<sockaddr_un>();
-            if ( retVal != nullptr ) {
-                retVal->sun_family = AF_UNIX;
-            }
-            return retVal;
-        }
-        //
-        // Method: CreateSockAddrHostInet
-        //
-        // (i): Creates the sockaddr_in for a internet connection.
-        //
-        static unique_ptr<sockaddr_in> CreateSockAddrHostInet(unsigned short port, const string& ip)
-        {
-            unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
-            if ( retVal != nullptr ) {
-                retVal->sin_family = AF_INET;
-                retVal->sin_port = port;
-                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
-            }
-            return retVal;
-        }
     };
     //
     // class: ItsSocketDatagramServer
@@ -495,34 +477,6 @@ namespace ItSoftware::Linux::IPC
         {
             return this->m_bIsClosed;
         }
-        //
-        // Method: CreateSockAddrHostUnix
-        //
-        // (i): Creates the sockaddr_un for a Unix local connection.
-        //
-        static unique_ptr<sockaddr_un> CreateSockAddrHostUnix()
-        {
-            unique_ptr<sockaddr_un> retVal = make_unique<sockaddr_un>();
-            if ( retVal != nullptr ) {
-                retVal->sun_family = AF_UNIX;
-            }
-            return retVal;
-        }
-        //
-        // Method: CreateSockAddrHostInet
-        //
-        // (i): Creates the sockaddr_in for a internet connection.
-        //
-        static unique_ptr<sockaddr_in> CreateSockAddrHostInet(unsigned short port, const string& ip)
-        {
-            unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
-            if ( retVal != nullptr ) {
-                retVal->sin_family = AF_INET;
-                retVal->sin_port = port;
-                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
-            }
-            return retVal;
-        }
     };// ItsNetPassive
 
     //
@@ -642,34 +596,6 @@ namespace ItSoftware::Linux::IPC
         bool GetIsClosed()
         {
             return this->m_bIsClosed;
-        }
-        //
-        // Method: CreateSockAddrHostUnix
-        //
-        // (i): Creates the sockaddr_un for a Unix local connection.
-        //
-        static unique_ptr<sockaddr_un> CreateSockAddrHostUnix()
-        {
-            unique_ptr<sockaddr_un> retVal = make_unique<sockaddr_un>();
-            if ( retVal != nullptr ) {
-                retVal->sun_family = AF_UNIX;
-            }
-            return retVal;
-        }
-        //
-        // Method: CreateSockAddrHostInet
-        //
-        // (i): Creates the sockaddr_in for a internet connection.
-        //
-        static unique_ptr<sockaddr_in> CreateSockAddrHostInet(unsigned short port, const string& ip)
-        {
-            unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
-            if ( retVal != nullptr ) {
-                retVal->sin_family = AF_INET;
-                retVal->sin_port = port;
-                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
-            }
-            return retVal;
         }
     };
     //
