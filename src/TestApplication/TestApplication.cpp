@@ -69,6 +69,7 @@ using ItSoftware::Linux::IPC::ItsFifoHeader;
 //
 void TestItsSocketDatagramClientServerStart();
 void TestItsSocketStreamClientServerStart();
+void TestItsSocketStreamClientServerINETStart();
 void TestItsConvert();
 void TestItsRandom();
 void TestItsTime();
@@ -89,6 +90,7 @@ void PrintTestHeader(const string& txt);
 void PrintTestSubHeader(const string& txt);
 void PrintTestApplicationEvent(const string& event);
 void HandleFileEvent(inotify_event& event);
+void TestItsSocketStreamClientServerINETStop();
 void TestItsSocketStreamClientServerStop();
 void TestItsSocketDatagramClientServerStop();
 void TestItsPipe();
@@ -122,17 +124,23 @@ string g_creatDir("/home/kjetilso/testdir");
 //
 unique_ptr<ItsSocketStreamServer> g_socket_stream_server;
 unique_ptr<ItsSocketStreamClient>  g_socket_stream_client;
+unique_ptr<ItsSocketStreamServer> g_socket_stream_in_server;
+unique_ptr<ItsSocketStreamClient>  g_socket_stream_in_client;
 unique_ptr<ItsSocketDatagramServer> g_socket_dg_server;
 unique_ptr<ItsSocketDatagramClient>  g_socket_dg_client;
 vector<string> g_socket_stream_traffic;
+vector<string> g_socket_stream_in_traffic;
 vector<string> g_socket_dg_traffic;
 unique_ptr<thread> g_socket_stream_thread1;
 unique_ptr<thread> g_socket_stream_thread2;
+unique_ptr<thread> g_socket_stream_in_thread1;
+unique_ptr<thread> g_socket_stream_in_thread2;
 unique_ptr<thread> g_socket_dg_thread1;
 unique_ptr<thread> g_socket_dg_thread2;
 struct sockaddr_un g_addr{0};
 struct sockaddr_un g_saddr{0};
 struct sockaddr_un g_caddr{0};
+struct sockaddr_in g_inaddr{0};
 
 //
 // Function: ExitFn
@@ -159,6 +167,7 @@ int main(int argc, char* argv[])
     TestItsTimerStart();
     TestItsSocketStreamClientServerStart();
     TestItsSocketDatagramClientServerStart();
+    TestItsSocketStreamClientServerINETStart();
     TestItsFileMonitorStart();
     TestItsConvert();
     TestItsRandom();
@@ -172,6 +181,7 @@ int main(int argc, char* argv[])
     TestItsPath();
     TestItsDirectory();
     TestItsFileMonitorStop();
+    TestItsSocketStreamClientServerINETStop();
     TestItsSocketDatagramClientServerStop();
     TestItsSocketStreamClientServerStop();
     TestItsPipe();
@@ -895,7 +905,7 @@ void TestItsSocketStreamClientServerStart()
     g_socket_stream_thread2 = make_unique<thread>([] () {   
         std::this_thread::sleep_for(std::chrono::seconds(1));
 
-        if (g_socket_stream_client->Connect((struct sockaddr*)&g_addr, sizeof(g_addr)) == 0) {
+        if (g_socket_stream_client->Connect() == 0) {
             g_socket_stream_traffic.push_back("g_socket_stream_client.Connect OK");
 
             char buf[1000] = "This is a test string.";
@@ -1264,5 +1274,102 @@ void TestItsFifo()
 
             fifoServer.Close();
         }
+    }
+}
+
+//
+// Function: TestItsSocketStreamClientServerStart
+//
+// (i): Starts testing socket stream client server.
+//
+void TestItsSocketStreamClientServerINETStart()
+{
+    PrintTestHeader("ItsSocketStream[Client/Server]INET Start");
+
+    auto ptr = ItsSocketStreamServer::CreateSockAddrHostInet(5500, "192.168.0.100");
+    g_inaddr = *ptr;
+
+    g_socket_stream_in_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr, sizeof(g_inaddr), ItsSocketStreamServer::DefaultBackdrop);
+    if ( g_socket_stream_in_server->GetInitWithError()) {
+        cout << "ItsSocketStreamServer INET, Init with error: " << strerror(g_socket_stream_in_server->GetInitWithErrorErrno()) << endl;
+    }
+    cout << "ItsSocketStreamServer INET, Init Ok!" << endl;
+
+    g_socket_stream_in_client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr, sizeof(g_inaddr));
+    if ( g_socket_stream_in_client->GetInitWithError()) {
+        cout << "ItsSocketStreamClient INET, Init with error: " << strerror(g_socket_stream_in_client->GetInitWithErrorErrno()) << endl;
+    }
+    cout << "ItsSocketStreamClient INET, Init Ok!" << endl;
+
+    if ( g_socket_stream_in_server->GetInitWithError() || g_socket_stream_in_client->GetInitWithError() ) {
+        return;
+    }
+
+    g_socket_stream_in_thread1 = make_unique<thread>([] () {
+        struct sockaddr_un accept_addr{0};
+        socklen_t accept_addr_len(0);
+        char buf[1000];
+        bool quit = false;
+        while (!quit) {
+            auto fd = g_socket_stream_in_server->Accept((struct sockaddr*)&accept_addr,&accept_addr_len);
+            if ( fd >= 0 ) {
+                g_socket_stream_in_traffic.push_back("g_socket_stream_in_server.Accept OK");
+                
+                auto nr = g_socket_stream_in_server->Read(fd, buf, 1000);
+                g_socket_stream_in_traffic.push_back("g_socket_stream_in_server.Read " + to_string(nr) + " bytes, " + buf);
+                
+                strcpy(buf, "This is a response ECHO ONE!");
+                auto nw = g_socket_stream_in_server->Write(fd, buf, strlen(buf)+1);
+                g_socket_stream_in_traffic.push_back("g_socket_stream_in_server.Write " + to_string(nw) + " bytes, " + buf);
+                quit = true;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+    });
+    g_socket_stream_in_thread2 = make_unique<thread>([] () {   
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        if (g_socket_stream_in_client->Connect() == 0) { 
+            g_socket_stream_in_traffic.push_back("g_socket_in_stream_client.Connect OK");
+
+            char buf[1000] = "This is a test string.";
+            auto nw = g_socket_stream_in_client->Write(buf, strlen(buf)+1);
+            g_socket_stream_in_traffic.push_back("g_socket_in_stream_client.Write " + to_string(nw) + " bytes, " + buf);
+            auto nr = g_socket_stream_in_client->Read(buf, 1000);
+            g_socket_stream_in_traffic.push_back("g_socket_in_stream_client.Read " + to_string(nr) + " bytes, " + buf);
+        
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+        else {
+            stringstream ss;
+            ss << "ItsSocketStreamClient INET, failed to connect with error: " << strerror(errno);
+            g_socket_stream_in_traffic.push_back(ss.str());
+        }
+    });
+}
+
+//
+// Function: TestItsSocketStreamClientServerStop
+//
+// (i): Stop testing socket stream client server.
+//
+void TestItsSocketStreamClientServerINETStop()
+{
+    PrintTestHeader("ItsSocketStream[Client/Server]INET Stop");
+
+    for ( auto s : g_socket_stream_in_traffic) {
+        cout << s << endl;
+    }
+
+    cout << "Closing net..." << endl;
+    g_socket_stream_in_client->Close();
+    g_socket_stream_in_server->Close();
+    cout << "... net closed" << endl;
+
+    if ( g_socket_stream_in_thread1 != nullptr ) {
+        cout << "Thread joining..." << endl;
+        g_socket_stream_in_thread1->join();
+        g_socket_stream_in_thread2->join();
+        cout << "... threads joined" << endl;
     }
 }

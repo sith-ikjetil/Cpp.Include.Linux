@@ -18,6 +18,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/msg.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 //
 // using
@@ -84,7 +86,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.
         //
-        ItsSocketStreamServer(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen, int backlog)
+        ItsSocketStreamServer(ItsSocketDomain domain, const struct sockaddr* addr, socklen_t addrlen, int backlog)
             : m_domain(domain),
             m_errno(0),
             m_type(ItsSocketConType::STREAM),
@@ -195,10 +197,38 @@ namespace ItSoftware::Linux::IPC
         {
             return this->m_bIsClosed;
         }
-    };// ItsNetPassive
+        //
+        // Method: CreateSockAddrHostUnix
+        //
+        // (i): Creates the sockaddr_un for a Unix local connection.
+        //
+        static unique_ptr<sockaddr_un> CreateSockAddrHostUnix()
+        {
+            unique_ptr<sockaddr_un> retVal = make_unique<sockaddr_un>();
+            if ( retVal != nullptr ) {
+                retVal->sun_family = AF_UNIX;
+            }
+            return retVal;
+        }
+        //
+        // Method: CreateSockAddrHostInet
+        //
+        // (i): Creates the sockaddr_in for a internet connection.
+        //
+        static unique_ptr<sockaddr_in> CreateSockAddrHostInet(unsigned short port, const string& ip)
+        {
+            unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
+            if ( retVal != nullptr ) {
+                retVal->sin_family = AF_INET;
+                retVal->sin_port = port;
+                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
+            }
+            return retVal;
+        }
+    };// ItsSocketStreamServer
 
     //
-    // class: ItsSocketActive
+    // class: ItsSocketStreamClient
     //
     // (i): Class for active socket communication.
     //
@@ -221,7 +251,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.
         //
-        ItsSocketStreamClient(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen)
+        ItsSocketStreamClient(ItsSocketDomain domain, const struct sockaddr* addr, socklen_t addrlen)
             : m_domain(domain),
             m_errno(0),
             m_type(ItsSocketConType::STREAM),
@@ -253,9 +283,9 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Connects to remote server.
         //
-        int Connect(struct sockaddr *addr, socklen_t addrlen)
+        int Connect()//(struct sockaddr *addr, socklen_t addrlen)
         {
-            return connect(this->m_socketfd, addr, addrlen);
+            return connect(this->m_socketfd, this->m_addr, this->m_addrlen);
         }
         //
         // Method: Close
@@ -316,6 +346,34 @@ namespace ItSoftware::Linux::IPC
         bool GetIsClosed()
         {
             return this->m_bIsClosed;
+        }
+        //
+        // Method: CreateSockAddrHostUnix
+        //
+        // (i): Creates the sockaddr_un for a Unix local connection.
+        //
+        static unique_ptr<sockaddr_un> CreateSockAddrHostUnix()
+        {
+            unique_ptr<sockaddr_un> retVal = make_unique<sockaddr_un>();
+            if ( retVal != nullptr ) {
+                retVal->sun_family = AF_UNIX;
+            }
+            return retVal;
+        }
+        //
+        // Method: CreateSockAddrHostInet
+        //
+        // (i): Creates the sockaddr_in for a internet connection.
+        //
+        static unique_ptr<sockaddr_in> CreateSockAddrHostInet(unsigned short port, const string& ip)
+        {
+            unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
+            if ( retVal != nullptr ) {
+                retVal->sin_family = AF_INET;
+                retVal->sin_port = port;
+                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
+            }
+            return retVal;
         }
     };
     //
