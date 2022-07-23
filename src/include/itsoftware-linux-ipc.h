@@ -79,7 +79,7 @@ namespace ItSoftware::Linux::IPC
             return retVal;
         }
         //
-        // Method: CreateSockAddrHostInet
+        // Method: CreateSockAddrHostInet4
         //
         // (i): Creates the sockaddr_in for a internet connection.
         //
@@ -89,7 +89,26 @@ namespace ItSoftware::Linux::IPC
             if ( retVal != nullptr ) {
                 retVal->sin_family = AF_INET;
                 retVal->sin_port = port;
-                inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr));
+                if ( inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr)) == 0 ) {
+                    return nullptr;
+                }
+            }
+            return retVal;
+        }
+        //
+        // Method: CreateSockAddrHostInet6
+        //
+        // (i): Creates the sockaddr_in for a internet connection.
+        //
+        static unique_ptr<sockaddr_in6> CreateSockAddrHostInet6(unsigned short port, const string& ip)
+        {
+            unique_ptr<sockaddr_in6> retVal = make_unique<sockaddr_in6>();
+            if ( retVal != nullptr ) {
+                retVal->sin6_family = AF_INET6;
+                retVal->sin6_port = port;
+                if (inet_pton(AF_INET6, ip.c_str(), (in6_addr*)&(retVal->sin6_addr.__in6_u)) != 1 ) {
+                    return nullptr;
+                }
             }
             return retVal;
         }
