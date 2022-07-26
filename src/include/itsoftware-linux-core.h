@@ -20,6 +20,7 @@
 #include <vector>
 
 #include <fcntl.h>
+#include <dlfcn.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/times.h>
@@ -345,6 +346,61 @@ namespace ItSoftware
                     closedir(dir);
                     
                     return files;
+                }
+            };
+
+            //
+            // struct: unique_shared_library_descriptor
+            //
+            struct unique_shared_library_descriptor
+            {
+              private:
+                void* m_d = nullptr;
+              protected:
+              public:
+                unique_shared_library_descriptor()
+                {
+                    this->m_d = nullptr;
+                }
+                unique_shared_library_descriptor(void* d)
+                {
+                    this->m_d = d;
+                }
+                ~unique_shared_library_descriptor()
+                {
+                    this->Close();
+                }
+                bool IsValid() const
+                {
+                    return this->m_d != nullptr;
+                }
+                bool IsInvalid() const
+                {
+                    return this->m_d == nullptr;
+                }
+                void operator=(void* d) 
+                {
+                    this->Close();
+                    this->m_d = d;
+                }
+                operator void*()
+                {
+                    return this->m_d;
+                }
+                void Close()
+                {
+                    if (this->IsValid()) {
+                        dlclose(this->m_d);
+                        this->m_d = nullptr;
+                    }
+                }
+                void *p() const
+                {
+                    return this->m_d;
+                }
+                const void *GetAddressOf() const
+                {
+                    return &this->m_d;
                 }
             };
 
