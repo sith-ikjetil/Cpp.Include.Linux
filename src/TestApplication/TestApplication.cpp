@@ -119,7 +119,7 @@ char g_shredFilename[] = "/home/kjetilso/test2shred.txt";
 string g_path1("/home");
 string g_path2("/kjetilso/test.txt");
 string g_invalidPath("home\0/kjetilso");
-string g_directoryRoot("/home/kjetilso");
+string g_directoryRoot("/home/kjetilso/");
 string g_creatDir("/home/kjetilso/testdir");
 
 //
@@ -200,7 +200,7 @@ int main(int argc, char* argv[])
     TestItsSvMsgQueue();
     TestItsFifo();
     TestItsTimerStop();
-
+    
     return EXIT_SUCCESS;
 }
 
@@ -784,10 +784,11 @@ void TestItsDirectory()
 //
 void TestItsFileMonitorStart()
 {
-    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open), HandleFileEvent);  
+    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open | ItsFileMonitorMask::Access | ItsFileMonitorMask::Create), HandleFileEvent);  
 
     PrintTestHeader("ItsFileMonitor Start");
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open'" << endl;
+
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access'" << endl;
     
     cout << endl;
 }
@@ -804,7 +805,7 @@ void TestItsFileMonitorStop()
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     g_fm->Stop();
 
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create'" << endl;
     cout << "Events:" << endl;
     for ( auto i : g_fileMonNames ) {
         cout << ">> " << i << endl;

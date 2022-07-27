@@ -1261,8 +1261,7 @@ namespace ItSoftware
                             continue;
                         }
                         if (nRead == -1) {
-                            this->m_bStopped = true;
-                            break;
+                            continue;
                         }
                         for (char *p = buffer; p < buffer + nRead;) {
                             inotify_event* event = (inotify_event*)p;
@@ -1291,7 +1290,7 @@ namespace ItSoftware
                             //std::cerr << "inotify_init" << endl;
                             return;
                         }
-                        fcntl(this->m_fd, F_SETFL, O_NONBLOCK);
+                        fcntl(this->m_fd, F_SETFL, fcntl(this->m_fd, F_GETFL) | O_NONBLOCK);
 
                         this->m_wd = inotify_add_watch(this->m_fd, pathname.c_str(), mask);
                         if (this->m_wd == -1) {
@@ -1299,7 +1298,7 @@ namespace ItSoftware
                             return;
                         }
                     
-                        this->m_thread = thread(&ItsFileMonitor::ExecuteDispatchThread, this, func);
+                        m_thread = thread(&ItsFileMonitor::ExecuteDispatchThread, this, func);
                     }
                 }
                 void Pause() {
