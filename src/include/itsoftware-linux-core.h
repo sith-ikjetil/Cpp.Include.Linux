@@ -473,6 +473,12 @@ namespace ItSoftware
             };
 
             //
+            // typedef
+            //
+            typedef unique_shared_library_descriptor unique_so_handle;
+            typedef unique_file_descriptor unique_file_handle;
+
+            //
             // File IO Wrapper
             //
             class ItsFile
