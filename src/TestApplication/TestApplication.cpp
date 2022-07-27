@@ -506,9 +506,7 @@ void TestItsFile()
     
 
     cout << "file.Close()" << endl;
-    if (!file.Close() ) {
-        cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;;
-    }
+    file.Close();
     cout << "> Success" << endl;
 
     cout << "ItsFile::Copy(g_filename, g_shredFilename, true)" << endl;
@@ -801,10 +799,11 @@ void TestItsFileMonitorStart()
 //
 void TestItsFileMonitorStop()
 {
+    PrintTestHeader("ItsFileMonitor Stop");
+
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     g_fm->Stop();
-    
-    PrintTestHeader("ItsFileMonitor Stop");
+
     cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open'" << endl;
     cout << "Events:" << endl;
     for ( auto i : g_fileMonNames ) {

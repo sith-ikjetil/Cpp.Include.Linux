@@ -350,133 +350,147 @@ namespace ItSoftware
             };
 
             //
-            // struct: unique_shared_library_descriptor
-            //
-            struct unique_shared_library_descriptor
-            {
-              private:
-                void* m_d = nullptr;
-              protected:
-              public:
-                unique_shared_library_descriptor()
+			// class: unique_handle
+			//
+			// (i): Wrapper for many types of Windows handles.
+			//
+			template<typename Traits>
+			class unique_handle
+			{
+			private:
+				typedef typename Traits::pointer pointer;
+
+				pointer m_value;
+
+			protected:
+			public:
+
+				explicit unique_handle(pointer value = Traits::invalid()) noexcept
+					: m_value{ value }
+				{
+
+				}
+
+				~unique_handle() noexcept
+				{
+					this->Close();
+				}
+
+				auto Close() noexcept -> void
+				{
+                 	if (*this)
+					{
+                 		Traits::close(this->m_value);
+                 		this->m_value = Traits::invalid();
+					}
+				}
+
+				pointer p()
+				{
+					return m_value;
+				}
+
+				pointer* GetAddressOf()
+				{
+					return &m_value;
+				}
+
+				//
+				// bool
+				//
+				explicit operator bool() const noexcept
+				{
+					return m_value != Traits::invalid();
+				}
+
+				//
+				// unique_so_handle
+				//
+				operator void*() const noexcept
+				{
+					return static_cast<void*>(m_value);
+				}
+
+				void operator=(void* handle)
+				{
+					if (this->m_value != Traits::invalid()) {
+						this->Close();
+					}
+					m_value = static_cast<typename Traits::pointer>(handle);
+				}
+
+                // 
+                // unique_file_handle
+                //
+                operator int() const noexcept
                 {
-                    this->m_d = nullptr;
+                    return static_cast<int>(m_value);
                 }
-                unique_shared_library_descriptor(void* d)
+
+                void operator=(int handle)
                 {
-                    this->m_d = d;
+                    if (this->m_value != Traits::invalid()) {
+						this->Close();
+					}
+					m_value = static_cast<typename Traits::pointer>(handle);
                 }
-                ~unique_shared_library_descriptor()
-                {
-                    this->Close();
-                }
-                bool IsValid() const
-                {
-                    return this->m_d != nullptr;
-                }
-                bool IsInvalid() const
-                {
-                    return this->m_d == nullptr;
-                }
-                void operator=(void* d) 
-                {
-                    this->Close();
-                    this->m_d = d;
-                }
-                operator void*()
-                {
-                    return this->m_d;
-                }
-                void Close()
-                {
-                    if (this->IsValid()) {
-                        dlclose(this->m_d);
-                        this->m_d = nullptr;
-                    }
-                }
-                void *p() const
-                {
-                    return this->m_d;
-                }
-                const void *GetAddressOf() const
-                {
-                    return &this->m_d;
-                }
-            };
+
+				//
+				// IsInvalid
+				//
+				bool IsInvalid()
+				{
+					return (m_value == Traits::invalid());
+				}
+
+				//
+				// IsValid
+				//
+				bool IsValid()
+				{
+					return (m_value != Traits::invalid());
+				}
+			};
 
             //
-            // struct: unique_file_descriptor
-            //
-            struct unique_file_descriptor
-            {
-              private:
-                int m_fd = -1;
+			// shared library descriptor traits
+			//
+			struct handle_shared_library_traits
+			{
+				typedef void* pointer;
+				static auto invalid() noexcept -> pointer
+				{
+					return nullptr;
+				}
 
-              protected:
-              public:
-                unique_file_descriptor()
-                {
-                    this->m_fd = -1;
-                }
-
-                explicit unique_file_descriptor(int fd)
-                {
-                    this->m_fd = fd;
-                }
-
-                ~unique_file_descriptor()
-                {
-                    this->Close();
-                }
-
-                bool IsValid() const
-                {
-                    return (this->m_fd >= 0);
-                }
-
-                bool IsInvalid() const
-                {
-                    return (this->m_fd < 0);
-                }
-
-                void operator=(int fd)
-                {
-                    this->Close();
-                    this->m_fd = fd;
-                }
-
-                operator int()
-                {
-                    return this->m_fd;
-                }
-
-                bool Close()
-                {
-                    if (this->IsInvalid())
-                    {
-                        return false;
-                    }
-                    close(this->m_fd);
-                    this->m_fd = -1;
-                    return true;
-                }
-
-                int p() const
-                {
-                    return this->m_fd;
-                }
-
-                const int *GetAddressOf() const
-                {
-                    return &this->m_fd;
-                }
-            };
+				static auto close(pointer value) noexcept -> void
+				{
+					::dlclose(value);
+				}
+			};
 
             //
-            // typedef
+			// shared library descriptor traits
+			//
+			struct handle_file_traits
+			{
+				typedef int pointer;
+				static auto invalid() noexcept -> pointer
+				{
+					return -1;
+				}
+
+				static auto close(pointer value) noexcept -> void
+				{
+ 					::close(value);
+				}
+			};
+
             //
-            typedef unique_shared_library_descriptor unique_so_handle;
-            typedef unique_file_descriptor unique_file_handle;
+            // typedef unique_handle's.
+            //
+            typedef unique_handle<handle_shared_library_traits> unique_so_handle;
+            typedef unique_handle<handle_file_traits> unique_file_handle;
 
             //
             // File IO Wrapper
@@ -484,7 +498,7 @@ namespace ItSoftware
             class ItsFile
             {
               private:
-                unique_file_descriptor m_fd;
+                unique_file_handle m_fd;
                 string m_filename;
               protected:
               public:
@@ -757,9 +771,9 @@ namespace ItSoftware
                     return true;
                 }
 
-                bool Close()
+                void Close()
                 {
-                    return this->m_fd.Close();
+                    this->m_fd.Close();
                 }
 
                 bool IsValid()
