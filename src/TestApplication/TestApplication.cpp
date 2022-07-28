@@ -113,14 +113,14 @@ void TestItsFifo();
 ItsTimer g_timer;
 unique_ptr<ItsFileMonitor> g_fm;
 vector<string> g_fileMonNames;
-char g_filename[] = "/home/kjetilso/test.txt";
-char g_copyToFilename[] = "/home/kjetilso/test2.txt";
-char g_shredFilename[] = "/home/kjetilso/test2shred.txt";
-string g_path1("/home");
-string g_path2("/kjetilso/test.txt");
+char g_filename[] = "/tmp/CppIncludeLinux/test.txt";
+char g_copyToFilename[] = "/tmp/CppIncludeLinux/test2.txt";
+char g_shredFilename[] = "/tmp/CppIncludeLinux/test2shred.txt";
+string g_path1("/tmp");
+string g_path2("/CppIncludeLinux/test.txt");
 string g_invalidPath("home\0/kjetilso");
-string g_directoryRoot("/home/kjetilso/");
-string g_creatDir("/home/kjetilso/testdir");
+string g_directoryRoot("/tmp/CppIncludeLinux/");
+string g_creatDir("/tmp/CppIncludeLinux/testdir");
 
 //
 // global data, IPC
@@ -170,8 +170,16 @@ void ExitFn()
 //
 int main(int argc, char* argv[])
 {
+    // Init directory
+    if ( ItsDirectory::Exists(g_directoryRoot) ) {
+        ItsFile::Delete(g_directoryRoot);
+    }
+    ItsDirectory::CreateDirectory(g_directoryRoot, ItsFile::CreateMode("rwx","rwx","rwx"));
+
+    // Set exit handler
     atexit(ExitFn);
 
+    // Start
     PrintTestApplicationEvent("Started");
 
     TestItsTimerStart();
@@ -784,9 +792,14 @@ void TestItsDirectory()
 //
 void TestItsFileMonitorStart()
 {
-    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open | ItsFileMonitorMask::Access | ItsFileMonitorMask::Create | ItsFileMonitorMask::CloseWrite), HandleFileEvent);  
-
     PrintTestHeader("ItsFileMonitor Start");
+
+    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open | ItsFileMonitorMask::Access | ItsFileMonitorMask::Create | ItsFileMonitorMask::CloseWrite), HandleFileEvent);  
+    if (g_fm->GetInitWithError()) {
+        cout << "ItsFileMonitor error on init: " << strerror(g_fm->GetInitWithErrorErrno()) << endl;
+        cout << endl;
+        return;
+    }
 
     cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create,CloseWrite'" << endl;
     
@@ -802,13 +815,15 @@ void TestItsFileMonitorStop()
 {
     PrintTestHeader("ItsFileMonitor Stop");
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    g_fm->Stop();
+    if ( !g_fm->GetInitWithError() ) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        g_fm->Stop();
 
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create,CloseWrite'" << endl;
-    cout << "Events:" << endl;
-    for ( auto i : g_fileMonNames ) {
-        cout << ">> " << i << endl;
+        cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create,CloseWrite'" << endl;
+        cout << "Events:" << endl;
+        for ( auto i : g_fileMonNames ) {
+            cout << ">> " << i << endl;
+        }
     }
 
     cout << endl;

@@ -1241,11 +1241,13 @@ namespace ItSoftware
             private:
                 int m_fd;
                 int m_wd;
+                int m_errno;
                 uint32_t m_mask;
                 thread m_thread;
                 string m_pathname;
                 bool m_bPaused;
                 bool m_bStopped;
+                bool m_bInitWithError;
                 
             protected:
                 void ExecuteDispatchThread(function<void(inotify_event&)> func) {
@@ -1279,6 +1281,8 @@ namespace ItSoftware
                 ItsFileMonitor(const string& pathname, uint32_t mask, function<void(inotify_event&)> func)
                     :   m_pathname(pathname), 
                         m_mask(mask),
+                        m_errno(0),
+                        m_bInitWithError(true),
                         m_fd(-1),
                         m_wd(-1),
                         m_bPaused(false),
@@ -1287,19 +1291,31 @@ namespace ItSoftware
                     if (ItsDirectory::Exists(this->m_pathname) ) {
                         this->m_fd = inotify_init();
                         if (this->m_fd == -1) {
-                            //std::cerr << "inotify_init" << endl;
+                            this->m_errno = errno;
                             return;
                         }
                         fcntl(this->m_fd, F_SETFL, fcntl(this->m_fd, F_GETFL) | O_NONBLOCK);
 
                         this->m_wd = inotify_add_watch(this->m_fd, pathname.c_str(), mask);
                         if (this->m_wd == -1) {
-                            //std::cerr << "inotify_add_watch" << endl;
+                            this->m_errno = errno;
                             return;
                         }
                     
                         m_thread = thread(&ItsFileMonitor::ExecuteDispatchThread, this, func);
+                        this->m_bInitWithError = false;
                     }
+                    else {
+                        this->m_errno = ENOENT;
+                    }
+                }
+                bool GetInitWithError()
+                {
+                    return this->m_bInitWithError;
+                }
+                int GetInitWithErrorErrno()
+                {
+                    return this->m_errno;
                 }
                 void Pause() {
                     this->m_bPaused = true;
