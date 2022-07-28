@@ -794,14 +794,14 @@ void TestItsFileMonitorStart()
 {
     PrintTestHeader("ItsFileMonitor Start");
 
-    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open | ItsFileMonitorMask::Access | ItsFileMonitorMask::Create | ItsFileMonitorMask::CloseWrite), HandleFileEvent);  
+    g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open | ItsFileMonitorMask::Access | ItsFileMonitorMask::Create | ItsFileMonitorMask::CloseWrite | ItsFileMonitorMask::CloseNoWrite), HandleFileEvent);  
     if (g_fm->GetInitWithError()) {
         cout << "ItsFileMonitor error on init: " << strerror(g_fm->GetInitWithErrorErrno()) << endl;
         cout << endl;
         return;
     }
 
-    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create,CloseWrite'" << endl;
+    cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create,CloseWrite,CloseNoWrite'" << endl;
     
     cout << endl;
 }
@@ -819,7 +819,7 @@ void TestItsFileMonitorStop()
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         g_fm->Stop();
 
-        cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create,CloseWrite'" << endl;
+        cout << "File monitor monitoring directory '" << g_directoryRoot << "' with mask 'ItsFileMonitorMask::Modify,Open,Access,Create,CloseWrite,CloseNoWrite'" << endl;
         cout << "Events:" << endl;
         for ( auto i : g_fileMonNames ) {
             cout << ">> " << i << endl;
