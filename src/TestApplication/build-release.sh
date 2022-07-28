@@ -7,7 +7,7 @@
 echo "Building TestApplication..."
 echo "> using release build <"
 
-g++ TestApplication.cpp --std=c++17 -luuid -lpthread -o TestApplication
+g++ TestApplication.cpp -std=c++17 -luuid -D_GLIBCXX_GTHREAD_USE_WEAK=0 -static -pthread -o TestApplication
 if [[ $? -eq 0 ]]
 then
     echo "> TestApplication build ok <"
