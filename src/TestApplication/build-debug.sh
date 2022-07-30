@@ -28,3 +28,29 @@ else
     echo "> TestDaemon build error <"
 fi
 echo "> build process complete <"
+
+echo ""
+
+echo "Building client..."
+echo "> using debug build <"
+g++ -ggdb client.cpp -o client -std=c++17
+if [[ $? -eq 0 ]]
+then
+    echo "> client build ok <"
+else
+    echo "> client build error <"
+fi
+echo "> build process complete <"
+
+echo ""
+
+echo "Building server..."
+echo "> using debug build <"
+g++ -ggdb server.cpp -o server -std=c++17
+if [[ $? -eq 0 ]]
+then
+    echo "> server build ok <"
+else
+    echo "> server build error <"
+fi
+echo "> build process complete <"
