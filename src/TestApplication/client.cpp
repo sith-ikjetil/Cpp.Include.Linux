@@ -22,11 +22,30 @@ using std::endl;
 using ItSoftware::Linux::IPC::ItsSocket;
 using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramClient;
+using ItSoftware::Linux::ItsConvert;
 
 //
 // constexpr
 //
 constexpr auto MAX_BUF_SIZE = 4096;
+
+//
+// struct: AppSettings
+//
+// (i): Application runtime settings.
+//
+struct AppSettings {
+    string      ServerAddress;
+    uint16_t    ServerPort;
+    string      ClientAddress;
+    uint16_t    ClientPort;
+};
+
+//
+// Functions prototypes
+//
+void UpdateAppSettings(int argc, char** argv, AppSettings& settings);
+string GetArgVal(string arg, int argc, char** argv);
 
 //
 // Function: main
@@ -35,23 +54,64 @@ constexpr auto MAX_BUF_SIZE = 4096;
 //
 int main(int argc, char** argv)
 {
+    //
+    // Application settings. Set default.
+    //
+    AppSettings settings {
+        .ServerAddress = "192.168.0.103",
+        .ServerPort = 5500,
+        .ClientAddress = "192.168.0.100",
+        .ClientPort = 5501
+    };
+
+    //
+    // Update application settings from command line arg.
+    //
+    UpdateAppSettings(argc,argv,settings);
+
+    //
+    // Output app settings
+    //
+    cout << "##" << endl;
+    cout << "## client" << endl;
+    cout << "##" << endl;
+    cout << "## Usage: client --server-port=<port> --server-address=<server ip address>" << endl;
+    cout << "##               --client-port=<port> --client-address=<client ip address>" << endl;
+    cout << "##" << endl;
+    cout << "> server port    : " << settings.ServerPort << " <" << endl;
+    cout << "> server address : " << settings.ServerAddress << " <" << endl;
+    cout << "> client port    : " << settings.ClientPort << " <" << endl;
+    cout << "> client address : " << settings.ClientAddress << " <" << endl;
+
+    //
+    // Create INET server host address.
+    //
     struct sockaddr_in addr_server{0};
-    struct sockaddr_in addr_client{0};
-    auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(5500, "192.168.0.103");
+    auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
     addr_server = *addr_host_server;
     
-    auto addr_host_client = ItsSocket::CreateSockAddrHostInet4(5501, "192.168.0.100");
+    //
+    // CREATE INET client host address
+    //
+    struct sockaddr_in addr_client{0};
+    auto addr_host_client = ItsSocket::CreateSockAddrHostInet4(settings.ClientPort, settings.ClientAddress);
     addr_client = *addr_host_client;
 
+    //
+    // Make ItsSocketDatagramClient
+    //
     auto client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_client, sizeof(addr_client));
     if ( client->GetInitWithError()) {
-        cout << "Client, Init with error: " << strerror(client->GetInitWithErrorErrno()) << endl;
+        cout << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <" << endl;
         return EXIT_FAILURE;
     }
     else {
-        cout << "Client, Init Ok!" << endl;
+        cout << "> client initialized successfully <" << endl;
     }
 
+    //
+    // Main program logic loop
+    //
     char buf[MAX_BUF_SIZE] = "";
     while (strcmp(buf, "quit") != 0) {
         cout << endl;
@@ -63,7 +123,55 @@ int main(int argc, char** argv)
         cout << "> " << nSent << " bytes sent <" << endl;
     }
 
-    cout << endl << "exiting client" << endl;
+    cout << endl << "> exiting client <" << endl;
 
     return EXIT_SUCCESS;
+}
+
+//
+// Function: UpdateAppSettings
+//
+// (i): Takes program args and sets server settings from them.
+//
+void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
+{
+    string sport = GetArgVal("--server-port", argc, argv);
+    string saddress = GetArgVal("--server-address", argc, argv);
+
+    if ( sport.length() > 0 ) {
+        settings.ServerPort = ItsConvert::ToNumber<uint16_t>(sport);
+    }
+
+    if ( saddress.length() > 0 ) {
+        settings.ServerAddress = saddress;
+    }
+
+    string cport = GetArgVal("--client-port", argc, argv);
+    string caddress = GetArgVal("--client-address", argc, argv);
+
+    if ( cport.length() > 0 ) {
+        settings.ClientPort = ItsConvert::ToNumber<uint16_t>(cport);
+    }
+
+    if ( caddress.length() > 0 ) {
+        settings.ClientAddress = caddress;
+    }
+}
+
+//
+// Function: GetArgVal
+//
+// (i): Gets argument value if there is one.
+//
+string GetArgVal(string arg, int argc, char** argv)
+{
+    arg += "=";
+
+    for ( int i = 0; i < argc; i++ ) {
+        if ( string(argv[i]).find(arg) == 0 ) {
+            return string(argv[i]).substr(arg.length());
+        }
+    }
+
+    return string("");
 }

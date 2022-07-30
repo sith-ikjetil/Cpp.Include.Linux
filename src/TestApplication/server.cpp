@@ -9,6 +9,7 @@
 // #include
 //
 #include <iostream>
+#include <string>
 #include <chrono>
 #include "../include/itsoftware-linux-core.h"
 #include "../include/itsoftware-linux-ipc.h"
@@ -20,14 +21,30 @@
 using std::cout;
 using std::cin;
 using std::endl;
+using std::string;
 using ItSoftware::Linux::IPC::ItsSocket;
 using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramServer;
+using ItSoftware::Linux::ItsConvert;
 
 //
 // constexpr
 //
 constexpr auto MAX_BUF_SIZE = 4096;
+
+//
+//
+//
+struct AppSettings {
+    string      ServerAddress;
+    uint16_t    ServerPort;
+};
+
+//
+// Functions prototypes
+//
+void UpdateAppSettings(int argc, char** argv, AppSettings& settings);
+string GetArgVal(string arg, int argc, char** argv);
 
 //
 // Function: main
@@ -36,18 +53,52 @@ constexpr auto MAX_BUF_SIZE = 4096;
 //
 int main(int argc, char** argv)
 {
+    //
+    // Application settings. Set default.
+    //
+    AppSettings settings {
+        .ServerAddress = "192.168.0.103",
+        .ServerPort = 5500
+    };
+
+    //
+    // Update application settings from command line arg.
+    //
+    UpdateAppSettings(argc,argv,settings);
+
+    //
+    // Output app settings
+    //
+    cout << "##" << endl;
+    cout << "## server" << endl;
+    cout << "##" << endl;
+    cout << "## Usage: server --server-port=<port> --server-address=<server ip address>" << endl;
+    cout << "##" << endl;
+    cout << "> server port    : " << settings.ServerPort << " <" << endl;
+    cout << "> server address : " << settings.ServerAddress << " <" << endl;
+
+    //
+    // Create INET host address.
+    //
     struct sockaddr_in addr_server{0};
-    auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(5500, "192.168.0.103");
+    auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
     addr_server = *addr_host_server;
 
+    //
+    // Make ItsSocketDatagramServer
+    //
     auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server));
     if ( server->GetInitWithError()) {
-        cout << "Server, Init with error: " << strerror(server->GetInitWithErrorErrno()) << endl;
+        cout << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
+        return EXIT_FAILURE;
     }
     else {
-        cout << "Server, Init Ok!" << endl;
+        cout << "> server initialized successfully <" << endl;
     }
 
+    //
+    // Main program logic loop
+    //
     char buf[MAX_BUF_SIZE] = "";
     while (strcmp(buf, "quit") != 0) {
         cout << endl;
@@ -66,7 +117,7 @@ int main(int argc, char** argv)
         }
         
         if ( nRecv == -1 ) {
-            cout << "> Server error: " << strerror(errno) << endl;
+            cout << "> server error: " << strerror(errno) << " <" << endl;
             return EXIT_FAILURE;
         }
 
@@ -74,7 +125,44 @@ int main(int argc, char** argv)
         cout << "> " << buf << " <" << endl;
     }
 
-    cout << endl << "exiting server" << endl;
+    cout << endl << "> exiting server <" << endl;
     
     return EXIT_SUCCESS;
+}
+
+//
+// Function: UpdateAppSettings
+//
+// (i): Takes program args and sets server settings from them.
+//
+void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
+{
+    string port = GetArgVal("--server-port", argc, argv);
+    string address = GetArgVal("--server-address", argc, argv);
+
+    if ( port.length() > 0 ) {
+        settings.ServerPort = ItsConvert::ToNumber<uint16_t>(port);
+    }
+
+    if ( address.length() > 0 ) {
+        settings.ServerAddress = address;
+    }
+}
+
+//
+// Function: GetArgVal
+//
+// (i): Gets argument value if there is one.
+//
+string GetArgVal(string arg, int argc, char** argv)
+{
+    arg += "=";
+
+    for ( int i = 0; i < argc; i++ ) {
+        if ( string(argv[i]).find(arg) == 0 ) {
+            return string(argv[i]).substr(arg.length());
+        }
+    }
+
+    return string("");
 }
