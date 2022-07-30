@@ -88,7 +88,7 @@ namespace ItSoftware::Linux::IPC
             unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
             
             retVal->sin_family = AF_INET;
-            retVal->sin_port = port;
+            retVal->sin_port = htons(port);
             if ( inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr)) == 0 ) {
                 return nullptr;
             }
@@ -105,7 +105,7 @@ namespace ItSoftware::Linux::IPC
             unique_ptr<sockaddr_in6> retVal = make_unique<sockaddr_in6>();
             
             retVal->sin6_family = AF_INET6;
-            retVal->sin6_port = port;
+            retVal->sin6_port = htons(port);
             if (inet_pton(AF_INET6, ip.c_str(), (in6_addr*)&(retVal->sin6_addr.__in6_u)) != 1 ) {
                 return nullptr;
             }
