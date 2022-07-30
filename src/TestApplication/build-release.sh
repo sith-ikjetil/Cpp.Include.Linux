@@ -16,6 +16,8 @@ else
 fi
 echo "> build process complete <"
 
+echo ""
+
 echo "Building TestDaemon ..."
 echo "> using release build <"
 g++ TestDaemon.cpp --std=c++17 -o TestDaemon

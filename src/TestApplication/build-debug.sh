@@ -16,6 +16,8 @@ else
 fi
 echo "> build process complete <"
 
+echo ""
+
 echo "Building TestDaemon ..."
 echo "> using debug build <"
 g++ -g TestDaemon.cpp --std=c++17 -o TestDaemon
