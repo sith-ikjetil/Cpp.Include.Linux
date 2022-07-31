@@ -64,7 +64,8 @@ int main(int argc, char** argv)
     //
     AppSettings settings {
         .ServerAddress = "192.168.0.103",
-        .ServerPort = 5500
+        .ServerPort = 5500,
+        .ConnectionType = "UDP"
     };
 
     //
