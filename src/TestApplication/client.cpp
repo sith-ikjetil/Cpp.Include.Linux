@@ -89,7 +89,8 @@ int main(int argc, char** argv)
     cout << "Server address  : " << settings.ServerAddress << endl;
     cout << "Client port     : " << settings.ClientPort << endl;
     cout << "Client address  : " << settings.ClientAddress << endl;
-
+    cout << endl;
+    
     //
     // Run the UDP or TCP version of the application
     //

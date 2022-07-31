@@ -34,7 +34,9 @@ using ItSoftware::Linux::ItsConvert;
 constexpr auto MAX_BUF_SIZE = 4096;
 
 //
+// struct: AppSettings
 //
+// (i): Application runtime settings.
 //
 struct AppSettings {
     string      ServerAddress;
@@ -82,7 +84,8 @@ int main(int argc, char** argv)
     cout << "Connection type : " << settings.ConnectionType << endl;
     cout << "Server port     : " << settings.ServerPort << endl;
     cout << "Server address  : " << settings.ServerAddress << endl;
-
+    cout << endl;
+    
     //
     // Run the UDP or TCP version of the application
     //
