@@ -16,13 +16,6 @@
 #include "../include/itsoftware-linux.h"
 
 //
-// #define
-//
-// (i): Uncomment USE_STREAM to use datagram
-//
-//#define USE_STREAM
-
-//
 // using
 //
 using std::cout;
@@ -46,6 +39,7 @@ constexpr auto MAX_BUF_SIZE = 4096;
 struct AppSettings {
     string      ServerAddress;
     uint16_t    ServerPort;
+    string      ConnectionType;
 };
 
 //
@@ -53,6 +47,8 @@ struct AppSettings {
 //
 void UpdateAppSettings(int argc, char** argv, AppSettings& settings);
 string GetArgVal(string arg, int argc, char** argv);
+int MainSocketTCP(AppSettings& settings);
+int MainSocketUDP(AppSettings& settings);
 
 //
 // Function: main
@@ -78,77 +74,22 @@ int main(int argc, char** argv)
     // Output app settings
     //
     cout << "##" << endl;
-    cout << "## server" << endl;
+    cout << "## server (Cpp.Include.Linux)" << endl;
     cout << "##" << endl;
     cout << "## Usage: server --server-port=<port> --server-address=<server ip address>" << endl;
+    cout << "##               --connection-type=<UDP/TCP>" << endl;
     cout << "##" << endl;
-    cout << "> server port    : " << settings.ServerPort << " <" << endl;
-    cout << "> server address : " << settings.ServerAddress << " <" << endl;
+    cout << "Connection type : " << settings.ConnectionType << endl;
+    cout << "Server port     : " << settings.ServerPort << endl;
+    cout << "Server address  : " << settings.ServerAddress << endl;
 
     //
-    // Create INET host address.
+    // Run the UDP or TCP version of the application
     //
-    struct sockaddr_in addr_server{0};
-    auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
-    addr_server = *addr_host_server;
-
-    //
-    // Make ItsSocketDatagramServer
-    //
-#ifdef USE_STREAM
-    auto server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), ItsSocketStreamServer::DefaultBackdrop, false);
-#else
-    auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), false);
-#endif
-    if ( server->GetInitWithError()) {
-        cout << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
-        return EXIT_FAILURE;
+    if (settings.ConnectionType == "UDP") {
+        return MainSocketUDP(settings);
     }
-    else {
-        cout << "> server initialized successfully <" << endl;
-    }
-
-    struct sockaddr_in addr;
-    socklen_t addr_length;
-
-#ifdef USE_STREAM
-    cout << "Waiting to accept client ..." << endl;
-    int fd = server->Accept((struct sockaddr*)&addr, &addr_length);
-    if ( fd == -1 ) {
-        cout << "> server accept error: " << strerror(errno) << " <" << endl;
-        return EXIT_FAILURE;
-    }
-    cout << "> client accepted <" << endl;
-#endif
-
-    //
-    // Main program logic loop
-    //
-    char buf[MAX_BUF_SIZE] = "";
-    while (strcmp(buf, "quit") != 0) {
-        cout << endl;
-
-        strcpy(buf, "");
-
-        cout << "Awaiting data ..." << endl;
-        ssize_t nRecv = 0;
-#ifdef USE_STREAM
-        nRecv = server->Read(fd, buf, MAX_BUF_SIZE);
-#else
-        nRecv = server->RecvFrom(buf, MAX_BUF_SIZE, 0, NULL, 0);
-#endif
-        if ( nRecv == -1 ) {
-            cout << "> server error: " << strerror(errno) << " <" << endl;
-            return EXIT_FAILURE;
-        }
-
-        cout << "> " << nRecv << " bytes received <" << endl;
-        cout << "> " << buf << " <" << endl;
-    }
-
-    cout << endl << "> exiting server <" << endl;
-    
-    return EXIT_SUCCESS;
+    return MainSocketTCP(settings);
 }
 
 //
@@ -168,6 +109,12 @@ void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
     if ( address.length() > 0 ) {
         settings.ServerAddress = address;
     }
+
+    string connectionType = GetArgVal("--connection-type", argc, argv);
+    if ( connectionType.length() > 0 ) {
+        std::transform(begin(connectionType),end(connectionType), begin(connectionType), ::toupper);
+        settings.ConnectionType = (connectionType == "TCP") ? "TCP" : "UDP";
+    }
 }
 
 //
@@ -186,4 +133,124 @@ string GetArgVal(string arg, int argc, char** argv)
     }
 
     return string("");
+}
+
+//
+// Function: MainSocketTCP
+//
+// (i): Main client logic for TCP.
+//
+int MainSocketTCP(AppSettings& settings)
+{
+    //
+    // Create INET host address.
+    //
+    struct sockaddr_in addr_server{0};
+    auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
+    addr_server = *addr_host_server;
+
+    //
+    // Make ItsSocketDatagramServer
+    //
+    auto server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), ItsSocketStreamServer::DefaultBackdrop, false);
+    if ( server->GetInitWithError()) {
+        cout << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
+        return EXIT_FAILURE;
+    }
+    else {
+        cout << "> server initialized successfully <" << endl;
+    }
+
+    struct sockaddr_in addr;
+    socklen_t addr_length;
+
+    cout << "Waiting to accept client ..." << endl;
+    int fd = server->Accept((struct sockaddr*)&addr, &addr_length);
+    if ( fd == -1 ) {
+        cout << "> server accept error: " << strerror(errno) << " <" << endl;
+        return EXIT_FAILURE;
+    }
+    cout << "> client accepted <" << endl;
+
+    //
+    // Main program logic loop
+    //
+    char buf[MAX_BUF_SIZE] = "";
+    while (strcmp(buf, "quit") != 0) {
+        cout << endl;
+
+        strcpy(buf, "");
+
+        cout << "Awaiting data ..." << endl;
+        ssize_t nRecv = 0;
+
+        nRecv = server->Read(fd, buf, MAX_BUF_SIZE);
+        if ( nRecv == -1 ) {
+            cout << "> server error: " << strerror(errno) << " <" << endl;
+            return EXIT_FAILURE;
+        }
+
+        cout << "> " << nRecv << " bytes received <" << endl;
+        cout << "> " << buf << " <" << endl;
+    }
+
+    cout << endl << "> exiting server <" << endl;
+    
+    return EXIT_SUCCESS;
+}
+
+//
+// Function: MainSocketUDP
+//
+// (i): Main client logic for UDP.
+//
+int MainSocketUDP(AppSettings& settings)
+{
+//
+    // Create INET host address.
+    //
+    struct sockaddr_in addr_server{0};
+    auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
+    addr_server = *addr_host_server;
+
+    //
+    // Make ItsSocketDatagramServer
+    //
+    auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), false);
+    if ( server->GetInitWithError()) {
+        cout << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
+        return EXIT_FAILURE;
+    }
+    else {
+        cout << "> server initialized successfully <" << endl;
+    }
+
+    struct sockaddr_in addr;
+    socklen_t addr_length;
+
+    //
+    // Main program logic loop
+    //
+    char buf[MAX_BUF_SIZE] = "";
+    while (strcmp(buf, "quit") != 0) {
+        cout << endl;
+
+        strcpy(buf, "");
+
+        cout << "Awaiting data ..." << endl;
+
+        ssize_t nRecv = 0;
+        nRecv = server->RecvFrom(buf, MAX_BUF_SIZE, 0, NULL, 0);
+        if ( nRecv == -1 ) {
+            cout << "> server error: " << strerror(errno) << " <" << endl;
+            return EXIT_FAILURE;
+        }
+
+        cout << "> " << nRecv << " bytes received <" << endl;
+        cout << "> " << buf << " <" << endl;
+    }
+
+    cout << endl << "> exiting server <" << endl;
+    
+    return EXIT_SUCCESS;
 }
