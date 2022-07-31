@@ -143,7 +143,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.
         //
-        ItsSocketStreamServer(ItsSocketDomain domain, const struct sockaddr* addr, socklen_t addrlen, int backlog)
+        ItsSocketStreamServer(ItsSocketDomain domain, const struct sockaddr* addr, socklen_t addrlen, int backlog, bool nonBlock)
             : m_domain(domain),
             m_errno(0),
             m_type(ItsSocketConType::STREAM),
@@ -155,7 +155,9 @@ namespace ItSoftware::Linux::IPC
         {
             this->m_socketfd = socket(this->m_domain, this->m_type, 0);
             if (this->m_socketfd >= 0) {
-                fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
+                if ( nonBlock ) {
+                    fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
+                }
                 this->m_errno = bind(this->m_socketfd, addr, addrlen);
                 if (this->m_errno == 0) {
                     this->m_errno = listen(this->m_socketfd,backlog);
@@ -401,7 +403,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Passive socket constructor. After constructor check GetInitWithError if all is well.
         //
-        ItsSocketDatagramServer(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen)
+        ItsSocketDatagramServer(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen, bool nonBlock)
             : m_domain(domain),
             m_errno(0),
             m_type(ItsSocketConType::DGRAM),
@@ -412,7 +414,9 @@ namespace ItSoftware::Linux::IPC
         {
             this->m_socketfd = socket(this->m_domain, this->m_type, 0);
             if (this->m_socketfd >= 0) {
-                fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
+                if (nonBlock) {
+                    fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
+                }
                 this->m_errno = bind(this->m_socketfd, addr, addrlen);
                 if (this->m_errno == 0) {
                     this->m_bInitWithError = false;
@@ -522,7 +526,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Datagram socket constructor. After constructor check GetInitWithError if all is well.
         //
-        ItsSocketDatagramClient(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen)
+        ItsSocketDatagramClient(ItsSocketDomain domain, const struct sockaddr *addr, socklen_t addrlen, bool nonBlock)
             : m_domain(domain),
             m_errno(0),
             m_type(ItsSocketConType::DGRAM),
@@ -533,7 +537,9 @@ namespace ItSoftware::Linux::IPC
         {
             this->m_socketfd = socket(this->m_domain, this->m_type, 0);
             if (this->m_socketfd >= 0) {
-                fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
+                if (nonBlock) {
+                    fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
+                }
                 this->m_errno = bind(this->m_socketfd, addr, addrlen);
                 if (this->m_errno == 0) {
                     this->m_bInitWithError = false;
@@ -617,6 +623,7 @@ namespace ItSoftware::Linux::IPC
             return this->m_bIsClosed;
         }
     };
+    
     //
     // class: ItsPipe
     //

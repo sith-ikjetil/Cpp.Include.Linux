@@ -16,6 +16,13 @@
 #include "../include/itsoftware-linux.h"
 
 //
+// #define
+//
+// (i): Uncomment USE_STREAM to use datagram
+//
+//#define USE_STREAM
+
+//
 // using
 //
 using std::cout;
@@ -25,6 +32,7 @@ using std::string;
 using ItSoftware::Linux::IPC::ItsSocket;
 using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramServer;
+using ItSoftware::Linux::IPC::ItsSocketStreamServer;
 using ItSoftware::Linux::ItsConvert;
 
 //
@@ -87,7 +95,11 @@ int main(int argc, char** argv)
     //
     // Make ItsSocketDatagramServer
     //
-    auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server));
+#ifdef USE_STREAM
+    auto server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), ItsSocketStreamServer::DefaultBackdrop, false);
+#else
+    auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), false);
+#endif
     if ( server->GetInitWithError()) {
         cout << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
         return EXIT_FAILURE;
@@ -96,6 +108,19 @@ int main(int argc, char** argv)
         cout << "> server initialized successfully <" << endl;
     }
 
+    struct sockaddr_in addr;
+    socklen_t addr_length;
+
+#ifdef USE_STREAM
+    cout << "Waiting to accept client ..." << endl;
+    int fd = server->Accept((struct sockaddr*)&addr, &addr_length);
+    if ( fd == -1 ) {
+        cout << "> server accept error: " << strerror(errno) << " <" << endl;
+        return EXIT_FAILURE;
+    }
+    cout << "> client accepted <" << endl;
+#endif
+
     //
     // Main program logic loop
     //
@@ -103,19 +128,15 @@ int main(int argc, char** argv)
     while (strcmp(buf, "quit") != 0) {
         cout << endl;
 
-        struct sockaddr_in addr;
-        socklen_t addr_length;
-
         strcpy(buf, "");
 
         cout << "Awaiting data ..." << endl;
         ssize_t nRecv = 0;
+#ifdef USE_STREAM
+        nRecv = server->Read(fd, buf, MAX_BUF_SIZE);
+#else
         nRecv = server->RecvFrom(buf, MAX_BUF_SIZE, 0, NULL, 0);
-        while ( nRecv == 0 || (nRecv == -1 && errno == EAGAIN) ) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            nRecv = server->RecvFrom(buf, 4096, 0, (struct sockaddr*)&addr, &addr_length);
-        }
-        
+#endif
         if ( nRecv == -1 ) {
             cout << "> server error: " << strerror(errno) << " <" << endl;
             return EXIT_FAILURE;

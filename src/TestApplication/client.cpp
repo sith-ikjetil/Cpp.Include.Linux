@@ -14,6 +14,13 @@
 #include "../include/itsoftware-linux.h"
 
 //
+// #define
+//
+// (i): uncomment USE_STREAM to use datagram.
+//
+//#define USE_STREAM
+
+//
 // using
 //
 using std::cout;
@@ -22,6 +29,7 @@ using std::endl;
 using ItSoftware::Linux::IPC::ItsSocket;
 using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramClient;
+using ItSoftware::Linux::IPC::ItsSocketStreamClient;
 using ItSoftware::Linux::ItsConvert;
 
 //
@@ -100,7 +108,12 @@ int main(int argc, char** argv)
     //
     // Make ItsSocketDatagramClient
     //
-    auto client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_client, sizeof(addr_client));
+#ifdef USE_STREAM
+    auto client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server));
+#else
+    auto client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_client, sizeof(addr_client), false);
+#endif
+
     if ( client->GetInitWithError()) {
         cout << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <" << endl;
         return EXIT_FAILURE;
@@ -108,6 +121,12 @@ int main(int argc, char** argv)
     else {
         cout << "> client initialized successfully <" << endl;
     }
+
+#ifdef USE_STREAM
+    if ( client->Connect() == -1 ) {
+        cout << "> connect failed to remote server <" << endl;
+    }
+#endif
 
     //
     // Main program logic loop
@@ -118,8 +137,11 @@ int main(int argc, char** argv)
         cout << "(enter message <quit> to exit both client and server)" << endl;
         cout << "Message: ";
         cin.getline(buf,MAX_BUF_SIZE);
-
+#ifdef USE_STREAM
+        ssize_t nSent = client->Write(buf, strlen(buf)+1);
+#else
         ssize_t nSent = client->SendTo(buf, strlen(buf)+1, 0, (struct sockaddr*)&addr_server, sizeof(addr_server));
+#endif
         cout << "> " << nSent << " bytes sent <" << endl;
     }
 

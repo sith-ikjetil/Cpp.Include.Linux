@@ -892,7 +892,7 @@ void TestItsSocketStreamClientServerStart()
 
     g_addr.sun_family = AF_UNIX;
     
-    g_socket_stream_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop);
+    g_socket_stream_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop, true);
     if ( g_socket_stream_server->GetInitWithError()) {
         cout << "ItsSocketStreamServer, Init with error: " << strerror(g_socket_stream_server->GetInitWithErrorErrno()) << endl;
     }
@@ -996,7 +996,7 @@ void TestItsSocketDatagramClientServerStart()
     snprintf(g_caddr.sun_path, sizeof(g_caddr.sun_path), "%s.%i", CL_SOCK_PATH, pid);
     remove(g_caddr.sun_path);
     
-    g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_saddr, sizeof(g_saddr));
+    g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_saddr, sizeof(g_saddr), true);
     if ( g_socket_dg_server->GetInitWithError()) {
         cout << "ItsSocketDatagramServer, Init with error: " << strerror(g_socket_dg_server->GetInitWithErrorErrno()) << endl;
     }
@@ -1004,7 +1004,7 @@ void TestItsSocketDatagramClientServerStart()
         cout << "ItsSocketDatagramServer, Init Ok!" << endl;
     }
 
-    g_socket_dg_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_caddr, sizeof(g_caddr));
+    g_socket_dg_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_caddr, sizeof(g_caddr), true);
     if ( g_socket_dg_client->GetInitWithError()) {
         cout << "ItsSocketDatagramClient, Init with error: " << strerror(g_socket_dg_client->GetInitWithErrorErrno()) << endl;
     }
@@ -1316,7 +1316,7 @@ void TestItsSocketStreamClientServerINETStart()
     auto ptr = ItsSocket::CreateSockAddrHostInet4(5500, "192.168.0.100");
     g_inaddr = *ptr;
 
-    g_socket_stream_in_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr, sizeof(g_inaddr), ItsSocketStreamServer::DefaultBackdrop);
+    g_socket_stream_in_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr, sizeof(g_inaddr), ItsSocketStreamServer::DefaultBackdrop, true);
     if ( g_socket_stream_in_server->GetInitWithError()) {
         cout << "ItsSocketStreamServer INET, Init with error: " << strerror(g_socket_stream_in_server->GetInitWithErrorErrno()) << endl;
     }
@@ -1413,7 +1413,7 @@ void TestItsSocketDatagramClientServerINETStart()
     auto ptrs = ItsSocket::CreateSockAddrHostInet4(5502, "192.168.0.100");
     g_inaddr2s = *ptrs;
     
-    g_socket_dg_in_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr2s, sizeof(g_inaddr2s));
+    g_socket_dg_in_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr2s, sizeof(g_inaddr2s), true);
     if ( g_socket_dg_in_server->GetInitWithError()) {
         cout << "ItsSocketDatagramServer INET, Init with error: " << strerror(g_socket_dg_in_server->GetInitWithErrorErrno()) << endl;
     }
@@ -1424,7 +1424,7 @@ void TestItsSocketDatagramClientServerINETStart()
     auto ptrc = ItsSocket::CreateSockAddrHostInet4(5501, "192.168.0.100");
     g_inaddr2c = *ptrc;
 
-    g_socket_dg_in_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr2c, sizeof(g_inaddr2c));
+    g_socket_dg_in_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&g_inaddr2c, sizeof(g_inaddr2c), true);
     if ( g_socket_dg_in_client->GetInitWithError()) {
         cout << "ItsSocketDatagramClient INET, Init with error: " << strerror(g_socket_dg_in_client->GetInitWithErrorErrno()) << endl;
     }
