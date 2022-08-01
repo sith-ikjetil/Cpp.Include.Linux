@@ -500,6 +500,44 @@ namespace ItSoftware::Linux::IPC
         {
             return this->m_bIsClosed;
         }
+        //
+        // Function: Create flags for recvfrom call.
+        //
+        // (i): Returnes flags for given input.
+        //
+        static int CreateRecvFromFlags(bool _CMSG_CLOEXEC, bool _DONTWAIT, bool _ERRQUEUE, bool _OOB, bool _PEEK, bool _TRUNC, bool _WAITALL)
+        {
+            int flags(0);
+
+            if ( _CMSG_CLOEXEC ) { flags |= MSG_CMSG_CLOEXEC; }
+            if ( _DONTWAIT ) { flags |= MSG_DONTWAIT; }
+            if ( _ERRQUEUE ) { flags |= MSG_ERRQUEUE; }
+            if ( _OOB ) { flags |= MSG_OOB; }
+            if ( _PEEK ) { flags |= MSG_PEEK; }
+            if ( _TRUNC ) { flags |= MSG_TRUNC; }
+            if ( _WAITALL ) { flags |= MSG_WAITALL; }
+
+            return flags;
+        }
+        //
+        // Function: Create flags for sendto call.
+        //
+        // (i): Returnes flags for given input.
+        //
+        static int CreateSendToFlags(bool _MSG_CONFIRM, bool _DONTROUTE, bool _DONTWAIT, bool _EOR, bool _MORE, bool _NOSIGNAL, bool _OOB)
+        {
+            int flags(0);
+
+            if ( _MSG_CONFIRM ) { flags |= MSG_CONFIRM; }
+            if ( _DONTROUTE ) { flags |= MSG_DONTROUTE; }
+            if ( _DONTWAIT ) { flags |= MSG_DONTWAIT; }
+            if ( _EOR ) { flags |= MSG_EOR; }
+            if ( _MORE ) { flags |= MSG_MORE; }
+            if ( _NOSIGNAL ) { flags |= MSG_NOSIGNAL; }
+            if ( _OOB ) { flags |= MSG_OOB; }
+
+            return flags;
+        }
     };// ItsNetPassive
 
     //
@@ -621,6 +659,44 @@ namespace ItSoftware::Linux::IPC
         bool GetIsClosed()
         {
             return this->m_bIsClosed;
+        }
+        //
+        // Function: Create flags for recvfrom call.
+        //
+        // (i): Returnes flags for given input.
+        //
+        static int CreateRecvFromFlags(bool _CMSG_CLOEXEC, bool _DONTWAIT, bool _ERRQUEUE, bool _OOB, bool _PEEK, bool _TRUNC, bool _WAITALL)
+        {
+            int flags(0);
+
+            if ( _CMSG_CLOEXEC ) { flags |= MSG_CMSG_CLOEXEC; }
+            if ( _DONTWAIT ) { flags |= MSG_DONTWAIT; }
+            if ( _ERRQUEUE ) { flags |= MSG_ERRQUEUE; }
+            if ( _OOB ) { flags |= MSG_OOB; }
+            if ( _PEEK ) { flags |= MSG_PEEK; }
+            if ( _TRUNC ) { flags |= MSG_TRUNC; }
+            if ( _WAITALL ) { flags |= MSG_WAITALL; }
+
+            return flags;
+        }
+        //
+        // Function: Create flags for sendto call.
+        //
+        // (i): Returnes flags for given input.
+        //
+        static int CreateSendToFlags(bool _MSG_CONFIRM, bool _DONTROUTE, bool _DONTWAIT, bool _EOR, bool _MORE, bool _NOSIGNAL, bool _OOB)
+        {
+            int flags(0);
+
+            if ( _MSG_CONFIRM ) { flags |= MSG_CONFIRM; }
+            if ( _DONTROUTE ) { flags |= MSG_DONTROUTE; }
+            if ( _DONTWAIT ) { flags |= MSG_DONTWAIT; }
+            if ( _EOR ) { flags |= MSG_EOR; }
+            if ( _MORE ) { flags |= MSG_MORE; }
+            if ( _NOSIGNAL ) { flags |= MSG_NOSIGNAL; }
+            if ( _OOB ) { flags |= MSG_OOB; }
+
+            return flags;
         }
     };
     
