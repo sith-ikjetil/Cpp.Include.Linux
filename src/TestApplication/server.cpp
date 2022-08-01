@@ -27,6 +27,7 @@ using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramServer;
 using ItSoftware::Linux::IPC::ItsSocketStreamServer;
 using ItSoftware::Linux::ItsConvert;
+using ItSoftware::Linux::ItsString;
 
 //
 // constexpr
@@ -103,15 +104,28 @@ int main(int argc, char** argv)
 //
 void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
 {
-    string port = GetArgVal("--server-port", argc, argv);
-    string address = GetArgVal("--server-address", argc, argv);
+    string sport = GetArgVal("--server-port", argc, argv);
+    string saddress = GetArgVal("--server-address", argc, argv);
 
-    if ( port.length() > 0 ) {
-        settings.ServerPort = ItsConvert::ToNumber<uint16_t>(port);
+    sport = ItsString::Trim(sport);
+    saddress = ItsString::Trim(saddress);
+
+    if ( sport.length() > 0 ) {
+        try
+        {
+            settings.ServerPort = ItsConvert::ToNumber<uint16_t>(sport);
+        }
+        catch(const std::invalid_argument& e)
+        {
+            cout << "## server (Cpp.Include.Linux)" << endl;
+            cout << "## ERROR ########################" << endl;
+            cout << "--server-port invalid port number" << endl;
+            exit(EXIT_FAILURE);
+        }
     }
 
-    if ( address.length() > 0 ) {
-        settings.ServerAddress = address;
+    if ( saddress.length() > 0 ) {
+        settings.ServerAddress = saddress;
     }
 
     string connectionType = GetArgVal("--connection-type", argc, argv);
@@ -159,6 +173,7 @@ int MainSocketTCP(AppSettings& settings)
     auto server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), ItsSocketStreamServer::DefaultBackdrop, false);
     if ( server->GetInitWithError()) {
         cout << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
+        cout << "> is this machine's ip address equal --server-address argument? <" << endl;
         return EXIT_FAILURE;
     }
     else {
@@ -223,6 +238,7 @@ int MainSocketUDP(AppSettings& settings)
     auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), false);
     if ( server->GetInitWithError()) {
         cout << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
+        cout << "> is this machine's ip address equal --server-address argument? <" << endl;
         return EXIT_FAILURE;
     }
     else {
