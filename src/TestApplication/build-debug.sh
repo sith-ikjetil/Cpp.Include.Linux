@@ -31,26 +31,26 @@ echo "> build process complete <"
 
 echo ""
 
-echo "Building client..."
+echo "Building TestClient..."
 echo "> using debug build <"
-g++ -ggdb client.cpp -o client -std=c++17
+g++ -ggdb TestClient.cpp -o TestClient -std=c++17
 if [[ $? -eq 0 ]]
 then
-    echo "> client build ok <"
+    echo "> TestClient build ok <"
 else
-    echo "> client build error <"
+    echo "> TestClient build error <"
 fi
 echo "> build process complete <"
 
 echo ""
 
-echo "Building server..."
+echo "Building TestServer..."
 echo "> using debug build <"
-g++ -ggdb server.cpp -o server -std=c++17
+g++ -ggdb TestServer.cpp -o TestServer -std=c++17
 if [[ $? -eq 0 ]]
 then
-    echo "> server build ok <"
+    echo "> TestServer build ok <"
 else
-    echo "> server build error <"
+    echo "> TestServer build error <"
 fi
 echo "> build process complete <"
