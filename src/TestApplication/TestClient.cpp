@@ -32,6 +32,7 @@ using ItSoftware::Linux::ItsString;
 // constexpr
 //
 constexpr auto MAX_BUF_SIZE = 4096;
+constexpr auto CLR_CYAN = "\033[36;1m";
 constexpr auto CLR_GREEN = "\033[32m";
 constexpr auto CLR_WHITE = "\033[37;1m";
 constexpr auto CLR_RESET = "\033[0m";
@@ -59,7 +60,8 @@ bool GetHasArg(string arg, int argc, char** argv);
 int MainSocketTCP(AppSettings& settings);
 int MainSocketUDP(AppSettings& settings);
 void PrintProlog(AppSettings& settings);
-void PrintError(AppSettings&, string msg);
+void PrintError(AppSettings& settings, string msg);
+void PrintEvent(AppSettings& settings, string msg);
 
 //
 // Function: main
@@ -137,6 +139,18 @@ void PrintError(AppSettings& settings, string msg)
     cout << std::left << std::setw(36) << std::setfill('#') << "## ERROR ##" << endl;
     if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
     cout << msg << endl;
+}
+
+//
+// Function: PrintEvent
+//
+// (i): prints event message to stdout
+//
+void PrintEvent(AppSettings& settings, string msg)
+{
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_CYAN; }
+    cout << "> " << msg << " <" << endl;
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
 }
 
 //
@@ -259,18 +273,18 @@ int MainSocketTCP(AppSettings& settings) {
     auto client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server));
     if ( client->GetInitWithError()) {
         stringstream ss;
-        ss << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <";
+        ss << "client initialized with error: " << strerror(client->GetInitWithErrorErrno());
         PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
     else {
-        cout << "> client initialized successfully <" << endl;
+        PrintEvent(settings,"client initialized successfully");
     }
 
     if ( client->Connect() == -1 ) {
         stringstream ss;
-        ss << "> connect failed to remote server: " << strerror(errno) << " <" << endl;
-        ss << "> have you started server yet? <" << endl;
+        ss << "connect failed to remote server: " << strerror(errno) << endl;
+        ss << "have you started server yet?";
         PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
@@ -286,10 +300,14 @@ int MainSocketTCP(AppSettings& settings) {
         cin.getline(buf,MAX_BUF_SIZE);
         
         ssize_t nSent = client->Write(buf, strlen(buf)+1);
-        cout << "> " << nSent << " bytes sent <" << endl;
+        stringstream ss;
+        ss << nSent << " bytes sent";
+        PrintEvent(settings,ss.str());
     }
 
-    cout << endl << "> exiting client <" << endl;
+    cout << endl;
+    PrintEvent(settings, "exiting client");
+    cout << endl;
 
     return EXIT_SUCCESS;
 }
@@ -326,11 +344,11 @@ int MainSocketUDP(AppSettings& settings) {
         return EXIT_FAILURE;
     }
     else {
-        cout << "> client initialized successfully <" << endl;
+        PrintEvent(settings, "client initialized successfully");
     }
 
     //
-    // Main program logic loop
+    // Main progm); logic loop
     //
     char buf[MAX_BUF_SIZE] = "";
     while (strcmp(buf, "quit") != 0) {
@@ -340,10 +358,14 @@ int MainSocketUDP(AppSettings& settings) {
         cin.getline(buf,MAX_BUF_SIZE);
         
         ssize_t nSent = client->SendTo(buf, strlen(buf)+1, 0, (struct sockaddr*)&addr_server, sizeof(addr_server));
-        cout << "> " << nSent << " bytes sent <" << endl;
+        stringstream ss;
+        ss << nSent << " bytes sent";
+        PrintEvent(settings,ss.str());
     }
 
-    cout << endl << "> exiting client <" << endl;
+    cout << endl;
+    PrintEvent(settings, "exiting client");
+    cout << endl;
 
     return EXIT_SUCCESS;
 }

@@ -34,6 +34,7 @@ using ItSoftware::Linux::ItsString;
 // constexpr
 //
 constexpr auto MAX_BUF_SIZE = 4096;
+constexpr auto CLR_CYAN = "\033[36;1m";
 constexpr auto CLR_GREEN = "\033[32m";
 constexpr auto CLR_WHITE = "\033[37;1m";
 constexpr auto CLR_RESET = "\033[0m";
@@ -59,7 +60,8 @@ bool GetHasArg(string arg, int argc, char** argv);
 int MainSocketTCP(AppSettings& settings);
 int MainSocketUDP(AppSettings& settings);
 void PrintProlog(AppSettings& settings);
-void PrintError(AppSettings&, string msg);
+void PrintError(AppSettings& settings, string msg);
+void PrintEvent(AppSettings& settings, string msg);
 
 //
 // Function: main
@@ -130,6 +132,18 @@ void PrintError(AppSettings& settings, string msg)
     cout << std::left << std::setw(36) << std::setfill('#') << "## ERROR ##" << endl;
     if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
     cout << msg;
+}
+
+//
+// Function: PrintEvent
+//
+// (i): prints event message to stdout
+//
+void PrintEvent(AppSettings& settings, string msg)
+{
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_CYAN; }
+    cout << "> " << msg << " <" << endl;
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
 }
 
 //
@@ -224,27 +238,27 @@ int MainSocketTCP(AppSettings& settings)
     auto server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), ItsSocketStreamServer::DefaultBackdrop, false);
     if ( server->GetInitWithError()) {
         stringstream ss;
-        ss << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
-        ss << "> is this machine's ip address equal --server-address argument? <" << endl;
+        ss << "server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << endl;
+        ss << "is this machine's ip address equal --server-address argument?";
         PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
     else {
-        cout << "> server initialized successfully <" << endl;
+        PrintEvent(settings, "server initialized successfully");
     }
 
     struct sockaddr_in addr;
     socklen_t addr_length;
 
-    cout << "Waiting to accept client ..." << endl;
+    PrintEvent(settings, "waiting to accept client ...");
     int fd = server->Accept((struct sockaddr*)&addr, &addr_length);
     if ( fd == -1 ) {
         stringstream ss;
-        ss << "> server accept error: " << strerror(errno) << " <" << endl;
+        ss << "server accept error: " << strerror(errno);
         PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
-    cout << "> client accepted <" << endl;
+    PrintEvent(settings, "client accepted");
 
     //
     // Main program logic loop
@@ -255,22 +269,26 @@ int MainSocketTCP(AppSettings& settings)
 
         strcpy(buf, "");
 
-        cout << "Awaiting data ..." << endl;
+        PrintEvent(settings, "Awaiting data ...");
         ssize_t nRecv = 0;
 
         nRecv = server->Read(fd, buf, MAX_BUF_SIZE);
         if ( nRecv == -1 ) {
             stringstream ss;
-            ss << "> server error: " << strerror(errno) << " <" << endl;
+            ss << "server error: " << strerror(errno);
             PrintError(settings, ss.str());
             return EXIT_FAILURE;
         }
 
-        cout << "> " << nRecv << " bytes received <" << endl;
-        cout << "> " << buf << " <" << endl;
+        stringstream ss;
+        ss << nRecv << " bytes received";
+        PrintEvent(settings, ss.str());
+        cout << "Received: " << buf << endl;
     }
 
-    cout << endl << "> exiting server <" << endl;
+    cout << endl;
+    PrintEvent(settings, "exiting server");
+    cout << endl;
     
     return EXIT_SUCCESS;
 }
@@ -295,13 +313,13 @@ int MainSocketUDP(AppSettings& settings)
     auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), false);
     if ( server->GetInitWithError()) {
         stringstream ss;
-        ss << "> server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << " <" << endl;
-        ss << "> is this machine's ip address equal --server-address argument? <" << endl;
+        ss << "server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << endl;
+        ss << "is this machine's ip address equal --server-address argument?" << endl;
         PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
     else {
-        cout << "> server initialized successfully <" << endl;
+        PrintEvent(settings, "server initialized successfully");
     }
 
     struct sockaddr_in addr;
@@ -316,7 +334,7 @@ int MainSocketUDP(AppSettings& settings)
 
         strcpy(buf, "");
 
-        cout << "Awaiting data ..." << endl;
+        PrintEvent(settings, "Awaiting data ...");
 
         ssize_t nRecv = 0;
         nRecv = server->RecvFrom(buf, MAX_BUF_SIZE, 0, NULL, 0);
@@ -327,11 +345,15 @@ int MainSocketUDP(AppSettings& settings)
             return EXIT_FAILURE;
         }
 
-        cout << "> " << nRecv << " bytes received <" << endl;
-        cout << "> " << buf << " <" << endl;
+        stringstream ss;
+        ss << nRecv << " bytes received";
+        PrintEvent(settings, ss.str());
+        cout << "Received: " << buf << endl;
     }
 
-    cout << endl << "> exiting server <" << endl;
+    cout << endl;
+    PrintEvent(settings, "exiting server");
+    cout << endl;
     
     return EXIT_SUCCESS;
 }
