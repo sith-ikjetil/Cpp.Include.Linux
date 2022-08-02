@@ -9,6 +9,7 @@
 // #include
 //
 #include <iostream>
+#include <string>
 #include "../include/itsoftware-linux-core.h"
 #include "../include/itsoftware-linux-ipc.h"
 #include "../include/itsoftware-linux.h"
@@ -19,6 +20,7 @@
 using std::cout;
 using std::cin;
 using std::endl;
+using std::stringstream;
 using ItSoftware::Linux::IPC::ItsSocket;
 using ItSoftware::Linux::IPC::ItsSocketDomain;
 using ItSoftware::Linux::IPC::ItsSocketDatagramClient;
@@ -30,6 +32,9 @@ using ItSoftware::Linux::ItsString;
 // constexpr
 //
 constexpr auto MAX_BUF_SIZE = 4096;
+constexpr auto CLR_GREEN = "\033[32m";
+constexpr auto CLR_WHITE = "\033[37;1m";
+constexpr auto CLR_RESET = "\033[0m";
 
 //
 // struct: AppSettings
@@ -42,6 +47,7 @@ struct AppSettings {
     string      ClientAddress;
     uint16_t    ClientPort;
     string      ConnectionType;
+    bool        NoColorOutput;
 };
 
 //
@@ -49,8 +55,11 @@ struct AppSettings {
 //
 void UpdateAppSettings(int argc, char** argv, AppSettings& settings);
 string GetArgVal(string arg, int argc, char** argv);
+bool GetHasArg(string arg, int argc, char** argv);
 int MainSocketTCP(AppSettings& settings);
 int MainSocketUDP(AppSettings& settings);
+void PrintProlog(AppSettings& settings);
+void PrintError(AppSettings&, string msg);
 
 //
 // Function: main
@@ -67,7 +76,8 @@ int main(int argc, char** argv)
         .ServerPort = 5500,
         .ClientAddress = "192.168.0.100",
         .ClientPort = 5501,
-        .ConnectionType = "UDP"
+        .ConnectionType = "UDP",
+        .NoColorOutput = false
     };
 
     //
@@ -78,6 +88,26 @@ int main(int argc, char** argv)
     //
     // Output app settings
     //
+    PrintProlog(settings);
+    
+    //
+    // Run the UDP or TCP version of the application
+    //
+    if ( settings.ConnectionType == "UDP" ) {
+        return MainSocketUDP(settings);
+    }
+    
+    return MainSocketTCP(settings);
+}
+
+//
+// Function: PrintProlog
+//
+// (i): prints prolog message to stdout
+//
+void PrintProlog(AppSettings& settings)
+{
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_GREEN; }
     cout << "##" << endl;
     cout << "## client (Cpp.Include.Linux)" << endl;
     cout << "##" << endl;
@@ -91,15 +121,20 @@ int main(int argc, char** argv)
     cout << "Client port     : " << settings.ClientPort << endl;
     cout << "Client address  : " << settings.ClientAddress << endl;
     cout << endl;
-    
-    //
-    // Run the UDP or TCP version of the application
-    //
-    if ( settings.ConnectionType == "UDP" ) {
-        return MainSocketUDP(settings);
-    }
-    
-    return MainSocketTCP(settings);
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
+}
+
+//
+// Function: PrintError
+//
+// (i): prints error message to stdout
+//
+void PrintError(AppSettings& settings, string msg)
+{
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_GREEN; }
+    cout << std::left << std::setw(36) << std::setfill('#') << "## ERROR ##" << endl;
+    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
+    cout << msg << endl;
 }
 
 //
@@ -122,9 +157,7 @@ void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
         }
         catch(const std::invalid_argument& e)
         {
-            cout << "## client (Cpp.Include.Linux)" << endl;
-            cout << "## ERROR ########################" << endl;
-            cout << "--server-port invalid port number" << endl;
+            PrintError(settings, "--server-port invalid port number");
             exit(EXIT_FAILURE);
         }
     }
@@ -146,9 +179,7 @@ void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
         }
         catch(const std::invalid_argument& e)
         {
-            cout << "## client (Cpp.Include.Linux)" << endl;
-            cout << "## ERROR ########################" << endl;
-            cout << "--client-port invalid port number" << endl;
+            PrintError(settings,"--client-port invalid port number");
             exit(EXIT_FAILURE);
         }
     }
@@ -162,6 +193,8 @@ void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
         std::transform(begin(connectionType),end(connectionType), begin(connectionType), ::toupper);
         settings.ConnectionType = (connectionType == "TCP") ? "TCP" : "UDP";
     }
+
+    settings.NoColorOutput = GetHasArg("--no-color-output", argc, argv);
 }
 
 //
@@ -180,6 +213,22 @@ string GetArgVal(string arg, int argc, char** argv)
     }
 
     return string("");
+}
+
+//
+// Function: GetHasArg
+//
+// (i): Gets if argument is set on command line.
+//
+bool GetHasArg(string arg, int argc, char** argv)
+{
+    for ( int i = 0; i < argc; i++ ) {
+        if ( string(argv[i]).find(arg) == 0 ) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //
@@ -207,7 +256,9 @@ int MainSocketTCP(AppSettings& settings) {
     //
     auto client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server));
     if ( client->GetInitWithError()) {
-        cout << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <" << endl;
+        stringstream ss;
+        ss << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <";
+        PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
     else {
@@ -215,7 +266,11 @@ int MainSocketTCP(AppSettings& settings) {
     }
 
     if ( client->Connect() == -1 ) {
-        cout << "> connect failed to remote server <" << endl;
+        stringstream ss;
+        ss << "> connect failed to remote server: " << strerror(errno) << " <" << endl;
+        ss << "> have you started server yet? <" << endl;
+        PrintError(settings, ss.str());
+        return EXIT_FAILURE;
     }
 
     //
@@ -261,10 +316,11 @@ int MainSocketUDP(AppSettings& settings) {
     // Make ItsSocketDatagramClient
     //
     auto client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_client, sizeof(addr_client), false);
-
     if ( client->GetInitWithError()) {
-        cout << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <" << endl;
-        cout << "> is this machine's ip address equal --client-address argument? <" << endl;
+        stringstream ss;
+        ss << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <" << endl;
+        ss << "> is this machine's ip address equal --client-address argument? <" << endl;
+        PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
     else {
