@@ -105,10 +105,12 @@ void PrintProlog(AppSettings& settings)
 {
     if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_GREEN; }
     cout << "##" << endl;
-    cout << "## server (Cpp.Include.Linux)" << endl;
+    cout << "## TestServer (Cpp.Include.Linux)" << endl;
     cout << "##" << endl;
-    cout << "## Usage: server --server-port=<port> --server-address=<server ip address>" << endl;
-    cout << "##               --connection-type=<UDP/TCP>" << endl;
+    cout << "## Usage: TestServer" << endl;
+    cout << "##        --server-port=<port> --server-address=<server ip address>" << endl;
+    cout << "##        --connection-type=<UDP/TCP>" << endl;
+    cout << "##        --no-color-output" << endl;
     cout << "##" << endl;
     cout << "Connection type : " << settings.ConnectionType << endl;
     cout << "Server port     : " << settings.ServerPort << endl;
