@@ -1,2 +1,1 @@
-#!/bin/bash
-cppcheck  --enable=all --suppress=missingIncludeSystem .
+cppcheck  --enable=all --suppress=missingIncludeSystem --suppress=ctuOneDefinitionRuleViolation .
