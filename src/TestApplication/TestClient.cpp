@@ -31,11 +31,17 @@ using ItSoftware::Linux::ItsString;
 //
 // constexpr
 //
-constexpr auto MAX_BUF_SIZE = 4096;
-constexpr auto CLR_CYAN = "\033[36;1m";
-constexpr auto CLR_GREEN = "\033[32m";
-constexpr auto CLR_WHITE = "\033[37;1m";
-constexpr auto CLR_RESET = "\033[0m";
+static constexpr auto MAX_BUF_SIZE = 4096;
+static constexpr auto COLOR_CYAN = "\033[36;1m";
+static constexpr auto COLOR_GREEN = "\033[32m";
+static constexpr auto COLOR_WHITE = "\033[37;1m";
+static constexpr auto COLOR_RESET = "\033[0m";
+static constexpr auto ARG_SERVER_PORT = "--server-port";
+static constexpr auto ARG_SERVER_ADDRESS = "--server-address";
+static constexpr auto ARG_CLIENT_PORT = "--client-port";
+static constexpr auto ARG_CLIENT_ADDRESS = "--client-address";
+static constexpr auto ARG_CONNECTION_TYPE = "--connection-type";
+static constexpr auto ARG_NO_COLOR_OUTPUT = "--no-color-output";
 
 //
 // struct: AppSettings
@@ -109,7 +115,7 @@ int main(int argc, char** argv)
 //
 void PrintProlog(const AppSettings& settings)
 {
-    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_GREEN; }
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_GREEN; }
     cout << "##" << endl;
     cout << "## TestClient (Cpp.Include.Linux)" << endl;
     cout << "##" << endl;
@@ -125,7 +131,7 @@ void PrintProlog(const AppSettings& settings)
     cout << "Client port     : " << settings.ClientPort << endl;
     cout << "Client address  : " << settings.ClientAddress << endl;
     cout << endl;
-    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_WHITE; }
 }
 
 //
@@ -135,9 +141,9 @@ void PrintProlog(const AppSettings& settings)
 //
 void PrintError(const AppSettings& settings, const string& msg)
 {
-    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_GREEN; }
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_GREEN; }
     cout << std::left << std::setw(36) << std::setfill('#') << "## ERROR ##" << endl;
-    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_WHITE; }
     cout << msg << endl;
 }
 
@@ -148,9 +154,9 @@ void PrintError(const AppSettings& settings, const string& msg)
 //
 void PrintEvent(const AppSettings& settings, const string& msg)
 {
-    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_CYAN; }
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_CYAN; }
     cout << "> " << msg << " <" << endl;
-    if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_WHITE; }
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_WHITE; }
 }
 
 //
@@ -160,8 +166,8 @@ void PrintEvent(const AppSettings& settings, const string& msg)
 //
 void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
 {
-    string sport = GetArgVal("--server-port", argc, argv);
-    string saddress = GetArgVal("--server-address", argc, argv);
+    string sport = GetArgVal(ARG_SERVER_PORT, argc, argv);
+    string saddress = GetArgVal(ARG_SERVER_ADDRESS, argc, argv);
 
     sport = ItsString::Trim(sport);
     saddress = ItsString::Trim(saddress);
@@ -182,8 +188,8 @@ void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
         settings.ServerAddress = saddress;
     }
 
-    string cport = GetArgVal("--client-port", argc, argv);
-    string caddress = GetArgVal("--client-address", argc, argv);
+    string cport = GetArgVal(ARG_CLIENT_PORT, argc, argv);
+    string caddress = GetArgVal(ARG_CLIENT_ADDRESS, argc, argv);
 
     cport = ItsString::Trim(cport);
     caddress = ItsString::Trim(caddress);
@@ -204,13 +210,13 @@ void UpdateAppSettings(int argc, char** argv, AppSettings& settings)
         settings.ClientAddress = caddress;
     }
 
-    string connectionType = GetArgVal("--connection-type", argc, argv);
+    string connectionType = GetArgVal(ARG_CONNECTION_TYPE, argc, argv);
     if ( connectionType.length() > 0 ) {
         std::transform(begin(connectionType),end(connectionType), begin(connectionType), ::toupper);
         settings.ConnectionType = (connectionType == "TCP") ? "TCP" : "UDP";
     }
 
-    settings.NoColorOutput = GetHasArg("--no-color-output", argc, argv);
+    settings.NoColorOutput = GetHasArg(ARG_NO_COLOR_OUTPUT, argc, argv);
 }
 
 //
