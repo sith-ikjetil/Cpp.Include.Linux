@@ -254,7 +254,7 @@ int MainSocketTCP(AppSettings& settings)
     int fd = server->Accept((struct sockaddr*)&addr, &addr_length);
     if ( fd == -1 ) {
         stringstream ss;
-        ss << "server accept error: " << strerror(errno);
+        ss << "server error (accept): " << strerror(errno);
         PrintError(settings, ss.str());
         return EXIT_FAILURE;
     }
@@ -275,7 +275,7 @@ int MainSocketTCP(AppSettings& settings)
         nRecv = server->Read(fd, buf, MAX_BUF_SIZE);
         if ( nRecv == -1 ) {
             stringstream ss;
-            ss << "server error: " << strerror(errno);
+            ss << "server error (read): " << strerror(errno);
             PrintError(settings, ss.str());
             return EXIT_FAILURE;
         }
@@ -283,7 +283,7 @@ int MainSocketTCP(AppSettings& settings)
         stringstream ss;
         ss << nRecv << " bytes received";
         PrintEvent(settings, ss.str());
-        cout << "Received: " << buf << endl;
+        cout << buf << endl;
     }
 
     cout << endl;
@@ -340,7 +340,7 @@ int MainSocketUDP(AppSettings& settings)
         nRecv = server->RecvFrom(buf, MAX_BUF_SIZE, 0, NULL, 0);
         if ( nRecv == -1 ) {
             stringstream ss;
-            ss << "> server error: " << strerror(errno) << " <" << endl;
+            ss << "server error (recvfrom): " << strerror(errno);
             PrintError(settings, ss.str());
             return EXIT_FAILURE;
         }
@@ -348,7 +348,7 @@ int MainSocketUDP(AppSettings& settings)
         stringstream ss;
         ss << nRecv << " bytes received";
         PrintEvent(settings, ss.str());
-        cout << "Received: " << buf << endl;
+        cout << buf << endl;
     }
 
     cout << endl;
