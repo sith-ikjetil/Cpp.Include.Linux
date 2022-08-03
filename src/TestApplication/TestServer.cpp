@@ -59,9 +59,9 @@ string GetArgVal(string arg, int argc, char** argv);
 bool GetHasArg(string arg, int argc, char** argv);
 int MainSocketTCP(AppSettings& settings);
 int MainSocketUDP(AppSettings& settings);
-void PrintProlog(AppSettings& settings);
-void PrintError(AppSettings& settings, string msg);
-void PrintEvent(AppSettings& settings, string msg);
+void PrintProlog(const AppSettings& settings);
+void PrintError(const AppSettings& settings, const string& msg);
+void PrintEvent(const AppSettings& settings, const string& msg);
 
 //
 // Function: main
@@ -103,7 +103,7 @@ int main(int argc, char** argv)
 //
 // (i): Prints prolog.
 //
-void PrintProlog(AppSettings& settings)
+void PrintProlog(const AppSettings& settings)
 {
     if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_GREEN; }
     cout << "##" << endl;
@@ -126,7 +126,7 @@ void PrintProlog(AppSettings& settings)
 //
 // (i): prints error message to stdout
 //
-void PrintError(AppSettings& settings, string msg)
+void PrintError(const AppSettings& settings, const string& msg)
 {
     if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_GREEN; }
     cout << std::left << std::setw(36) << std::setfill('#') << "## ERROR ##" << endl;
@@ -139,7 +139,7 @@ void PrintError(AppSettings& settings, string msg)
 //
 // (i): prints event message to stdout
 //
-void PrintEvent(AppSettings& settings, string msg)
+void PrintEvent(const AppSettings& settings, const string& msg)
 {
     if (!settings.NoColorOutput) { cout << CLR_RESET << CLR_CYAN; }
     cout << "> " << msg << " <" << endl;
