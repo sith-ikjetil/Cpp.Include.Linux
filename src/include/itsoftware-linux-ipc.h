@@ -39,7 +39,7 @@ namespace ItSoftware::Linux::IPC
     //
     // (i): Socket domain.
     //
-    enum ItsSocketDomain : int
+    enum class ItsSocketDomain : int
     {
         UNIX = AF_UNIX,
         INET = AF_INET,
@@ -51,7 +51,7 @@ namespace ItSoftware::Linux::IPC
     //
     // (i): Socket type. 
     //
-    enum ItsSocketConType : int
+    enum class ItsSocketConType : int
     {
         STREAM = SOCK_STREAM,
         DGRAM = SOCK_DGRAM
@@ -153,7 +153,7 @@ namespace ItSoftware::Linux::IPC
             m_bInitWithError(true),
             m_bIsClosed(false)
         {
-            this->m_socketfd = socket(this->m_domain, this->m_type, 0);
+            this->m_socketfd = socket(static_cast<int>(this->m_domain), static_cast<int>(this->m_type), 0);
             if (this->m_socketfd >= 0) {
                 if ( nonBlock ) {
                     fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
@@ -291,7 +291,7 @@ namespace ItSoftware::Linux::IPC
             m_bInitWithError(true),
             m_bIsClosed(false)
         {
-            this->m_socketfd = socket(this->m_domain, this->m_type, 0);
+            this->m_socketfd = socket(static_cast<int>(this->m_domain), static_cast<int>(this->m_type), 0);
             if (this->m_socketfd >= 0) {
                 this->m_bInitWithError = false;
             }
@@ -412,7 +412,7 @@ namespace ItSoftware::Linux::IPC
             m_bInitWithError(true),
             m_bIsClosed(false)
         {
-            this->m_socketfd = socket(this->m_domain, this->m_type, 0);
+            this->m_socketfd = socket(static_cast<int>(this->m_domain), static_cast<int>(this->m_type), 0);
             if (this->m_socketfd >= 0) {
                 if (nonBlock) {
                     fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
@@ -573,7 +573,7 @@ namespace ItSoftware::Linux::IPC
             m_bInitWithError(true),
             m_bIsClosed(false)
         {
-            this->m_socketfd = socket(this->m_domain, this->m_type, 0);
+            this->m_socketfd = socket(static_cast<int>(this->m_domain), static_cast<int>(this->m_type), 0);
             if (this->m_socketfd >= 0) {
                 if (nonBlock) {
                     fcntl(this->m_socketfd, F_SETFL, fcntl(this->m_socketfd, F_GETFL) | O_NONBLOCK);
