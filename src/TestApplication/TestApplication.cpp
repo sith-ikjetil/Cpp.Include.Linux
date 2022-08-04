@@ -95,13 +95,15 @@ void TestItsSocketDatagramClientServerStop();
 void TestItsPipe();
 void TestItsSvMsgQueue();
 void TestItsFifo();
+void InitializeTestDirectory();
+void CleanupTestDirectory();
 
 //
-// #define
+// constexpr
 //
-#define CLR_GREEN      "\033[32m"
-#define CLR_WHITE      "\033[37;1m"
-#define CLR_RESET      "\033[0m"
+constexpr auto COLOR_GREEN = "\033[32m";
+constexpr auto COLOR_WHITE = "\033[37;1m";
+constexpr auto COLOR_RESET = "\033[0m";
 
 //
 // global data
@@ -153,18 +155,22 @@ void ExitFn()
 //
 int main(int argc, char* argv[])
 {
-    // Init directory
-    if ( ItsDirectory::Exists(g_directoryRoot) ) {
-        ItsFile::Delete(g_directoryRoot);
-    }
-    ItsDirectory::CreateDirectory(g_directoryRoot, ItsFile::CreateMode("rwx","rwx","rwx"));
-
     // Set exit handler
     atexit(ExitFn);
 
-    // Start
+    //
+    // Initialize test directory.
+    //
+    InitializeTestDirectory();
+
+    //
+    // Start.
+    //
     PrintTestApplicationEvent("Started");
 
+    //
+    // Do all tests.
+    //
     TestItsTimerStart();
     TestItsSocketStreamClientServerStart();
     TestItsSocketDatagramClientServerStart();
@@ -188,7 +194,38 @@ int main(int argc, char* argv[])
     TestItsFifo();
     TestItsTimerStop();
     
+    //
+    // Cleanup test directory.
+    //
+    CleanupTestDirectory();
+
+    //
+    // Exit all ok
+    //
     return EXIT_SUCCESS;
+}
+
+//
+// Function: InitializeTestDirectory
+//
+// (i): Initialize the test directory.
+//
+void InitializeTestDirectory()
+{
+    CleanupTestDirectory();
+    ItsDirectory::CreateDirectory(g_directoryRoot, ItsFile::CreateMode("rwx","rwx","rwx"));
+}
+
+//
+// Function: CleanupTestDirectory
+//
+// (i): Remove test directory if exists.
+//
+void CleanupTestDirectory()
+{
+    if ( ItsDirectory::Exists(g_directoryRoot) ) {
+        ItsFile::Delete(g_directoryRoot);
+    }
 }
 
 //
@@ -198,12 +235,9 @@ int main(int argc, char* argv[])
 //
 void PrintTestApplicationEvent(const string& event)
 {
-    cout << CLR_RESET << CLR_GREEN;
-    
+    cout << COLOR_RESET << COLOR_GREEN;
     cout << std::setw(80) << std::setfill('#') << std::left << "## Test Application " << endl;
-    
-    cout << CLR_RESET << CLR_WHITE;
-    
+    cout << COLOR_RESET << COLOR_WHITE;
     cout << "> "<< event << " <" << endl;
 }
 
@@ -214,15 +248,14 @@ void PrintTestApplicationEvent(const string& event)
 //
 void PrintTestHeader(const string& txt)
 {
-    cout << CLR_RESET << CLR_GREEN;
-
+    cout << COLOR_RESET << COLOR_GREEN;
     cout << endl;
 
     stringstream ss;
     ss << " " << txt << " ";
     cout << ItsString::WidthExpand(ss.str(), 80, '_', ItsExpandDirection::Middle) << endl;
 
-    cout << CLR_RESET << CLR_WHITE;
+    cout << COLOR_RESET << COLOR_WHITE;
 }
 
 //
@@ -232,12 +265,12 @@ void PrintTestHeader(const string& txt)
 //
 void PrintTestSubHeader(const string& txt)
 {
-    cout << CLR_RESET << CLR_GREEN;
+    cout << COLOR_RESET << COLOR_GREEN;
 
     cout << endl;
     cout << "__ " << txt << " __" << endl;
 
-    cout << CLR_RESET << CLR_WHITE;
+    cout << COLOR_RESET << COLOR_WHITE;
 }
 
 //
