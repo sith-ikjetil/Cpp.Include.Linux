@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-//: Title        : client.cpp
+//: Title        : TestClient.cpp
 //: Product:     : Simple client example
 //: Date         : 2022-07-30
 //: Author       : "Kjetil Kristoffer Solberg" <post@ikjetil.no>

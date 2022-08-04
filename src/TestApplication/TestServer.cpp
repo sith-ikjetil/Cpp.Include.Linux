@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////
-//: Title        : server.cpp
+//: Title        : TestServer.cpp
 //: Product:     : Simple server example
 //: Date         : 2022-07-30
 //: Author       : "Kjetil Kristoffer Solberg" <post@ikjetil.no>
