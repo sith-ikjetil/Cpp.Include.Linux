@@ -31,17 +31,17 @@ using ItSoftware::Linux::ItsString;
 //
 // constexpr
 //
-static constexpr auto MAX_BUF_SIZE = 4096;
-static constexpr auto COLOR_CYAN = "\033[36;1m";
-static constexpr auto COLOR_GREEN = "\033[32m";
-static constexpr auto COLOR_WHITE = "\033[37;1m";
-static constexpr auto COLOR_RESET = "\033[0m";
-static constexpr auto ARG_SERVER_PORT = "--server-port";
-static constexpr auto ARG_SERVER_ADDRESS = "--server-address";
-static constexpr auto ARG_CLIENT_PORT = "--client-port";
-static constexpr auto ARG_CLIENT_ADDRESS = "--client-address";
-static constexpr auto ARG_CONNECTION_TYPE = "--connection-type";
-static constexpr auto ARG_NO_COLOR_OUTPUT = "--no-color-output";
+constexpr auto MAX_BUF_SIZE = 4096;
+constexpr auto COLOR_CYAN = "\033[36;1m";
+constexpr auto COLOR_GREEN = "\033[32m";
+constexpr auto COLOR_WHITE = "\033[37;1m";
+constexpr auto COLOR_RESET = "\033[0m";
+constexpr auto ARG_SERVER_PORT = "--server-port";
+constexpr auto ARG_SERVER_ADDRESS = "--server-address";
+constexpr auto ARG_CLIENT_PORT = "--client-port";
+constexpr auto ARG_CLIENT_ADDRESS = "--client-address";
+constexpr auto ARG_CONNECTION_TYPE = "--connection-type";
+constexpr auto ARG_NO_COLOR_OUTPUT = "--no-color-output";
 
 //
 // struct: AppSettings
