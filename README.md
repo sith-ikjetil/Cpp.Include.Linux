@@ -5,6 +5,7 @@ License: **GPL-3.0-or-later**
 ## itsoftware-linux-core.h
 Has the following types:
     * ItsTimer
+    
     * ItsGuid
     * ItsError
     * ItsDirectory
