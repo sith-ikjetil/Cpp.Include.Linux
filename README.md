@@ -4,8 +4,8 @@ License: **GPL-3.0-or-later**
 
 ## itsoftware-linux-core.h
 Has the following types:
+
     * ItsTimer
-    
     * ItsGuid
     * ItsError
     * ItsDirectory
@@ -18,6 +18,7 @@ Has the following types:
 
 ## itsoftware-linux-ipc.h
 Has the following types:
+
     * ItsSocket
     * ItsSocketStreamServer
     * ItsSocketStreamClient
@@ -30,6 +31,7 @@ Has the following types:
 
 ## itsoftware-linux.h
 Has the following types:
+
     * ItsTime
     * ItsString
     * ItsConvert
