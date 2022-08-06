@@ -8,12 +8,14 @@
 //
 // #include
 //
+#include <string>
 #include "../include/itsoftware-linux.h"
 #include "../include/itsoftware-linux-core.h"
 
 //
 // using
 //
+using std::string;
 using ItSoftware::Linux::Core::ItsDaemon;
 using ItSoftware::Linux::Core::ItsFile;
 
@@ -45,13 +47,20 @@ int main(int argc, char* argv[])
     ItsDaemon::SetSigKill( [] (void) { _exit(1); } );
     
     //
+    // Set filename with pid.
+    //
+    string filename("/tmp/TestDaemon-");
+    filename += std::to_string(getpid());
+    filename += ".txt";
+
+    //
     // Implement your daemon logic here. 
     // This is only an example: appending lines to a file.
     //
     while (!ItsDaemon::GetSigKill() && !ItsDaemon::GetSigTerm()) {
         if (!ItsDaemon::GetSigStop()) {
             ItsFile file;
-            if (!file.OpenOrCreate("/home/kjetilso/daemon.txt","rwa",ItsFile::CreateMode("rw","rw","rw")))
+            if (!file.OpenOrCreate(filename,"rwa",ItsFile::CreateMode("rw","rw","rw")))
             {
                 return EXIT_FAILURE;
             }
