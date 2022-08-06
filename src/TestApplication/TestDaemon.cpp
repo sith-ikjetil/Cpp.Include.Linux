@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     //
     // Sanity check that daemon is successfull.
     //
-    if (!daemon.GetInitWithError()) {
+    if (daemon.GetInitWithError()) {
         //
         // Return daemon unsuccessfull
         //
