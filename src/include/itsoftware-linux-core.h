@@ -1500,7 +1500,7 @@ namespace ItSoftware
                 //
                 // (i): Returnes true is daemon was correctly set up. false otherwise.
                 //
-                bool WasDaemonSuccessful() {
+                bool GetInitWithError() {
                     return (this->m_deamonRetVal == 0);
                 }
                 //
