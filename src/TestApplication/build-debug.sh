@@ -6,7 +6,6 @@
 #: Description : Builds TestApplication and TestDaemon.
 echo "Building TestApplication..."
 echo "> using debug build <"
-
 g++ -ggdb TestApplication.cpp -std=c++17 -luuid -D_GLIBCXX_GTHREAD_USE_WEAK=0 -static -pthread -o TestApplication
 if [[ $? -eq 0 ]]
 then
