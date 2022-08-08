@@ -86,9 +86,9 @@ void TestItsDirectory();
 void TestItsFileMonitorStart();
 void TestItsFileMonitorStop();
 void ExitFn();
-void PrintTestHeader(const string& txt);
-void PrintTestSubHeader(const string& txt);
-void PrintTestApplicationEvent(const string& event);
+void PrintHeader(const string& txt);
+void PrintSubHeader(const string& txt);
+void PrintApplicationEvent(const string& event);
 void HandleFileEvent(inotify_event& event);
 void TestItsSocketStreamClientServerStop();
 void TestItsSocketDatagramClientServerStop();
@@ -145,7 +145,7 @@ struct sockaddr_un g_caddr{0};
 void ExitFn()
 {
     cout << endl;
-    PrintTestApplicationEvent("Completed");
+    PrintApplicationEvent("Completed");
 }
 
 //
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
     //
     // Start.
     //
-    PrintTestApplicationEvent("Started");
+    PrintApplicationEvent("Started");
 
     //
     // Do all tests.
@@ -229,11 +229,11 @@ void CleanupTestDirectory()
 }
 
 //
-// Function: PrintTestApplicationEvent
+// Function: PrintApplicationEvent
 //
 // (i): prints application event string.
 //
-void PrintTestApplicationEvent(const string& event)
+void PrintApplicationEvent(const string& event)
 {
     cout << COLOR_RESET << COLOR_GREEN;
     cout << std::setw(80) << std::setfill('#') << std::left << "## Test Application " << endl;
@@ -242,11 +242,11 @@ void PrintTestApplicationEvent(const string& event)
 }
 
 //
-// Function: PrintTestHeader
+// Function: PrintHeader
 //
 // (i): Prints a tests header.
 //
-void PrintTestHeader(const string& txt)
+void PrintHeader(const string& txt)
 {
     cout << COLOR_RESET << COLOR_GREEN;
     cout << endl;
@@ -259,11 +259,11 @@ void PrintTestHeader(const string& txt)
 }
 
 //
-// Function: PrintTestSubHeader
+// Function: PrintSubHeader
 //
 // (i): Prints a tests sub header.
 //
-void PrintTestSubHeader(const string& txt)
+void PrintSubHeader(const string& txt)
 {
     cout << COLOR_RESET << COLOR_GREEN;
 
@@ -280,9 +280,9 @@ void PrintTestSubHeader(const string& txt)
 //
 void TestItsConvert()
 {
-    PrintTestHeader("ItsConvert");
+    PrintHeader("ItsConvert");
 
-    PrintTestSubHeader("ToNumber");
+    PrintSubHeader("ToNumber");
     cout << R"(ItsConvert::ToNumber<int>("-1234"))" << endl;
     cout << "> " << ItsConvert::ToNumber<int>("-1234") << endl;
     cout << R"(ItsConvert::ToNumber<unsigned int>("1234"))" << endl;
@@ -306,7 +306,7 @@ void TestItsConvert()
     cout << R"(ItsConvert::ToNumber<unsigned short>("40001"))" << endl;
     cout << "> " << ItsConvert::ToNumber<unsigned short>("40001") << endl;
 
-    PrintTestSubHeader("ToString");
+    PrintSubHeader("ToString");
     cout << R"(ItsConvert::ToString<int>(-1234))" << endl;
     cout << R"(> ")" << ItsConvert::ToString<int>(-1234) << R"(")" << endl;
     cout << R"(ItsConvert::ToString<unsigned int>(1234))" << endl;
@@ -330,13 +330,13 @@ void TestItsConvert()
     cout << R"(ItsConvert::ToString<unsigned short>(40001))" << endl;
     cout << R"(> ")" << ItsConvert::ToString<unsigned short>(40001) << R"(")" << endl;
     
-    PrintTestSubHeader("ToStringFormatted");
+    PrintSubHeader("ToStringFormatted");
     cout << R"(ItsConvert::ToStringFormatted(256810246))" << endl;
     cout << R"(> ")" << ItsConvert::ToStringFormatted(256810246) << R"(")" << endl;
     cout << R"(ItsConvert::ToStringFormatted(256810246, L' '))" << endl;
     cout << R"(> ")" << ItsConvert::ToStringFormatted(256810246, L' ') << R"(")" << endl;
     
-    PrintTestSubHeader("ToDataSizeString");
+    PrintSubHeader("ToDataSizeString");
     cout << R"(ItsConvert::ToDataSizeString(1024, 2))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(1024, 2) << R"(")" << endl;
     cout << R"(ItsConvert::ToDataSizeString(200100400, 0))" << endl;
@@ -352,7 +352,7 @@ void TestItsConvert()
     cout << R"(ItsConvert::ToDataSizeString(size_t max, 2, ItsDataSizeStringType::IEC))" << endl;
     cout << R"(> ")" << ItsConvert::ToDataSizeString(SIZE_MAX, 2, ItsDataSizeStringType::IEC) << R"(")" << endl;
 
-    PrintTestSubHeader("ToLongFromHex");
+    PrintSubHeader("ToLongFromHex");
     cout << R"(ItsConvert::ToLongFromHex("0xFF3333"))" << endl;
     cout << "> " << ItsConvert::ToLongFromHex("0xFF3333") << endl;
 
@@ -366,7 +366,7 @@ void TestItsConvert()
 //
 void TestItsRandom()
 {
-    PrintTestHeader("ItsRandom");
+    PrintHeader("ItsRandom");
 
     cout << "ItsRandom<long>(10'000, 1'000'000)" << endl;
     cout << "> " << ItsRandom<long>(10'000, 1'000'000) << endl;
@@ -391,15 +391,15 @@ void TestItsRandom()
 //
 void TestItsTime()
 {
-    PrintTestHeader("ItsTime");
+    PrintHeader("ItsTime");
 
-    PrintTestSubHeader("RenderMsToFullString");
+    PrintSubHeader("RenderMsToFullString");
     cout << "ItsTime::RenderMsToFullString(92481379, false)" << endl;
     cout << R"(> ")" << ItsTime::RenderMsToFullString(92481379, false) << R"(")" << endl;
     cout << "ItsTime::RenderMsToFullString(92481379, true)" << endl;
     cout << R"(> ")" << ItsTime::RenderMsToFullString(92481379, true) << R"(")" << endl;
     
-    PrintTestSubHeader("Now + ToString");
+    PrintSubHeader("Now + ToString");
     cout << "ItsDateTime::Now().ToString()" << endl;
     cout << R"(> ")" << ItsDateTime::Now().ToString() << R"(")" << endl;
     cout << R"(ItsDateTime.Now().ToString("s"))" << endl;
@@ -415,7 +415,7 @@ void TestItsTime()
 //
 void TestItsString()
 {
-    PrintTestHeader("ItsString");
+    PrintHeader("ItsString");
 
     cout << R"(ItsString::Left("Ab12Cd",4))" << endl;
     cout << R"(> ")" << ItsString::Left("Ab12Cd", 4) << R"(")" << endl;
@@ -466,7 +466,7 @@ void TestItsString()
 //
 void TestItsLog()
 {
-	PrintTestHeader("ItsLog");
+	PrintHeader("ItsLog");
 
     ItsLog log{"ItsTestApp",true};
     log.LogInformation("This is an information log item");
@@ -475,10 +475,10 @@ void TestItsLog()
     log.LogOther("This is an other log item");
     log.LogDebug("This is an debug log item");
 
-    PrintTestSubHeader("ToString");
+    PrintSubHeader("ToString");
     cout << log.ToString() << endl;
 
-    PrintTestSubHeader("ToString(tailN=1)");
+    PrintSubHeader("ToString(tailN=1)");
     cout << log.ToString(1) << endl;
     
     cout << endl;
@@ -491,7 +491,7 @@ void TestItsLog()
 //
 void TestItsFile()
 {
-	PrintTestHeader("ItsFile");
+	PrintHeader("ItsFile");
 
 	ItsFile file;
     cout << R"(file.OpenOrCreate(g_filename,"rwt",ItsFile::CreateMode("rw","rw","rw")))" << endl;
@@ -580,7 +580,7 @@ void TestItsFile()
 //
 void TestItsTimerStart()
 {
-	PrintTestHeader("ItsTimer::Start");
+	PrintHeader("ItsTimer::Start");
 
 	g_timer.Start();
     cout << "Timer started..." << endl;
@@ -595,7 +595,7 @@ void TestItsTimerStart()
 //
 void TestItsTimerStop()
 {
-	PrintTestHeader("ItsTimer::Stop");
+	PrintHeader("ItsTimer::Stop");
 
 	g_timer.Stop();
 	cout << "Elapsed Time: " << ItsTime::RenderMsToFullString(g_timer.GetMilliseconds(),true) << endl;
@@ -610,7 +610,7 @@ void TestItsTimerStop()
 //
 void TestItsDateTime()
 {
-    PrintTestHeader("ItsDateTime");
+    PrintHeader("ItsDateTime");
 
     auto now = ItsDateTime::Now();
     cout << "ItsDateTime.Now(): " << now.ToString() << endl;
@@ -639,7 +639,7 @@ void TestItsDateTime()
 //
 void TestItsID()
 {
-    PrintTestHeader("ItsID");
+    PrintHeader("ItsID");
 
     cout << "ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false)" << endl;
     cout << R"(> ")" << ItsID::CreateID(12, ItsCreateIDOptions::LowerAndUpperCase, false) << R"(")" << endl;
@@ -668,7 +668,7 @@ void TestItsID()
 //
 void TestItsGuid()
 {
-    PrintTestHeader("ItsGuid");
+    PrintHeader("ItsGuid");
 
     cout << "ItsGuid::CreateGuid()" << endl;
     cout << R"(> ")" << ItsGuid::CreateGuid() << R"(")" << endl;
@@ -704,7 +704,7 @@ void TestItsGuid()
 //
 void TestItsPath()
 {
-    PrintTestHeader("ItsPath");
+    PrintHeader("ItsPath");
 
     string path = ItsPath::Combine(g_path1, g_path2);
     cout << R"(ItsPath::Exists(path))" << endl;
@@ -744,7 +744,7 @@ void TestItsPath()
 //
 void TestItsDirectory()
 {
-    PrintTestHeader("ItsDirectory");
+    PrintHeader("ItsDirectory");
 
     cout << R"(ItsDirectory::Exists(g_directoryRoot))" << endl;
     if (!ItsDirectory::Exists(g_directoryRoot)) {
@@ -804,7 +804,7 @@ void TestItsDirectory()
 //
 void TestItsFileMonitorStart()
 {
-    PrintTestHeader("ItsFileMonitor Start");
+    PrintHeader("ItsFileMonitor Start");
 
     g_fm = make_unique<ItsFileMonitor>(g_directoryRoot, (ItsFileMonitorMask::Modify | ItsFileMonitorMask::Open | ItsFileMonitorMask::Access | ItsFileMonitorMask::Create | ItsFileMonitorMask::CloseWrite | ItsFileMonitorMask::CloseNoWrite), HandleFileEvent);  
     if (g_fm->GetInitWithError()) {
@@ -825,7 +825,7 @@ void TestItsFileMonitorStart()
 //
 void TestItsFileMonitorStop()
 {
-    PrintTestHeader("ItsFileMonitor Stop");
+    PrintHeader("ItsFileMonitor Stop");
 
     if ( !g_fm->GetInitWithError() ) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
@@ -900,7 +900,7 @@ void HandleFileEvent(inotify_event& event)
 //
 void TestItsSocketStreamClientServerStart()
 {
-    PrintTestHeader("ItsSocketStream[Client/Server] Start");
+    PrintHeader("ItsSocketStream[Client/Server] Start");
 
     g_addr.sun_family = AF_UNIX;
     
@@ -968,7 +968,7 @@ void TestItsSocketStreamClientServerStart()
 //
 void TestItsSocketStreamClientServerStop()
 {
-    PrintTestHeader("ItsSocketStream[Client/Server] Stop");
+    PrintHeader("ItsSocketStream[Client/Server] Stop");
 
     for ( auto s : g_socket_stream_traffic) {
         cout << s << endl;
@@ -994,7 +994,7 @@ void TestItsSocketStreamClientServerStop()
 //
 void TestItsSocketDatagramClientServerStart()
 {
-    PrintTestHeader("ItsSocketDatagram[Client/Server] Start");
+    PrintHeader("ItsSocketDatagram[Client/Server] Start");
     
     auto pid = getpid();
 
@@ -1082,7 +1082,7 @@ void TestItsSocketDatagramClientServerStop()
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(1200));
 
-    PrintTestHeader("ItsSocketDatagram[Client/Server] Stop");
+    PrintHeader("ItsSocketDatagram[Client/Server] Stop");
 
     for ( auto s : g_socket_dg_traffic) {
         cout << s << endl;
@@ -1111,7 +1111,7 @@ void TestItsSocketDatagramClientServerStop()
 //
 void TestItsPipe()
 {
-    PrintTestHeader("ItsPipe");
+    PrintHeader("ItsPipe");
 
     ItsPipe pipe;
 
@@ -1174,7 +1174,7 @@ void TestItsPipe()
 //
 void TestItsSvMsgQueue()
 {
-    PrintTestHeader("ItsSvMessageQueue");
+    PrintHeader("ItsSvMessageQueue");
     
     ItsSvMsgQueue queue(IPC_PRIVATE, ItsSvMsgQueue::CreateQueueFlags(true, false, "rw", "rw", "rw"));
     if ( queue.GetInitWithError() ) {
@@ -1240,7 +1240,7 @@ void TestItsSvMsgQueue()
 //
 void TestItsFifo()
 {
-    PrintTestHeader("ItsFifo");
+    PrintHeader("ItsFifo");
 
     ItsFifoServer fifoServer("/tmp/its-fifo-src", "/tmp/its-fifo_cl", ItsFifoServer::CreateFifoFlags("rw","rw","rw"));
     if ( fifoServer.GetInitWithError() ) {
