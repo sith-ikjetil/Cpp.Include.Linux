@@ -66,6 +66,7 @@ bool GetHasArg(string arg, int argc, char** argv);
 int MainSocketTCP(AppSettings& settings);
 int MainSocketUDP(AppSettings& settings);
 void PrintProlog(const AppSettings& settings);
+void PrintSettings(const AppSettings& settings);
 void PrintError(const AppSettings& settings, const string& msg);
 void PrintEvent(const AppSettings& settings, const string& msg);
 
@@ -89,6 +90,11 @@ int main(int argc, char** argv)
     };
 
     //
+    // Print prolog
+    //
+    PrintProlog(settings);
+
+    //
     // Update application settings from command line arg.
     //
     UpdateAppSettings(argc,argv,settings);
@@ -96,7 +102,7 @@ int main(int argc, char** argv)
     //
     // Output app settings
     //
-    PrintProlog(settings);
+    PrintSettings(settings);
     
     //
     // Run the UDP or TCP version of the application
@@ -125,6 +131,17 @@ void PrintProlog(const AppSettings& settings)
     cout << "##        --connection-type=<UDP/TCP>" << endl;
     cout << "##        --no-color-output" << endl;
     cout << "##" << endl;
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_WHITE; }
+}
+
+//
+// Function: PrintSettings
+//
+// (i): Prints out settings information to stdout.
+//
+void PrintSettings(const AppSettings& settings)
+{
+    if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_GREEN; }
     cout << "Connection type : " << settings.ConnectionType << endl;
     cout << "Server port     : " << settings.ServerPort << endl;
     cout << "Server address  : " << settings.ServerAddress << endl;
