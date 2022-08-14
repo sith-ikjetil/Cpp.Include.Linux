@@ -136,7 +136,7 @@ void PrintError(const AppSettings& settings, const string& msg)
     if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_GREEN; }
     cout << std::left << std::setw(36) << std::setfill('#') << "## ERROR ##" << endl;
     if (!settings.NoColorOutput) { cout << COLOR_RESET << COLOR_WHITE; }
-    cout << msg;
+    cout << msg << endl;
 }
 
 //
@@ -235,6 +235,10 @@ int MainSocketTCP(AppSettings& settings)
     //
     struct sockaddr_in addr_server{0};
     auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
+    if ( addr_host_server == nullptr ) {
+        PrintError(settings, "Invalid --server-address argument");
+        return EXIT_FAILURE;
+    }
     addr_server = *addr_host_server;
 
     //
@@ -310,6 +314,10 @@ int MainSocketUDP(AppSettings& settings)
     //
     struct sockaddr_in addr_server{0};
     auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
+    if ( addr_host_server == nullptr ) {
+        PrintError(settings, "Invalid --server-address argument");
+        return EXIT_FAILURE;
+    }
     addr_server = *addr_host_server;
 
     //

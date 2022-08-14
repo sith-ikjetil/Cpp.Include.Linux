@@ -264,6 +264,10 @@ int MainSocketTCP(AppSettings& settings) {
     //
     struct sockaddr_in addr_server{0};
     auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
+    if ( addr_host_server == nullptr ) {
+        PrintError(settings, "Invalid --server-address argument");
+        return EXIT_FAILURE;
+    }
     addr_server = *addr_host_server;
     
     //
@@ -271,6 +275,10 @@ int MainSocketTCP(AppSettings& settings) {
     //
     struct sockaddr_in addr_client{0};
     auto addr_host_client = ItsSocket::CreateSockAddrHostInet4(settings.ClientPort, settings.ClientAddress);
+    if ( addr_host_client == nullptr ) {
+        PrintError(settings, "Invalid --client-address argument");
+        return EXIT_FAILURE;
+    }
     addr_client = *addr_host_client;
 
     //
@@ -329,6 +337,10 @@ int MainSocketUDP(AppSettings& settings) {
     //
     struct sockaddr_in addr_server{0};
     auto addr_host_server = ItsSocket::CreateSockAddrHostInet4(settings.ServerPort, settings.ServerAddress);
+    if ( addr_host_server == nullptr ) {
+        PrintError(settings, "Invalid --server-address argument");
+        return EXIT_FAILURE;
+    }
     addr_server = *addr_host_server;
     
     //
@@ -336,6 +348,10 @@ int MainSocketUDP(AppSettings& settings) {
     //
     struct sockaddr_in addr_client{0};
     auto addr_host_client = ItsSocket::CreateSockAddrHostInet4(settings.ClientPort, settings.ClientAddress);
+    if ( addr_host_client == nullptr ) {
+        PrintError(settings, "Invalid --client-address argument");
+        return EXIT_FAILURE;
+    }
     addr_client = *addr_host_client;
 
     //
