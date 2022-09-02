@@ -84,6 +84,12 @@ namespace ItSoftware::CppIncludeLinux::TestDaemon
     }
 }
 
+//
+// Function: main
+//
+// (i): Application entry point.
+//      Redirects to ItSoftware::CppIncludeLinux::TestDaemon::main.
+//
 int main(int argc, const char* argv[])
 {
     return ItSoftware::CppIncludeLinux::TestDaemon::main(argc,argv);
