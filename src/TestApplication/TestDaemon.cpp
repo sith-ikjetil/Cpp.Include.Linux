@@ -42,11 +42,6 @@ namespace ItSoftware::CppIncludeLinux::TestDaemon
             //
             return EXIT_FAILURE;
         }
-
-        //
-        // Set handlers for important signals
-        //
-        ItsDaemon::SetSigKill( [] (void) { _exit(1); } );
         
         //
         // Set filename with pid.
@@ -59,20 +54,18 @@ namespace ItSoftware::CppIncludeLinux::TestDaemon
         // Implement your daemon logic here. 
         // This is only an example: appending lines to a file.
         //
-        while (!ItsDaemon::GetSigKill() && !ItsDaemon::GetSigTerm()) {
-            if (!ItsDaemon::GetSigStop()) {
-                ItsFile file;
-                if (!file.OpenOrCreate(filename,"rwa",ItsFile::CreateMode("rw","rw","rw")))
-                {
-                    return EXIT_FAILURE;
-                }
+        while (!ItsDaemon::GetSigTerm()) {
+            ItsFile file;
+            if (!file.OpenOrCreate(filename,"rwa",ItsFile::CreateMode("rw","rw","rw")))
+            {
+                return EXIT_FAILURE;
+            }
 
-                char text[] = "Cpp.Include.Linux TestDaemon 12345\n";
-                size_t written(0);
-                if ( !file.Write((void*)text,strlen(text), &written) )
-                {
-                    return EXIT_FAILURE;
-                }
+            char text[] = "Cpp.Include.Linux TestDaemon 12345\n";
+            size_t written(0);
+            if ( !file.Write((void*)text,strlen(text), &written) )
+            {
+                return EXIT_FAILURE;
             }
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }

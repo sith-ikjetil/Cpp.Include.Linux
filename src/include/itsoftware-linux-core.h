@@ -1352,40 +1352,25 @@ namespace ItSoftware::Linux::Core
     {
     private:
         int m_deamonRetVal;
-        struct sigaction m_sa;
-        inline static bool s_sigkill = false;
-        inline static bool s_sigstop = false;
+        struct sigaction m_saT;
+        struct sigaction m_saC;
+        struct sigaction m_saH;
         inline static bool s_sigterm = false;
         inline static bool s_sighup = false;
-        inline static function<void(void)> s_fnSigKill;
         inline static function<void(void)> s_fnSigTerm;
-        inline static function<void(void)> s_fnSigStop;
         inline static function<void(void)> s_fnSigCont;
         inline static function<void(void)> s_fnSigHup;
     protected:
-        static void SigHupHandler(int sig) {
+        static void SigHandler(int sig) {
             switch(sig)
-            {
-                case SIGKILL:
-                    ItsDaemon::s_sigkill = true;
-                    if (ItsDaemon::s_fnSigKill != nullptr) {
-                        ItsDaemon::s_fnSigKill();
-                    }
-                    break;
-                case SIGSTOP:
-                    ItsDaemon::s_sigstop = true;
-                    if (ItsDaemon::s_fnSigStop != nullptr) {
-                        ItsDaemon::s_fnSigStop();
-                    }
-                    break;
+            {                
                 case SIGTERM:
                     ItsDaemon::s_sigterm = true;
                     if (ItsDaemon::s_fnSigTerm != nullptr) {
                         ItsDaemon::s_fnSigTerm();
                     }
                     break;
-                case SIGCONT:
-                    ItsDaemon::s_sigstop = false;
+                case SIGCONT:                    
                     if (ItsDaemon::s_fnSigCont != nullptr) {
                         ItsDaemon::s_fnSigCont();
                     }
@@ -1473,14 +1458,28 @@ namespace ItSoftware::Linux::Core
         //
         // (i): Constructor.
         //
-        explicit ItsDaemon(int flags) {
-            ItsDaemon::s_sigkill = false;
+        explicit ItsDaemon(int flags) {            
             this->m_deamonRetVal = this->BecomeDaemon(flags);
             if ( this->m_deamonRetVal == 0 ) {
-                sigemptyset(&this->m_sa.sa_mask);
-                this->m_sa.sa_flags = SA_RESTART;
-                this->m_sa.sa_handler = ItsDaemon::SigHupHandler;
-                if (sigaction(SIGHUP,&this->m_sa, NULL) == -1 ) {
+                // SIGTERM
+                sigemptyset(&this->m_saT.sa_mask);
+                this->m_saT.sa_flags = SA_RESTART;
+                this->m_saT.sa_handler = ItsDaemon::SigHandler;
+                if (sigaction(SIGTERM,&this->m_saT, NULL) == -1 ) {
+                    _exit(-1);
+                }
+                // SIGCONT
+                sigemptyset(&this->m_saC.sa_mask);
+                this->m_saC.sa_flags = SA_RESTART;
+                this->m_saC.sa_handler = ItsDaemon::SigHandler;
+                if (sigaction(SIGCONT,&this->m_saC, NULL) == -1 ) {
+                    _exit(-1);
+                }
+                // SIGHUP
+                sigemptyset(&this->m_saH.sa_mask);
+                this->m_saH.sa_flags = SA_RESTART;
+                this->m_saH.sa_handler = ItsDaemon::SigHandler;
+                if (sigaction(SIGHUP,&this->m_saH, NULL) == -1 ) {
                     _exit(-1);
                 }
             }
@@ -1494,31 +1493,13 @@ namespace ItSoftware::Linux::Core
             return (this->m_deamonRetVal != 0);
         }
         //
-        // Function: GetSigKill
-        //
-        // (i): kill signal usually only set if SIGTERM does not work.
-        //
-        static bool GetSigKill() {
-            return ItsDaemon::s_sigkill;
-        }
-        //
-        // Function: GetSigStop
-        //
-        // (i): pause signal. allows continue usage with SIGCONT. If 
-        //      SIGSTOP is true and SIGCONT is signaled, then GetSIGSTOP 
-        //      will return false.
-        //
-        static bool GetSigStop() {
-            return ItsDaemon::s_sigstop;
-        }
-        //
         // Function: GetSigTerm
         //
         // (i): normal daemon termination signal. should shut down daemon.
         //
         static bool GetSigTerm() {
             return ItsDaemon::s_sigterm;
-        }
+        }        
         //
         // Function: GetSigHup
         //
@@ -1534,8 +1515,6 @@ namespace ItSoftware::Linux::Core
         //
         static void ClearSignalFlags()
         {
-            s_sigkill = false;
-            s_sigstop = false;
             s_sigterm = false;
             s_sighup = false;
         }
@@ -1544,27 +1523,9 @@ namespace ItSoftware::Linux::Core
         //
         // (i): set handler for SIGKILL
         //
-        static void SetSigKill(function<void(void)> fn)
-        {
-            ItsDaemon::s_fnSigKill = fn;
-        }
-                        //
-        // Function: SetSigKill
-        //
-        // (i): set handler for SIGKILL
-        //
         static void SetSigTerm(function<void(void)> fn)
         {
             ItsDaemon::s_fnSigTerm = fn;
-        }
-        //
-        // Function: SetSigKill
-        //
-        // (i): set handler for SIGKILL
-        //
-        static void SetSigStop(function<void(void)> fn)
-        {
-            ItsDaemon::s_fnSigStop = fn;
         }
         //
         // Function: SetSigKill
