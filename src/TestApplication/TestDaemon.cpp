@@ -12,53 +12,49 @@
 #include "../include/itsoftware-linux.h"
 #include "../include/itsoftware-linux-core.h"
 
-//
-// using
-//
-using std::string;
-using ItSoftware::Linux::Core::ItsDaemon;
-using ItSoftware::Linux::Core::ItsFile;
-
-//
-// Function: main
-//
-// (i): C/C++ application entry point.
-//
-int main(int argc, char* argv[]) 
+namespace ItSoftware::CppIncludeLinux::TestDaemon
 {
     //
-    // This makes this app a daemon
+    // using
     //
-    ItsDaemon daemon;
+    using std::string;
+    using ItSoftware::Linux::Core::ItsDaemon;
+    using ItSoftware::Linux::Core::ItsFile;
 
     //
-    // Sanity check that daemon is successfull.
+    // Function: main
     //
-    if (daemon.GetInitWithError()) {
+    // (i): C/C++ application entry point.
+    //
+    int main(int argc, const char* argv[]) 
+    {
         //
-        // Return daemon unsuccessfull
+        // This makes this app a daemon
         //
-        return EXIT_FAILURE;
-    }
+        ItsDaemon daemon;
 
-    //
-    // Set handlers for important signals
-    //
-    ItsDaemon::SetSigKill( [] (void) { _exit(1); } );
-    
-    //
-    // Set filename with pid.
-    //
-    string filename("/tmp/TestDaemon-");
-    filename += std::to_string(getpid());
-    filename += ".txt";
+        //
+        // Sanity check that daemon is successfull.
+        //
+        if (daemon.GetInitWithError()) {
+            //
+            // Return daemon unsuccessfull
+            //
+            return EXIT_FAILURE;
+        }
+        
+        //
+        // Set filename with pid.
+        //
+        string filename("/tmp/TestDaemon-");
+        filename += std::to_string(getpid());
+        filename += ".txt";
 
-    //
-    // Implement your daemon logic here. 
-    // This is only an example: appending lines to a file.
-    //
-    while (!ItsDaemon::GetSigKill() && !ItsDaemon::GetSigTerm()) {
-        if (!ItsDaemon::GetSigStop()) {
+        //
+        // Implement your daemon logic here. 
+        // This is only an example: appending lines to a file.
+        //
+        while (!ItsDaemon::GetSigTerm()) {
             ItsFile file;
             if (!file.OpenOrCreate(filename,"rwa",ItsFile::CreateMode("rw","rw","rw")))
             {
@@ -71,12 +67,23 @@ int main(int argc, char* argv[])
             {
                 return EXIT_FAILURE;
             }
+            std::this_thread::sleep_for(std::chrono::seconds(5));
         }
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-    }
 
-    //
-    // Return all ok
-    //
-    return EXIT_SUCCESS;
+        //
+        // Return all ok
+        //
+        return EXIT_SUCCESS;
+    }
+}
+
+//
+// Function: main
+//
+// (i): Application entry point.
+//      Redirects to ItSoftware::CppIncludeLinux::TestDaemon::main.
+//
+int main(int argc, const char* argv[])
+{
+    return ItSoftware::CppIncludeLinux::TestDaemon::main(argc,argv);
 }
