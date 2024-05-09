@@ -425,31 +425,32 @@ namespace ItSoftware
 
 			static string Replace(string s, const string& replace, const string& replace_with)
 			{
-				if (s.size() == 0 || replace.size() == 0 || replace.size() > s.size())
-				{
-					return string("");
-				}
+					if ( s.size( ) == 0 || replace.size( ) == 0 || replace.size( ) > s.size( ) )
+					{
+						return wstring( L"" );
+					}
 
-				string retVal = s;
-				size_t index = retVal.find(replace);
-				if (index == string::npos)
-				{
-					return s;
-				}
-				while (index != string::npos)
-				{
+					wstring retVal = s;
+					size_t index = retVal.find( replace );
+					if ( index == wstring::npos )
+					{
+						return retVal;
+					}
+
+					auto result = ItsString::Split(s, replace);
 					stringstream ss;
-					ss << ItsString::Left(retVal, (int)index);
-					ss << replace_with;
-					ss << ItsString::Right(retVal, (int)(retVal.size() - index - replace.size()));
+					bool bHit = false;
+					for (auto& t : result) {
+						if (bHit) {
+							ss << replace_with;
+						}
 
-					string temp = ss.str();
-					retVal = temp;
-
-					index = retVal.find(replace, index + replace.size());
-				}
-
-				return retVal;
+						ss << t;
+						
+						bHit = true;
+					}
+					
+					return ss.str();
 			}
 		};
 
