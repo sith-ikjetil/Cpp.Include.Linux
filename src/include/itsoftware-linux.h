@@ -425,12 +425,12 @@ namespace ItSoftware::Linux
 		{
 			if (s.size() == 0 || replace.size() == 0 || replace.size() > s.size())
             {
-                return wstring(L"");
+                return string("");
             }
 
             string retVal = s;
             size_t index = retVal.find(replace);
-            if (index == wstring::npos)
+            if (index == string::npos)
             {
                 return retVal;
             }
