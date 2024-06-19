@@ -507,7 +507,7 @@ namespace ItSoftware::Linux::Core
         //
         // Method: OpenExisting
         //
-        bool OpenExisting(string filename, const string& flags)
+        bool OpenExisting(string& filename, const string& flags)
         {
             if (this->m_fd.IsValid())
             {
@@ -815,7 +815,7 @@ namespace ItSoftware::Linux::Core
             return (!rename(sourceFilename.c_str(), targetFilename.c_str()));
         }
 
-        static bool Copy(string sourceFilename, string targetFilename, bool replaceIfExists)
+        static bool Copy(string& sourceFilename, string& targetFilename, bool replaceIfExists)
         {
             if (!ItsFile::Exists(sourceFilename))
             {
@@ -863,7 +863,7 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool GetMode(string filename, int *mode)
+        static bool GetMode(string& filename, int *mode)
         {
             if (!ItsFile::Exists(filename))
             {
@@ -879,7 +879,7 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool SetMode(string filename, int mode)
+        static bool SetMode(string& filename, int mode)
         {
             if (!ItsFile::Exists(filename))
             {
@@ -940,7 +940,7 @@ namespace ItSoftware::Linux::Core
             return mode;
         }
 
-        static bool Shred(string filename, bool alsoDelete)
+        static bool Shred(string& filename, bool alsoDelete)
         {
             if (!ItsFile::Exists(filename)) 
             {
@@ -982,7 +982,7 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool ShredAndDelete(string filename) 
+        static bool ShredAndDelete(string& filename) 
         {
             return ItsFile::Shred(filename,true);
         }
@@ -1010,7 +1010,7 @@ namespace ItSoftware::Linux::Core
             chars.push_back('/');
             return chars;
         }
-        static string Combine(string path1, string path2)
+        static string Combine(string& path1, string& path2)
         {
             if (path1.size() == 0 && path2.size() == 0) {
                 return string("");
@@ -1042,15 +1042,15 @@ namespace ItSoftware::Linux::Core
             }
             return false;
         }
-        static bool IsFile(string path)
+        static bool IsFile(string& path)
         {
             return ItsFile::Exists(path);
         }
-        static bool IsDirectory(string path)
+        static bool IsDirectory(string& path)
         {
             return ItsDirectory::Exists(path);
         }
-        static string GetDirectory(string path) 
+        static string GetDirectory(string& path) 
         {
             if (path.size() == 0) {
                 return string("");
@@ -1066,7 +1066,7 @@ namespace ItSoftware::Linux::Core
             }
             return path.substr(0, i+1);
         }
-        static string GetFilename(string path) 
+        static string GetFilename(string& path) 
         {
             if (path.size() == 0) {
                 return string("");
@@ -1082,7 +1082,7 @@ namespace ItSoftware::Linux::Core
             }
             return path.substr(i+1, path.size()-i-1);
         }
-        static string GetExtension(string path)
+        static string GetExtension(string& path)
         {
             if (path.size() == 0) {
                 return string("");
@@ -1098,7 +1098,7 @@ namespace ItSoftware::Linux::Core
             }
             return path.substr(i, path.size() - i);
         }
-        static bool IsPathValid(string path)
+        static bool IsPathValid(string& path)
         {
             if (path.size() == 0) {
                 return false;
