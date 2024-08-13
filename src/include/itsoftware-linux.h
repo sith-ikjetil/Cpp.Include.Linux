@@ -297,20 +297,29 @@ namespace ItSoftware::Linux
 			return retVal;
 		}
 
-		static vector<string> Split(string data, const string& token)
+		static vector<string> Split(string data, string token)
 		{
 			vector<string> output;
+
+			if (data.length() == 0) {
+				return output;
+			}
+
 			size_t pos = string::npos; // size_t to avoid improbable overflow
-			do
-			{
-				pos = data.find(token);
-				output.push_back(data.substr(0, pos));
-				if (string::npos != pos)
-					data = data.substr(pos + token.size());
-			} while (string::npos != pos);
+
+			if (data.find(token) != string::npos) {
+				do
+				{
+					pos = data.find(token);
+					output.push_back(data.substr(0, pos));
+					if (string::npos != pos)
+						data = data.substr(pos + token.size());
+				} while (string::npos != pos);
+			}
 
 			return output;
 		}
+
 		// to lower case
 		static string ToLowerCase(string s)
 		{
