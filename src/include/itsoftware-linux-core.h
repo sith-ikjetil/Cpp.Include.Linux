@@ -982,9 +982,59 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool ShredAndDelete(string& filename) 
+        static bool ShredAndDelete(string filename) 
         {
             return ItsFile::Shred(filename,true);
+        }
+
+        static bool ReadTextAll(string filename, string& textRead) 
+        {
+            if (!ItsFile::Exists(filename)) {
+                return false;
+            }
+
+            ItsFile file{};
+            string flags(L"rw");
+            if (!file.OpenExisting(filename, flags)) {
+                return false;
+            }
+
+            file.SetPosFromBeg(0);
+            if (!file.ReadAllText(textRead)) {
+                return false;
+            }
+
+            file.Close();
+            return true;
+        }
+
+        static bool ReadTextAllLines(string filename, vector<string>& textLines) 
+        {
+            if (!ItsFile::Exists(filename)) {
+                return false;
+            }
+
+            ItsFile file{};
+            string flags(L"rw");
+            if (!file.OpenExisting(filename, flags)) {
+                return false;
+            }
+
+            file.SetPosFromBeg(0);
+            string textRead;
+            if (!file.ReadAllText(textRead)) {
+                return false;
+            }
+
+            file.Close();
+
+            textLines.clear();
+            auto lines = ItsString::Split(textRead, "\n");
+            for (const auto& i : lines) {
+                textLines.push_back(i);
+            }
+
+            return true;
         }
     };
 
