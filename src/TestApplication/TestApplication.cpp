@@ -525,12 +525,32 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
             return;
         }
         cout << "> Success. Read all text from file " << g_filename << endl;
-        
+                
 
         cout << "file.Close()" << endl;
         file.Close();
         cout << "> Success" << endl;
 
+        string content;
+        cout << "ItsFile::ReadAllText(str)" << endl;
+        if (!ItsFile::ReadTextAll(g_filename, content)) {
+            cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
+            cout << endl;
+            return;
+        }
+        cout << "> Success. Read all text from file " << g_filename << endl;
+        cout << "> Length: " << content.size() << endl;
+
+        vector<string> contentLines;
+        cout << "ItsFile::ReadAllTextLines(str)" << endl;
+        if (!ItsFile::ReadTextAllLines(g_filename, contentLines)) {
+            cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
+            cout << endl;
+            return;
+        }
+        cout << "> Success. Read all text lines from file " << g_filename << endl;
+        cout << "> Line#: " << contentLines.size() << endl;
+        
         cout << "ItsFile::Copy(g_filename, g_shredFilename, true)" << endl;
         if (!ItsFile::Copy(g_filename, g_shredFilename, true)) {
             cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
