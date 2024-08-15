@@ -240,7 +240,7 @@ namespace ItSoftware::Linux
 	//
 	struct ItsString
 	{
-		static string WidthExpand(string& source, size_t width, char fill, ItsExpandDirection direction)
+		static string WidthExpand(string source, size_t width, char fill, ItsExpandDirection direction)
 		{
 			if (source.size() == 0)
 			{
@@ -349,14 +349,14 @@ namespace ItSoftware::Linux
 		}
 
 		// trim from left & right
-		static string Trim(const string& s, const char *t = " \t\n\r\f\v")
+		static string Trim(const string s, const char *t = " \t\n\r\f\v")
 		{
 			auto val = TrimRight(s, t);
 			return TrimLeft(val, t);
 		}
 
 		// left count chars
-		static string Left(string& s, uint32_t count)
+		static string Left(string s, uint32_t count)
 		{
 			if (s.size() == 0 || count == 0)
 			{
@@ -379,7 +379,7 @@ namespace ItSoftware::Linux
 		}
 
 		// mid index, count chars
-		static string Mid(string& s, uint32_t index, uint32_t count)
+		static string Mid(string s, uint32_t index, uint32_t count)
 		{
 			if (s.size() == 0 || count == 0 || index >= s.size())
 			{
@@ -408,7 +408,7 @@ namespace ItSoftware::Linux
 		}
 
 		// right count chars
-		static string Right(string& s, uint32_t count)
+		static string Right(string s, uint32_t count)
 		{
 			if (s.size() == 0 || count == 0)
 			{
@@ -430,7 +430,7 @@ namespace ItSoftware::Linux
 			return str;
 		}
 
-		static string Replace(string& s, const string& replace, const string& replace_with)
+		static string Replace(string s, const string replace, const string replace_with)
 		{
 			if (s.size() == 0 || replace.size() == 0 || replace.size() > s.size())
             {
