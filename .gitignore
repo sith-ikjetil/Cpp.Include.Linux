@@ -211,6 +211,13 @@ Backup*/
 UpgradeLog*.XML
 UpgradeLog*.htm
 
+# Executable Files
+TestApplication
+!TestApplication/
+TestClient
+TestDaemon
+TestServer
+
 # SQL Server files
 *.mdf
 *.ldf
