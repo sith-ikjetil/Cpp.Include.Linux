@@ -922,13 +922,13 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
 
         g_addr.sun_family = AF_UNIX;
         
-        g_socket_stream_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop, true);
+        g_socket_stream_server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::UNIX, reinterpret_cast<sockaddr*>(&g_addr), sizeof(g_addr), ItsSocketStreamServer::DefaultBackdrop, true);
         if ( g_socket_stream_server->GetInitWithError()) {
             cout << "ItsSocketStreamServer, Init with error: " << strerror(g_socket_stream_server->GetInitWithErrorErrno()) << endl;
         }
         cout << "ItsSocketStreamServer, Init Ok!" << endl;
 
-        g_socket_stream_client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_addr, sizeof(g_addr));
+        g_socket_stream_client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::UNIX, reinterpret_cast<sockaddr*>(&g_addr), sizeof(g_addr));
         if ( g_socket_stream_client->GetInitWithError()) {
             cout << "ItsSocketStreamClient, Init with error: " << strerror(g_socket_stream_client->GetInitWithErrorErrno()) << endl;
         }
@@ -944,7 +944,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
             char buf[1000];
             bool quit = false;
             while (!quit) {
-                auto fd = g_socket_stream_server->Accept((struct sockaddr*)&accept_addr,&accept_addr_len);
+                auto fd = g_socket_stream_server->Accept(reinterpret_cast<sockaddr*>(&accept_addr),&accept_addr_len);
                 if ( fd >= 0 ) {
                     g_socket_stream_traffic.push_back("g_socket_stream_server.Accept OK");
                     
@@ -1026,7 +1026,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
         snprintf(g_caddr.sun_path, sizeof(g_caddr.sun_path), "%s.%i", CL_SOCK_PATH, pid);
         remove(g_caddr.sun_path);
         
-        g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_saddr, sizeof(g_saddr), true);
+        g_socket_dg_server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::UNIX, reinterpret_cast<sockaddr*>(&g_saddr), sizeof(g_saddr), true);
         if ( g_socket_dg_server->GetInitWithError()) {
             cout << "ItsSocketDatagramServer, Init with error: " << strerror(g_socket_dg_server->GetInitWithErrorErrno()) << endl;
         }
@@ -1034,7 +1034,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
             cout << "ItsSocketDatagramServer, Init Ok!" << endl;
         }
 
-        g_socket_dg_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::UNIX, (struct sockaddr*)&g_caddr, sizeof(g_caddr), true);
+        g_socket_dg_client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::UNIX, reinterpret_cast<sockaddr*>(&g_caddr), sizeof(g_caddr), true);
         if ( g_socket_dg_client->GetInitWithError()) {
             cout << "ItsSocketDatagramClient, Init with error: " << strerror(g_socket_dg_client->GetInitWithErrorErrno()) << endl;
         }
