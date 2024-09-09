@@ -1,12 +1,6 @@
+#!/bin/bash
 cppcheck  --enable=all \
+          --std=c++17 \
           --suppress=missingIncludeSystem \
-          --suppress=ctuOneDefinitionRuleViolation \
-          --suppress=duplicateConditionalAssign \
-          --suppress=knownConditionTrueFalse \
-          --suppress=cstyleCast \
-          --suppress=constVariableReference \
-          --suppress=constVariable \
-          --suppress=unusedFunction \
-          --suppress=unmatchedSuppression \
-          --suppress=constParameterReference \
-          --suppress=checkersReport .
+          --suppress=passedByValue \
+          .

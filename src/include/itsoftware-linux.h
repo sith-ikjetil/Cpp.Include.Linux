@@ -542,7 +542,7 @@ namespace ItSoftware::Linux
 		}
 
 		template <typename Numeric>
-		static Numeric ToNumber(const string &str)
+		static Numeric ToNumber(const string str)
 		{
 			if (std::is_same_v<Numeric, char>) 
 			{
@@ -601,7 +601,7 @@ namespace ItSoftware::Linux
 			return x;
 		}
 
-		static int ToLongFromHex(const string &str)
+		static int ToLongFromHex(const string str)
 		{
 			char *p;
 			long n = strtol(str.c_str(), &p, 16);
@@ -726,7 +726,7 @@ namespace ItSoftware::Linux
 			return tos;
 		}
 
-		static tm ToTM(const string &dateTime)
+		static tm ToTM(const string dateTime)
 		{
 			tm t = {0};
 
@@ -740,19 +740,19 @@ namespace ItSoftware::Linux
 			return t;
 		}
 
-		static string ToLowerCase(string &text)
+		static string ToLowerCase(string text)
 		{
 			std::transform(text.begin(), text.end(), text.begin(), tolower);
 			return text;
 		}
 
-		static string ToUpperCase(string &text)
+		static string ToUpperCase(string text)
 		{
 			std::transform(text.begin(), text.end(), text.begin(), toupper);
 			return text;
 		}
 
-		static bool ToBool(string &flag)
+		static bool ToBool(string flag)
 		{
 			flag = ItsConvert::ToLowerCase(flag);
 
@@ -792,7 +792,7 @@ namespace ItSoftware::Linux
 			return tos;
 		}
 
-		static vector<uint64_t> ToPK(const string &pks)
+		static vector<uint64_t> ToPK(const string pks)
 		{
 			stringstream ss;
 			ss.str(string(pks.begin(), pks.end()));
@@ -1302,7 +1302,7 @@ namespace ItSoftware::Linux
 		string m_ident;
 		bool m_bLogToSyslog;
 	public:
-		ItsLog(const string& ident, bool log_to_syslog)
+		ItsLog(const string ident, bool log_to_syslog)
 		:	m_ident(ident),
 			m_bLogToSyslog(log_to_syslog)
 		{
@@ -1316,7 +1316,7 @@ namespace ItSoftware::Linux
 				closelog();
 			}
 		}
-		void LogInformation(const string& description)
+		void LogInformation(const string description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1330,7 +1330,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogWarning(const string& description)
+		void LogWarning(const string description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1344,7 +1344,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogError(const string& description)
+		void LogError(const string description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1358,7 +1358,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogOther(const string& description)
+		void LogOther(const string description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1372,7 +1372,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogDebug(const string& description)
+		void LogDebug(const string description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();

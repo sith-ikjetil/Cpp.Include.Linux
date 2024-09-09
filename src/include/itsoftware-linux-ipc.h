@@ -83,7 +83,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Creates the sockaddr_in for a internet connection.
         //
-        static unique_ptr<sockaddr_in> CreateSockAddrHostInet4(unsigned short port, const string& ip)
+        static unique_ptr<sockaddr_in> CreateSockAddrHostInet4(unsigned short port, const string ip)
         {
             unique_ptr<sockaddr_in> retVal = make_unique<sockaddr_in>();
             
@@ -100,7 +100,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Creates the sockaddr_in for a internet connection.
         //
-        static unique_ptr<sockaddr_in6> CreateSockAddrHostInet6(unsigned short port, const string& ip)
+        static unique_ptr<sockaddr_in6> CreateSockAddrHostInet6(unsigned short port, const string ip)
         {
             unique_ptr<sockaddr_in6> retVal = make_unique<sockaddr_in6>();
             
@@ -893,7 +893,7 @@ namespace ItSoftware::Linux::IPC
         // (i): Creates a queue key from path and project id.
         //      Return value of -1 means failure. errno indicates error.
         //
-        static key_t CreateQueueKey(const string& path, char projid)
+        static key_t CreateQueueKey(const string path, char projid)
         {
             return ftok(path.c_str(), (int)projid);
         } 
@@ -1009,7 +1009,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Creates constructor flags.
         //
-        static int CreateQueueFlags(bool ipc_creat, bool ipc_excl, const string& user, const string& group, const string& other)
+        static int CreateQueueFlags(bool ipc_creat, bool ipc_excl, const string user, const string group, const string other)
         {
             int flags(0);
 
@@ -1100,7 +1100,7 @@ namespace ItSoftware::Linux::IPC
         bool m_bIsClosed;
     protected:
     public:
-        ItsFifoServer(const string& server_filename, const string& client_filename, int flags)
+        ItsFifoServer(const string server_filename, const string client_filename, int flags)
             : m_serverfd(-1),
             m_dummyfd(-1),
             m_errno(0),
@@ -1171,7 +1171,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Create flags for server creation.
         //
-        static int CreateFifoFlags(const string& user, const string& group, const string& other)
+        static int CreateFifoFlags(const string user, const string group, const string other)
         {
             int flags(0);
 
@@ -1292,7 +1292,7 @@ namespace ItSoftware::Linux::IPC
         bool m_bIsClosed;
     protected:
     public:
-        ItsFifoClient(const string& server_filename, const string& client_filename, int flags)
+        ItsFifoClient(const string server_filename, const string client_filename, int flags)
             : m_clientfd(-1),
             m_dummyfd(-1),
             m_errno(0),
@@ -1366,7 +1366,7 @@ namespace ItSoftware::Linux::IPC
         //
         // (i): Create flags for server creation.
         //
-        static int CreateFifoFlags(const string& user, const string& group, const string& other)
+        static int CreateFifoFlags(const string user, const string group, const string other)
         {
             int flags(0);
 

@@ -216,17 +216,17 @@ namespace ItSoftware::Linux::Core
         static string ToString(uuid_t guid) {
             return ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftRegistryFormat, true);
         }
-        static string ToString(uuid_t guid, const string& format, bool isMicrosoftGuidFormat) {
+        static string ToString(uuid_t guid, const string format, bool isMicrosoftGuidFormat) {
             char szBuffer[100];
             memset(szBuffer, 0, 100);
 
             if (isMicrosoftGuidFormat) {
-                sprintf(szBuffer, format.c_str(),
+                snprintf(szBuffer, 100, format.c_str(),
                     *reinterpret_cast<uint32_t*>(&guid[0]), *reinterpret_cast<uint16_t*>(&guid[4]), *reinterpret_cast<uint16_t*>(&guid[6]),
                     guid[8], guid[9], guid[10], guid[11], guid[12], guid[13], guid[14], guid[15]);
             }
             else {
-                sprintf(szBuffer, format.c_str(),
+                snprintf(szBuffer, 100, format.c_str(),
                     guid[0], guid[1], guid[2], guid[3], guid[4], guid[5], guid[6], guid[7],
                     guid[8], guid[9], guid[10], guid[11], guid[12], guid[13], guid[14], guid[15]);
             }
@@ -260,7 +260,7 @@ namespace ItSoftware::Linux::Core
     struct ItsDirectory
     {
     public:
-        static bool Exists(const string& dirname)
+        static bool Exists(const string dirname)
         {
             struct stat sb;
 
@@ -279,19 +279,19 @@ namespace ItSoftware::Linux::Core
             }
             return string(path);
         }
-        static bool CreateDirectory(const string& path, int mode)
+        static bool CreateDirectory(const string path, int mode)
         {
             return (mkdir(path.c_str(), mode) == 0);
         }
-        static bool RemoveDirectory(const string& path)
+        static bool RemoveDirectory(const string path)
         {
             return (rmdir(path.c_str()) == 0);
         }
-        static bool SetCurrentDirectory(const string& path)
+        static bool SetCurrentDirectory(const string path)
         {
             return (chdir(path.c_str()) == 0);
         }
-        static vector<string> GetDirectories(const string& path) {
+        static vector<string> GetDirectories(const string path) {
             if (path.size() == 0) {
                 return vector<string>();
             }
@@ -314,7 +314,7 @@ namespace ItSoftware::Linux::Core
             
             return directories;
         }
-        static vector<string> GetFiles(const string& path) {
+        static vector<string> GetFiles(const string path) {
             if (path.size() == 0) {
                 return vector<string>();
             }
@@ -798,7 +798,7 @@ namespace ItSoftware::Linux::Core
             return (!unlink(filename.c_str()));
         }
 
-        static bool Exists(const string& filename)
+        static bool Exists(const string filename)
         {
             struct stat sb;
 
@@ -987,7 +987,7 @@ namespace ItSoftware::Linux::Core
             return ItsFile::Shred(filename,true);
         }
 
-        static bool ReadTextAll(string filename, string& textRead) 
+        static bool ReadTextAll(string filename, string textRead) 
         {
             if (!ItsFile::Exists(filename)) {
                 return false;
@@ -1029,11 +1029,8 @@ namespace ItSoftware::Linux::Core
             file.Close();
 
             textLines.clear();
-            auto lines = ItsString::Split(textRead, "\n");
-            for (const auto& i : lines) {
-                textLines.push_back(i);
-            }
-
+            textLines = ItsString::Split(textRead, "\n");
+            
             return true;
         }
     };
@@ -1313,12 +1310,12 @@ namespace ItSoftware::Linux::Core
             }
         }
     public:
-        ItsFileMonitor(const string& pathname, function<void(inotify_event&)> func)
+        explicit ItsFileMonitor(const string pathname, function<void(inotify_event&)> func)
             :   ItsFileMonitor(pathname, (ItsFileMonitorMask::Modify|ItsFileMonitorMask::Open), func) 
         {
             
         }
-        ItsFileMonitor(const string& pathname, uint32_t mask, function<void(inotify_event&)> func)
+        explicit ItsFileMonitor(const string pathname, uint32_t mask, function<void(inotify_event&)> func)
             :   m_pathname(pathname), 
                 m_mask(mask),
                 m_errno(0),
