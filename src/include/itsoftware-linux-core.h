@@ -1161,18 +1161,17 @@ namespace ItSoftware::Linux::Core
                 return false;
             }
 
-            for (auto d : directory) {
-                if (any_of(begin(invalidPathChars), end(invalidPathChars), [&d] (char ch){ return ch==d; }))
-                {
-                    return false;
-                }
-            }
+            return std::all_of(directory.begin(), directory.end(), [&](wchar_t d) {
+                return std::none_of(invalidPathChars.begin(), invalidPathChars.end(), [&](wchar_t i) {
+                    return d == i;
+                    });
+                });
 
-            for (auto f : filename) {
-                if (any_of(begin(invalidFileChars), end(invalidFileChars), [&f] (char ch){ return ch==f; })) {
-                    return false;
-                }
-            }
+            return std::all_of(filename.begin(), filename.end(), [&](wchar_t d) {
+                return std::none_of(invalidFileChars.begin(), invalidFileChars.end(), [&](wchar_t i) {
+                    return d == i;
+                    });
+                });
 
             return true;
         }
