@@ -443,9 +443,8 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
                 ss << ",";
             }
             ss << R"(")" << s << R"(")";
-            if ( bFirst ) {
-                bFirst = false;
-            }
+
+            bFirst = false;            
         }
         ss << "}";
         
@@ -508,7 +507,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
         char text[] = "Test Line 1\nTest Line 2\n";
         size_t written(0);
         cout << "file.Write((void*)text,strlen(text), &written)" << endl;
-        if ( !file.Write((void*)text,strlen(text), &written) )
+        if ( !file.Write(reinterpret_cast<void*>(text),strlen(text), &written) )
         {
             cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
             cout << endl;
@@ -697,7 +696,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
         
         uuid_t guid{ 0 };
         cout << "ItsGuid::CreateGuid(guid)" << endl;
-        if (ItsGuid::CreateGuid(guid))
+        ItsGuid::CreateGuid(guid);
         {
             cout << "> Success" << endl;
             
@@ -711,9 +710,6 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
             cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftCompactFormat, true) << R"(")" << endl;
             cout << "ItsGuid::ToString(guid,ItsGuidFormat::MicrosoftPrefixedCompactFormat, true)" << endl;
             cout << R"(> ")" << ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftPrefixedCompactFormat, true) << R"(")" << endl;
-        }
-        else {
-            cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
         }
 
         cout << endl;
@@ -1056,12 +1052,12 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
             char buf[1000];
             bool quit = false;
             while (!quit) {
-                auto nr = g_socket_dg_server->RecvFrom(buf, 1000, 0, (struct sockaddr*)&accept_addr,&accept_addr_len);
+                auto nr = g_socket_dg_server->RecvFrom(buf, 1000, 0, reinterpret_cast<sockaddr*>(&accept_addr),&accept_addr_len);
                 if ( nr > 0 ) {
                     g_socket_dg_traffic.push_back("g_socket_dg_server.RecvFrom " + to_string(nr) + " bytes, " + buf);
                 
                     strcpy(buf, "This is a response ECHO ONE!");
-                    auto nw = g_socket_dg_server->SendTo(buf, strlen(buf)+1, 0, (struct sockaddr*)&g_caddr, sizeof(g_caddr));
+                    auto nw = g_socket_dg_server->SendTo(buf, strlen(buf)+1, 0, reinterpret_cast<sockaddr*>(&g_caddr), sizeof(g_caddr));
                     g_socket_dg_traffic.push_back("g_socket_dg_server.SendTo " + to_string(nw) + " bytes, " + buf);
                     
                     quit = true;
@@ -1077,7 +1073,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
             socklen_t accept_addr_len(0);
 
             char buf[1000] = "This is a test string.";
-            auto nw = g_socket_dg_client->SendTo(buf, strlen(buf)+1, 0, (struct sockaddr*)&g_saddr, sizeof(g_saddr));
+            auto nw = g_socket_dg_client->SendTo(buf, strlen(buf)+1, 0, reinterpret_cast<sockaddr*>(&g_saddr), sizeof(g_saddr));
             g_socket_dg_traffic.push_back("g_socket_dg_client.SendTo " + to_string(nw) + " bytes, " + buf);
 
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -1085,7 +1081,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
             bool quit = false;
             while (!quit)
             { 
-                auto nr = g_socket_dg_client->RecvFrom(buf, 1000, 0, (struct sockaddr*)&accept_addr,&accept_addr_len);
+                auto nr = g_socket_dg_client->RecvFrom(buf, 1000, 0, reinterpret_cast<sockaddr*>(&accept_addr),&accept_addr_len);
                 if ( nr > 0 ) {
                     g_socket_dg_traffic.push_back("g_socket_dg_client.RecvFrom " + to_string(nr) + " bytes, " + buf);
                     quit = true;
@@ -1293,7 +1289,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
                 tmp.length = strlen(buf)+1;
                 tmp.pid = getpid();
                 
-                auto nw = fifoClient.Write(buf, &tmp);
+                auto nw = fifoClient.Write(reinterpret_cast<void*>(buf), &tmp);
                 if ( nw > 0 ) {
                     cout << "ItsFifoClient, Child::Write Ok: pid=" << to_string(tmp.pid) << ", content=" << buf << endl;
                 }
