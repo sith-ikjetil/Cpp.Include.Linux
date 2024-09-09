@@ -684,7 +684,7 @@ namespace ItSoftware::Linux::Core
 
             char data[2048];
             size_t bytesRead(0);
-            while (this->Read((void*)data, 2048, &bytesRead) && bytesRead > 0)
+            while (this->Read(reinterpret_cast<void*>(data), 2048, &bytesRead) && bytesRead > 0)
             {
                 ss.write(data, bytesRead);
             }
@@ -1302,7 +1302,7 @@ namespace ItSoftware::Linux::Core
                     continue;
                 }
                 for (char *p = buffer; p < buffer + nRead;) {
-                    inotify_event* event = (inotify_event*)p;
+                    inotify_event* event = reinterpret_cast<inotify_event*>(p);
                     func(*event);
                     p += sizeof(inotify_event) + event->len;
                 }

@@ -89,7 +89,7 @@ namespace ItSoftware::Linux::IPC
             
             retVal->sin_family = AF_INET;
             retVal->sin_port = htons(port);
-            if ( inet_aton(ip.c_str(), (in_addr*)&(retVal->sin_addr.s_addr)) == 0 ) {
+            if ( inet_aton(ip.c_str(), reinterpret_cast<in_addr*>(&(retVal->sin_addr.s_addr))) == 0 ) {
                 return nullptr;
             }
         
@@ -106,7 +106,7 @@ namespace ItSoftware::Linux::IPC
             
             retVal->sin6_family = AF_INET6;
             retVal->sin6_port = htons(port);
-            if (inet_pton(AF_INET6, ip.c_str(), (in6_addr*)&(retVal->sin6_addr.__in6_u)) != 1 ) {
+            if (inet_pton(AF_INET6, ip.c_str(), reinterpret_cast<in6_addr*>(&(retVal->sin6_addr.__in6_u))) != 1 ) {
                 return nullptr;
             }
 
@@ -959,7 +959,7 @@ namespace ItSoftware::Linux::IPC
         //
         int MsgSnd(const void* msg, size_t msgsz, int msgflags)
         {
-            return msgsnd(this->m_msqid, (const void*)msg, msgsz, msgflags);
+            return msgsnd(this->m_msqid, msg, msgsz, msgflags);
         }
         //
         // Method: MsgRcv
