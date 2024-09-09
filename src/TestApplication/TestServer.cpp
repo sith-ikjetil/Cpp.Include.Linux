@@ -63,8 +63,8 @@ namespace ItSoftware::CppIncludeLinux::TestServer
     void UpdateAppSettings(int argc, const char* argv[], AppSettings& settings);
     string GetArgVal(string arg, int argc, const char* argv[]);
     bool GetHasArg(string arg, int argc, const char* argv[]);
-    int MainSocketTCP(AppSettings& settings);
-    int MainSocketUDP(AppSettings& settings);
+    int MainSocketTCP(const AppSettings& settings);
+    int MainSocketUDP(const AppSettings& settings);
     void PrintProlog(const AppSettings& settings);
     void PrintSettings(const AppSettings& settings);
     void PrintError(const AppSettings& settings, const string& msg);
@@ -247,7 +247,7 @@ namespace ItSoftware::CppIncludeLinux::TestServer
     //
     // (i): Main client logic for TCP.
     //
-    int MainSocketTCP(AppSettings& settings)
+    int MainSocketTCP(const AppSettings& settings)
     {
         //
         // Create INET host address.
@@ -263,7 +263,7 @@ namespace ItSoftware::CppIncludeLinux::TestServer
         //
         // Make ItsSocketDatagramServer
         //
-        auto server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), ItsSocketStreamServer::DefaultBackdrop, false);
+        auto server = make_unique<ItsSocketStreamServer>(ItsSocketDomain::INET, reinterpret_cast<sockaddr*>(&addr_server), sizeof(addr_server), ItsSocketStreamServer::DefaultBackdrop, false);
         if ( server->GetInitWithError()) {
             stringstream ss;
             ss << "server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << endl;
@@ -279,7 +279,7 @@ namespace ItSoftware::CppIncludeLinux::TestServer
         socklen_t addr_length;
 
         PrintEvent(settings, "waiting to accept client ...");
-        int fd = server->Accept((struct sockaddr*)&addr, &addr_length);
+        int fd = server->Accept(reinterpret_cast<sockaddr*>(&addr), &addr_length);
         if ( fd == -1 ) {
             stringstream ss;
             ss << "server error (accept): " << strerror(errno);
@@ -326,7 +326,7 @@ namespace ItSoftware::CppIncludeLinux::TestServer
     //
     // (i): Main client logic for UDP.
     //
-    int MainSocketUDP(AppSettings& settings)
+    int MainSocketUDP(const AppSettings& settings)
     {
     //
         // Create INET host address.
@@ -342,7 +342,7 @@ namespace ItSoftware::CppIncludeLinux::TestServer
         //
         // Make ItsSocketDatagramServer
         //
-        auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server), false);
+        auto server = make_unique<ItsSocketDatagramServer>(ItsSocketDomain::INET, reinterpret_cast<sockaddr*>(&addr_server), sizeof(addr_server), false);
         if ( server->GetInitWithError()) {
             stringstream ss;
             ss << "server initialized with error: " << strerror(server->GetInitWithErrorErrno()) << endl;

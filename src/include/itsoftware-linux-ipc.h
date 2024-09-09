@@ -968,7 +968,7 @@ namespace ItSoftware::Linux::IPC
         //
         ssize_t MsgRcv(void* msg, size_t maxmsgsz, long msgtype, int msgflags)
         {
-            return msgrcv(this->m_msqid, (void*)msg, maxmsgsz, msgtype, msgflags);
+            return msgrcv(this->m_msqid, msg, maxmsgsz, msgtype, msgflags);
         }
         //
         // Method: Delete

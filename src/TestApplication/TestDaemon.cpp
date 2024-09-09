@@ -63,7 +63,7 @@ namespace ItSoftware::CppIncludeLinux::TestDaemon
 
             char text[] = "Cpp.Include.Linux TestDaemon 12345\n";
             size_t written(0);
-            if ( !file.Write((void*)text,strlen(text), &written) )
+            if ( !file.Write(reinterpret_cast<void*>(text),strlen(text), &written) )
             {
                 return EXIT_FAILURE;
             }

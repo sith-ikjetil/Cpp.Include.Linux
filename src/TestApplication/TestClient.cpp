@@ -65,8 +65,8 @@ namespace ItSoftware::CppIncludeLinux::TestClient
     void UpdateAppSettings(int argc, const char* argv[], AppSettings& settings);
     string GetArgVal(string arg, int argc, const char* argv[]);
     bool GetHasArg(string arg, int argc, const char* argv[]);
-    int MainSocketTCP(AppSettings& settings);
-    int MainSocketUDP(AppSettings& settings);
+    int MainSocketTCP(const AppSettings& settings);
+    int MainSocketUDP(const AppSettings& settings);
     void PrintProlog(const AppSettings& settings);
     void PrintSettings(const AppSettings& settings);
     void PrintError(const AppSettings& settings, const string& msg);
@@ -277,7 +277,7 @@ namespace ItSoftware::CppIncludeLinux::TestClient
     //
     // (i): Main client logic for TCP.
     //
-    int MainSocketTCP(AppSettings& settings) {
+    int MainSocketTCP(const AppSettings& settings) {
         //
         // Create INET server host address.
         //
@@ -303,7 +303,7 @@ namespace ItSoftware::CppIncludeLinux::TestClient
         //
         // Make ItsSocketStreamClient
         //
-        auto client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_server, sizeof(addr_server));
+        auto client = make_unique<ItsSocketStreamClient>(ItsSocketDomain::INET, reinterpret_cast<sockaddr*>(&addr_server), sizeof(addr_server));
         if ( client->GetInitWithError()) {
             stringstream ss;
             ss << "client initialized with error: " << strerror(client->GetInitWithErrorErrno());
@@ -350,7 +350,7 @@ namespace ItSoftware::CppIncludeLinux::TestClient
     //
     // (i): Main client logic for UDP.
     //
-    int MainSocketUDP(AppSettings& settings) {
+    int MainSocketUDP(const AppSettings& settings) {
         //
         // Create INET server host address.
         //
@@ -376,7 +376,7 @@ namespace ItSoftware::CppIncludeLinux::TestClient
         //
         // Make ItsSocketDatagramClient
         //
-        auto client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, (struct sockaddr*)&addr_client, sizeof(addr_client), false);
+        auto client = make_unique<ItsSocketDatagramClient>(ItsSocketDomain::INET, reinterpret_cast<sockaddr*>(&addr_client), sizeof(addr_client), false);
         if ( client->GetInitWithError()) {
             stringstream ss;
             ss << "> client initialized with error: " << strerror(client->GetInitWithErrorErrno()) << " <" << endl;
@@ -398,7 +398,7 @@ namespace ItSoftware::CppIncludeLinux::TestClient
             cout << "Message: ";
             cin.getline(buf,MAX_BUF_SIZE);
             
-            ssize_t nSent = client->SendTo(buf, strlen(buf)+1, 0, (struct sockaddr*)&addr_server, sizeof(addr_server));
+            ssize_t nSent = client->SendTo(buf, strlen(buf)+1, 0, reinterpret_cast<sockaddr*>(&addr_server), sizeof(addr_server));
             stringstream ss;
             ss << nSent << " bytes sent";
             PrintEvent(settings,ss.str());
