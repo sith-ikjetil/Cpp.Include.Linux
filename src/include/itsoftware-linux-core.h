@@ -987,7 +987,7 @@ namespace ItSoftware::Linux::Core
             return ItsFile::Shred(filename,true);
         }
 
-        static bool ReadTextAll(string filename, string textRead) 
+        static bool ReadTextAll(string filename, string& textRead) 
         {
             if (!ItsFile::Exists(filename)) {
                 return false;
