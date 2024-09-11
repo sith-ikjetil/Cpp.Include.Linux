@@ -297,7 +297,7 @@ namespace ItSoftware::Linux
 			return retVal;
 		}
 
-		static vector<string> Split(string input, string delimiter)
+		static vector<string> Split(string input, const string& delimiter)
 		{
 			vector<string> result;
 
@@ -335,21 +335,21 @@ namespace ItSoftware::Linux
 		}
 
 		// trim from left
-		static string TrimLeft(string s, const char *t = " \t\n\r\f\v")
+		static string TrimLeft(string s, const string& t = " \t\n\r\f\v")
 		{
 			s.erase(0, s.find_first_not_of(t));
 			return s;
 		}
 
 		// trim from right
-		static string TrimRight(string s, const char *t = " \t\n\r\f\v")
+		static string TrimRight(string s, const string& t = " \t\n\r\f\v")
 		{
 			s.erase(s.find_last_not_of(t) + 1);
 			return s;
 		}
 
 		// trim from left & right
-		static string Trim(const string s, const char *t = " \t\n\r\f\v")
+		static string Trim(const string& s, const string& t = " \t\n\r\f\v")
 		{
 			auto val = TrimRight(s, t);
 			return TrimLeft(val, t);
@@ -430,7 +430,7 @@ namespace ItSoftware::Linux
 			return str;
 		}
 
-		static string Replace(string s, const string replace, const string replace_with)
+		static string Replace(string s, const string& replace, const string& replace_with)
 		{
 			if (s.size() == 0 || replace.size() == 0 || replace.size() > s.size())
             {
@@ -542,7 +542,7 @@ namespace ItSoftware::Linux
 		}
 
 		template <typename Numeric>
-		static Numeric ToNumber(const string str)
+		static Numeric ToNumber(const string& str)
 		{
 			if (std::is_same_v<Numeric, char>) 
 			{
@@ -601,7 +601,7 @@ namespace ItSoftware::Linux
 			return x;
 		}
 
-		static int ToLongFromHex(const string str)
+		static int ToLongFromHex(const string& str)
 		{
 			char *p;
 			long n = strtol(str.c_str(), &p, 16);
@@ -726,7 +726,7 @@ namespace ItSoftware::Linux
 			return tos;
 		}
 
-		static tm ToTM(const string dateTime)
+		static tm ToTM(const string& dateTime)
 		{
 			tm t = {0};
 
@@ -792,7 +792,7 @@ namespace ItSoftware::Linux
 			return tos;
 		}
 
-		static vector<uint64_t> ToPK(const string pks)
+		static vector<uint64_t> ToPK(const string& pks)
 		{
 			stringstream ss;
 			ss.str(string(pks.begin(), pks.end()));
@@ -1302,7 +1302,7 @@ namespace ItSoftware::Linux
 		string m_ident;
 		bool m_bLogToSyslog;
 	public:
-		ItsLog(const string ident, bool log_to_syslog)
+		ItsLog(const string& ident, bool log_to_syslog)
 		:	m_ident(ident),
 			m_bLogToSyslog(log_to_syslog)
 		{
@@ -1316,7 +1316,7 @@ namespace ItSoftware::Linux
 				closelog();
 			}
 		}
-		void LogInformation(const string description)
+		void LogInformation(const string& description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1330,7 +1330,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogWarning(const string description)
+		void LogWarning(const string& description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1344,7 +1344,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogError(const string description)
+		void LogError(const string& description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1358,7 +1358,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogOther(const string description)
+		void LogOther(const string& description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();
@@ -1372,7 +1372,7 @@ namespace ItSoftware::Linux
 			}
 		}
 
-		void LogDebug(const string description)
+		void LogDebug(const string& description)
 		{
 			ItsLogItem item;
 			item.When = ItsDateTime::Now().TM();

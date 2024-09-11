@@ -532,7 +532,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
 
         string content;
         cout << "ItsFile::ReadAllText(str)" << endl;
-        if (!ItsFile::ReadTextAll(g_filename, content)) {
+        if (!ItsFile::ReadAllText(g_filename, content)) {
             cout << "> FAILED: " << ItsError::GetLastErrorDescription() << endl;
             cout << endl;
             return;

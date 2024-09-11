@@ -216,7 +216,7 @@ namespace ItSoftware::Linux::Core
         static string ToString(uuid_t guid) {
             return ItsGuid::ToString(guid, ItsGuidFormat::MicrosoftRegistryFormat, true);
         }
-        static string ToString(uuid_t guid, const string format, bool isMicrosoftGuidFormat) {
+        static string ToString(uuid_t guid, const string& format, bool isMicrosoftGuidFormat) {
             char szBuffer[100];
             memset(szBuffer, 0, 100);
 
@@ -260,7 +260,7 @@ namespace ItSoftware::Linux::Core
     struct ItsDirectory
     {
     public:
-        static bool Exists(const string dirname)
+        static bool Exists(const string& dirname)
         {
             struct stat sb;
 
@@ -279,19 +279,19 @@ namespace ItSoftware::Linux::Core
             }
             return string(path);
         }
-        static bool CreateDirectory(const string path, int mode)
+        static bool CreateDirectory(const string& path, int mode)
         {
             return (mkdir(path.c_str(), mode) == 0);
         }
-        static bool RemoveDirectory(const string path)
+        static bool RemoveDirectory(const string& path)
         {
             return (rmdir(path.c_str()) == 0);
         }
-        static bool SetCurrentDirectory(const string path)
+        static bool SetCurrentDirectory(const string& path)
         {
             return (chdir(path.c_str()) == 0);
         }
-        static vector<string> GetDirectories(const string path) {
+        static vector<string> GetDirectories(const string& path) {
             if (path.size() == 0) {
                 return vector<string>();
             }
@@ -314,7 +314,7 @@ namespace ItSoftware::Linux::Core
             
             return directories;
         }
-        static vector<string> GetFiles(const string path) {
+        static vector<string> GetFiles(const string& path) {
             if (path.size() == 0) {
                 return vector<string>();
             }
@@ -507,7 +507,7 @@ namespace ItSoftware::Linux::Core
         //
         // Method: OpenExisting
         //
-        bool OpenExisting(string filename, const string flags)
+        bool OpenExisting(const string& filename, const string& flags)
         {
             if (this->m_fd.IsValid())
             {
@@ -575,7 +575,7 @@ namespace ItSoftware::Linux::Core
         //
         // (i) mode = "rwta" (read, write, trunc, append)
         //
-        bool OpenOrCreate(const string filename, const string flags, int mode)
+        bool OpenOrCreate(const string& filename, const string& flags, int mode)
         {
             if (this->m_fd.IsValid())
             {
@@ -784,7 +784,7 @@ namespace ItSoftware::Linux::Core
         //
         // GetFileSize
         //
-        static size_t GetFileSize(const string filename)
+        static size_t GetFileSize(const string& filename)
         {
             struct stat statbuf;
             if ( stat(filename.c_str(), &statbuf) == -1 ) {
@@ -793,12 +793,12 @@ namespace ItSoftware::Linux::Core
             return statbuf.st_size;
         }
 
-        static bool Delete(const string filename)
+        static bool Delete(const string& filename)
         {
             return (!unlink(filename.c_str()));
         }
 
-        static bool Exists(const string filename)
+        static bool Exists(const string& filename)
         {
             struct stat sb;
 
@@ -810,12 +810,12 @@ namespace ItSoftware::Linux::Core
             return false;
         }
 
-        static bool Move(const string sourceFilename, const string targetFilename)
+        static bool Move(const string& sourceFilename, const string& targetFilename)
         {
             return (!rename(sourceFilename.c_str(), targetFilename.c_str()));
         }
 
-        static bool Copy(string sourceFilename, string targetFilename, bool replaceIfExists)
+        static bool Copy(const string& sourceFilename, const string& targetFilename, bool replaceIfExists)
         {
             if (!ItsFile::Exists(sourceFilename))
             {
@@ -863,7 +863,7 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool GetMode(string filename, int *mode)
+        static bool GetMode(const string& filename, int *mode)
         {
             if (!ItsFile::Exists(filename))
             {
@@ -879,7 +879,7 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool SetMode(string filename, int mode)
+        static bool SetMode(const string& filename, int mode)
         {
             if (!ItsFile::Exists(filename))
             {
@@ -894,7 +894,7 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static int CreateMode(const string user, const string group, const string other)
+        static int CreateMode(const string& user, const string& group, const string& other)
         {
             int mode(0);
 
@@ -940,7 +940,7 @@ namespace ItSoftware::Linux::Core
             return mode;
         }
 
-        static bool Shred(string filename, bool alsoDelete)
+        static bool Shred(const string& filename, bool alsoDelete)
         {
             if (!ItsFile::Exists(filename)) 
             {
@@ -982,12 +982,12 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool ShredAndDelete(string filename) 
+        static bool ShredAndDelete(const string& filename) 
         {
             return ItsFile::Shred(filename,true);
         }
 
-        static bool ReadTextAll(string filename, string& textRead) 
+        static bool ReadAllText(const string& filename, string& textRead) 
         {
             if (!ItsFile::Exists(filename)) {
                 return false;
@@ -1008,7 +1008,7 @@ namespace ItSoftware::Linux::Core
             return true;
         }
 
-        static bool ReadTextAllLines(string filename, vector<string>& textLines) 
+        static bool ReadTextAllLines(const string& filename, vector<string>& textLines) 
         {
             if (!ItsFile::Exists(filename)) {
                 return false;
@@ -1057,7 +1057,7 @@ namespace ItSoftware::Linux::Core
             chars.push_back('/');
             return chars;
         }
-        static string Combine(string path1, string path2)
+        static string Combine(const string& path1, const string& path2)
         {
             if (path1.size() == 0 && path2.size() == 0) {
                 return string("");
@@ -1082,22 +1082,22 @@ namespace ItSoftware::Linux::Core
             string retVal = path.str();
             return retVal;
         }
-        static bool Exists(const string path)
+        static bool Exists(const string& path)
         {
             if (access(path.c_str(), F_OK) == 0) {
                 return true;
             }
             return false;
         }
-        static bool IsFile(string path)
+        static bool IsFile(const string& path)
         {
             return ItsFile::Exists(path);
         }
-        static bool IsDirectory(string path)
+        static bool IsDirectory(const string& path)
         {
             return ItsDirectory::Exists(path);
         }
-        static string GetDirectory(string path) 
+        static string GetDirectory(const string& path) 
         {
             if (path.size() == 0) {
                 return string("");
@@ -1113,7 +1113,7 @@ namespace ItSoftware::Linux::Core
             }
             return path.substr(0, i+1);
         }
-        static string GetFilename(string path) 
+        static string GetFilename(const string& path) 
         {
             if (path.size() == 0) {
                 return string("");
@@ -1129,7 +1129,7 @@ namespace ItSoftware::Linux::Core
             }
             return path.substr(i+1, path.size()-i-1);
         }
-        static string GetExtension(string path)
+        static string GetExtension(const string& path)
         {
             if (path.size() == 0) {
                 return string("");
@@ -1145,7 +1145,7 @@ namespace ItSoftware::Linux::Core
             }
             return path.substr(i, path.size() - i);
         }
-        static bool IsPathValid(string path)
+        static bool IsPathValid(const string& path)
         {
             if (path.size() == 0) {
                 return false;
@@ -1175,7 +1175,7 @@ namespace ItSoftware::Linux::Core
 
             return true;
         }
-        static bool HasExtension(const string path, const string extension)
+        static bool HasExtension(const string& path, const string& extension)
         {
             if (path.size() == 0) {
                 return false;
@@ -1188,7 +1188,7 @@ namespace ItSoftware::Linux::Core
 
             return (strcmp(ext.c_str(), extension.c_str()) == 0);
         }
-        static string ChangeExtension(string path, string newExtension) 
+        static string ChangeExtension(const string& path, const string& newExtension) 
         {
             if (path.size() == 0) {
                 return string("");
@@ -1217,32 +1217,33 @@ namespace ItSoftware::Linux::Core
                 return path;
             }
 
-            string retVal = path.replace(pe, path.size()-pe, newExtension);
+            string path_str = path;
+            string retVal = path_str.replace(pe, path.size()-pe, newExtension);
             return retVal;
         }
 
-        static string GetParentDirectory(string path) 
+        static string GetParentDirectory(const string& path) 
         {
             if (path.size() == 0) {
                 return string("");
             }
 
-            path = ItsPath::GetDirectory(path);
+            auto path_str = ItsPath::GetDirectory(path);
             
-            size_t pos1 = path.rfind(ItsPath::PathSeparator);
+            size_t pos1 = path_str.rfind(ItsPath::PathSeparator);
             if (pos1 == string::npos) {
                 return string("");
             }
 
             size_t pos2 = pos1;
-            if (pos1 == (path.size() - 1)) {
-                pos2 = path.rfind(ItsPath::PathSeparator, pos1 - 1);
+            if (pos1 == (path_str.size() - 1)) {
+                pos2 = path_str.rfind(ItsPath::PathSeparator, pos1 - 1);
                 if (pos2 == string::npos) {
                     pos2 = pos1;
                 }
             }
 
-            return path.substr(0, pos2+1);
+            return path_str.substr(0, pos2+1);
         }
 
     };
@@ -1309,12 +1310,12 @@ namespace ItSoftware::Linux::Core
             }
         }
     public:
-        explicit ItsFileMonitor(const string pathname, function<void(inotify_event&)> func)
+        ItsFileMonitor(const string& pathname, function<void(inotify_event&)> func)
             :   ItsFileMonitor(pathname, (ItsFileMonitorMask::Modify|ItsFileMonitorMask::Open), func) 
         {
             
         }
-        explicit ItsFileMonitor(const string pathname, uint32_t mask, function<void(inotify_event&)> func)
+        ItsFileMonitor(const string& pathname, uint32_t mask, function<void(inotify_event&)> func)
             :   m_pathname(pathname), 
                 m_mask(mask),
                 m_errno(0),
@@ -1495,7 +1496,7 @@ namespace ItSoftware::Linux::Core
         //
         // (i): Constructor.
         //
-        ItsDaemon()
+        explicit ItsDaemon()
         : ItsDaemon(0) {
 
         }
