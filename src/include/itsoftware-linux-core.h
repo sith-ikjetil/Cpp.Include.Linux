@@ -18,6 +18,7 @@
 #include <functional>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 #include <fcntl.h>
 #include <dlfcn.h>
@@ -64,28 +65,16 @@ namespace ItSoftware::Linux::Core
     struct ItsTimer
     {
         private:
-        size_t m_start = 0;
-        size_t m_end = 0;
-        tms m_tms;
+        std::chrono::time_point<std::chrono::steady_clock> m_start;
+        std::chrono::time_point<std::chrono::steady_clock> m_end;        
         bool m_isRunning = false;
-
-        size_t GetTickCount()
-        {
-            struct timespec ts;
-            if (clock_gettime(CLOCK_REALTIME,&ts) != 0)
-            {
-                return 0;
-            }
-            
-            return (ts.tv_sec * 1'000'000'000) + ts.tv_nsec;
-        }
 
         public:
         void Start()
         {
             if (!this->IsRunning())
             {
-                this->m_start = this->GetTickCount();
+                this->m_start = std::chrono::steady_clock::now();
                 this->m_end = m_start;
                 this->m_isRunning = true;
             }
@@ -93,7 +82,7 @@ namespace ItSoftware::Linux::Core
 
         void Stop()
         {
-            this->m_end = this->GetTickCount();
+            this->m_end = std::chrono::steady_clock::now();
             this->m_isRunning = false;
         }
 
@@ -102,82 +91,82 @@ namespace ItSoftware::Linux::Core
             return this->m_isRunning;
         }
 
-        size_t LapSeconds()
+        int64_t LapSeconds()
         {
             if (!this->IsRunning())
             {
                 return 0;
             }
 
-            return (size_t)((this->GetTickCount() - this->m_start) / 1'000'000'000);
+            return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - this->m_start).count();
         }
 
-        size_t LapMilliseconds()
+        int64_t LapMilliseconds()
         {
             if (!this->IsRunning())
             {
                 return 0;
             }
 
-            return (size_t)((this->GetTickCount() - this->m_start) / 1'000'000);
+            return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - this->m_start).count();
         }
 
-        size_t LapMicroseconds()
+        int64_t LapMicroseconds()
         {
             if (!this->IsRunning())
             {
                 return 0;
             }
 
-            return (size_t)((this->GetTickCount() - this->m_start) / 1'000);
+            return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - this->m_start).count();
         }
 
-        size_t LapNanoseconds()
+        int64_t LapNanoseconds()
         {
             if (!this->IsRunning())
             {
                 return 0;
             }
-            return (this->GetTickCount() - this->m_start);
+            return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - this->m_start).count();
         }
 
-        size_t GetSeconds()
+        int64_t GetSeconds()
         {
             if (this->IsRunning())
             {
                 return 0;
             }
 
-            return (size_t)((this->m_end - this->m_start) / 1'000'000'000);
+            return std::chrono::duration_cast<std::chrono::seconds>(this->m_end - this->m_start).count();
         }
 
-        size_t GetMilliseconds()
+        int64_t GetMilliseconds()
         {
             if (this->IsRunning())
             {
                 return 0;
             }
 
-            return (size_t)((this->m_end - this->m_start) / 1'000'000);
+            return std::chrono::duration_cast<std::chrono::milliseconds>(this->m_end - this->m_start).count();
         }
 
-        size_t GetMicroseconds()
+        int64_t GetMicroseconds()
         {
             if (this->IsRunning())
             {
                 return 0;
             }
 
-            return (size_t)((this->m_end - this->m_start) / 1'000);
+            return std::chrono::duration_cast<std::chrono::microseconds>(this->m_end - this->m_start).count();
         }
 
-        size_t GetNanoseconds()
+        int64_t GetNanoseconds()
         {
             if (this->IsRunning())
             {
                 return 0;
             }
-            return (this->m_end - this->m_start);
+            return std::chrono::duration_cast<std::chrono::nanoseconds>(this->m_end - this->m_start).count();
         }
     };
 
