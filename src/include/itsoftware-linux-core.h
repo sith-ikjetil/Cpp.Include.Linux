@@ -60,6 +60,72 @@ namespace ItSoftware::Linux::Core
     #define FILE_MONITOR_BUFFER_LENGTH (10 * (sizeof(inotify_event) + NAME_MAX + 1))
 
     //
+    // class: ItsTimeTracker
+    //
+    // (i): Simple time tracking class that prints elapsed time on destruction.
+    //
+    class ItsTimeTracker {
+    private:
+        std::chrono::time_point<std::chrono::steady_clock> start, end;
+        std::string name;
+        std::wstring wname;
+        bool wide{ false };
+        std::function<void(std::string name, std::chrono::steady_clock::duration)> fnComplete = nullptr;
+    public:
+        explicit ItsTimeTracker(const std::string& fName)
+            : name(fName),
+            wide(false),
+            start(std::chrono::steady_clock::now())
+        {            
+        }
+
+        explicit ItsTimeTracker(const std::wstring& fName)
+            : wname(fName),
+                wide(true),
+                start(std::chrono::steady_clock::now())
+        {
+        }
+
+        ItsTimeTracker(const std::string& fName, std::function<void(std::string name, std::chrono::steady_clock::duration)> ff)
+            : name(fName),
+            fnComplete(ff),
+            start(std::chrono::steady_clock::now())
+        {
+            
+        }
+
+        ~ItsTimeTracker() noexcept
+        {
+            end = std::chrono::steady_clock::now();
+
+            if (fnComplete) {
+                fnComplete(this->name, (end - start));
+            }
+            else {
+                auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+                auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+                auto duration3 = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
+
+                //std::println("{}: {} ms | {} us | {} ns", name, duration1, duration2, duration3);
+                if (wide) 
+                {
+                    std::wcout << wname << ": " << duration1 << " ms | " << duration2 << " us | " << duration3 << " ns" << '\n';
+                }
+                else 
+                {
+                    std::cout << name << ": " << duration1 << " ms | " << duration2 << " us | " << duration3 << " ns" << '\n';
+                }
+            }
+        }
+
+        // No copying or moving
+        ItsTimeTracker(const ItsTimeTracker&) = delete;
+        ItsTimeTracker& operator=(const ItsTimeTracker&) = delete;
+        ItsTimeTracker(ItsTimeTracker&&) = delete;
+        ItsTimeTracker& operator=(ItsTimeTracker&&) = delete;
+    };
+    
+    //
     // struct: ItsTimer
     //
     struct ItsTimer
