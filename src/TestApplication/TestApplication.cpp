@@ -67,7 +67,8 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
     using ItSoftware::Linux::IPC::ItsFifoClient;
     using ItSoftware::Linux::IPC::ItsFifoHeader;
     using ItSoftware::Linux::Core::ItsTimeTracker;
-
+    using ItSoftware::Linux::DebugOnly;
+    
     //
     // Function Prototypes
     //
@@ -158,7 +159,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
     //
     int main(int argc, const char* argv[])
     {
-        ItsTimeTracker tt("main");
+        DebugOnly<ItsTimeTracker> tt("main");
 
         // Set exit handler
         atexit(ExitFn);
