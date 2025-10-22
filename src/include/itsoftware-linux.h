@@ -21,6 +21,8 @@
 #include <codecvt>
 #include <random>
 #include <functional>
+#include <regex>
+//#include <generator>
 #include <stdlib.h>
 #include <syslog.h>
 #include <time.h>
@@ -47,7 +49,7 @@ namespace ItSoftware::Linux
 	#define DECIMALTOSTRING1(d) DECIMALTOSTRING2(d)
 	#define ERR_AT_LOCATION(e) __FILE__ "(" DECIMALTOSTRING1(__LINE__) "): " #e
 	#define ERROR_HERE __FILE__ "(" DECIMALTOSTRING2(__LINE__) "): "
-	#define CHAR_BIT 8
+	//#define CHAR_BIT 8
 	#define BitsCount(val) (sizeof(val) * CHAR_BIT)
 	#define Shift(val, steps) (steps % BitsCount(val))
 	#define ROL(val, steps) ((val << Shift(val, steps)) | (val >> (BitsCount(val) - Shift(val, steps))))
@@ -257,6 +259,72 @@ namespace ItSoftware::Linux
 	//
 	struct ItsString
 	{
+		/* static std::generator<string> StringFromTextByRegex(const string& text, const string& re) {
+			std::regex rgx(re);
+			std::sregex_token_iterator iter(text.begin(), text.end(), rgx);
+			std::sregex_token_iterator end;
+			for (; iter != end; ++iter) {
+				co_yield iter->str();
+			}
+			co_return;
+		}
+
+		static std::generator<wstring> StringFromTextByRegex(const wstring& text, const wstring& re) {
+			std::wregex rgx(re);
+			std::wsregex_token_iterator iter(text.begin(), text.end(), rgx);
+			std::wsregex_token_iterator end;
+			for (; iter != end; ++iter) {
+				co_yield iter->str();
+			}
+			co_return;
+		}
+
+		static std::generator<string> WordsFromText(const string& text) {
+			std::regex rgx(R"(\b\w+\b)");
+			std::sregex_token_iterator iter(text.begin(), text.end(), rgx);
+			std::sregex_token_iterator end;
+			for (; iter != end; ++iter) {
+				co_yield iter->str();
+			}
+			co_return;
+		}
+
+		static std::generator<wstring> WordsFromText(const wstring& text) {
+			std::wregex rgx(LR"(\b\w+\b)");
+			std::wsregex_token_iterator iter(text.begin(), text.end(), rgx);
+			std::wsregex_token_iterator end;
+			for (; iter != end; ++iter) {
+				co_yield iter->str();
+			}
+			co_return;
+		}
+
+		static std::generator<string> LinesFromText(const string& text) {
+			std::regex r("^.*$");
+			string normalized_text = std::regex_replace(text, std::regex("\r\n"), "\n"); // normalize
+			auto words_begin = std::sregex_iterator(normalized_text.begin(), normalized_text.end(), r);
+			auto words_end = std::sregex_iterator();
+
+			for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+				co_yield i->str();
+			}
+
+			co_return;
+		}
+
+		static std::generator<wstring> LinesFromText(const wstring& text) {
+			std::wregex r(L"^.*$");
+			wstring normalized_text = std::regex_replace(text, std::wregex(L"\r\n"), L"\n"); // normalize
+			auto words_begin = std::wsregex_iterator(normalized_text.begin(), normalized_text.end(), r);
+			auto words_end = std::wsregex_iterator();
+
+			for (std::wsregex_iterator i = words_begin; i != words_end; ++i) {
+				co_yield i->str();
+			}
+
+			co_return;
+		} */
+
 		static string WidthExpand(string source, size_t width, char fill, ItsExpandDirection direction)
 		{
 			if (source.size() == 0)
