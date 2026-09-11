@@ -40,6 +40,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
     using ItSoftware::Linux::ItsDateTime;
     using ItSoftware::Linux::ItsLog;
     using ItSoftware::Linux::ItsLogType;
+    using ItSoftware::Linux::ItsLogStatus;
     using ItSoftware::Linux::ItsDataSizeStringType;
     using ItSoftware::Linux::ItsID;
     using ItSoftware::Linux::ItsCreateIDOptions;
@@ -473,18 +474,25 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
     {
         PrintHeader("ItsLog");
 
-        ItsLog log{"ItsTestApp",true};
-        log.LogInformation("This is an information log item");
-        log.LogWarning("This is an warning log item");
-        log.LogError("This is an error log item");
-        log.LogOther("This is an other log item");
-        log.LogDebug("This is an debug log item");
+        string fileName = "/tmp/test-application.log";
 
-        PrintSubHeader("ToString");
-        cout << log.ToString() << endl;
+        ItsLog log{fileName};
+        log.LogInformation(ItsLogStatus::OK, "This is an information log item", "Some description here.");
+        log.LogWarning(ItsLogStatus::OK, "This is an warning log item", "Some description here.");
+        log.LogError(ItsLogStatus::OK, "This is an error log item", "Some description here.");
+        log.LogOther(ItsLogStatus::OK, "This is an other log item", "Some description here.");
+        log.LogDebug(ItsLogStatus::OK, "This is an debug log item", "Some description here.");
 
-        PrintSubHeader("ToString(tailN=1)");
-        cout << log.ToString(1) << endl;
+        PrintSubHeader("ItsLog");
+        string logText;
+        ItsFile logFile;
+        logFile.OpenExisting(fileName, "r");
+        if ( logFile.ReadAllText(logText) ) {
+            cout << logText << endl;
+        }
+        else {
+            cout << "ERROR" << endl;
+        }
         
         cout << endl;
     }
@@ -752,6 +760,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
         cout << R"(ItsPath::IsPathValid(path))" << endl; 
         cout << R"(> )" << ((ItsPath::IsPathValid(path)) ? "true" : "false") << endl;
         cout << R"(ItsPath::IsPathValid(g_invalidPath))" << endl; 
+        cout << "INVALID PATH=" << g_invalidPath << endl; 
         cout << R"(> )" << ((ItsPath::IsPathValid(g_invalidPath)) ? "true" : "false") << endl;
         cout << R"(ItsPath::GetParentDirectory("path"))" << endl;
         cout << R"(> )" << ItsPath::GetParentDirectory(path) << endl;

@@ -13,6 +13,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 #include <exception>
 #include <algorithm>
@@ -22,6 +23,7 @@
 #include <random>
 #include <functional>
 #include <regex>
+#include <chrono>
 //#include <generator>
 #include <stdlib.h>
 #include <syslog.h>
@@ -1294,14 +1296,9 @@ namespace ItSoftware::Linux
 	}
 
 	//
-	// forward declare
-	//
-	struct ItsLog;
-
-	//
 	// ItsLogType
 	//
-	// (i): Log type for ItsLogItem
+	// (i): Log type
 	//
 	enum class ItsLogType
 	{
@@ -1310,6 +1307,17 @@ namespace ItSoftware::Linux
 		Error,
 		Other,
 		Debug
+	};
+
+	//
+	// ItsLogStatus
+	//
+	// (i): Log status
+	//
+	enum class ItsLogStatus 
+	{
+		OK,
+		Failure
 	};
 
 	//
@@ -1327,198 +1335,117 @@ namespace ItSoftware::Linux
 				return "Information";
 				break;
 			case ItsLogType::Warning:
-				return "Warning";
+				return "Warning    ";
 				break;
 			case ItsLogType::Error:
-				return "Error";
+				return "Error      ";
 				break;
 			case ItsLogType::Other:
-				return "Other";
+				return "Other      ";
 				break;
 			case ItsLogType::Debug:
-				return "Debug";
+				return "Debug      ";
 				break;
 			default:
 				break;
 			}
-			return "Unknown";
+			return "<UNKNOWN>  ";
 		}
-	};
-
-	//
-	// struct: ItsLogItem
-	//
-	// (i): Log item for ItsLog
-	//
-	struct ItsLogItem
-	{
-		ItsLogType Type;
-		string Description;
-		tm When;
-
-		string ToString()
+		static constexpr const char* LogStatusToString(ItsLogStatus s)
 		{
-			stringstream ss;
-			string nl1("\r\n");
-			string nl2("\n");
-			string s1(":");
-			string rep_nl(" ");
-			string rep_s(" - ");
-			
-			auto description = ItsString::Replace(this->Description, nl1, rep_nl);
-			description = ItsString::Replace(description, nl2, rep_nl);
-			description = ItsString::Replace(description, s1, rep_s);
-			ss << "Type=" << ItsLogUtil::LogTypeToString(this->Type) << " " << "When=" << ItsDateTime(this->When).ToString("s") << " " << "Description=" << description;
-
-			string retVal = ss.str();
-			return retVal;
-		}
+			switch (s)
+			{
+			case ItsLogStatus::OK:
+				return "[  OK  ]";
+				break;
+			case ItsLogStatus::Failure:
+				return "[FAILED]";
+				break;
+			default:
+				break;
+			}
+			return "[  ??  ]";
+		}		
 	};
 
+	
 	//
 	// struct: ItsLog
 	//
-	// (i): CUstom application event log.
+	// (i): Custom application event log.
 	//
 	struct ItsLog
 	{
 	private:
-		vector<ItsLogItem> m_items;
-		string m_ident;
-		bool m_bLogToSyslog;
+		string m_filename;
+		
 	public:
-		ItsLog(const string& ident, bool log_to_syslog)
-		:	m_ident(ident),
-			m_bLogToSyslog(log_to_syslog)
+		explicit ItsLog(const string& fileName)
+			: m_filename(fileName)
 		{
-			if (this->m_bLogToSyslog) {
-				openlog(this->m_ident.c_str(), LOG_NDELAY|LOG_NOWAIT|LOG_PID,0);
-			}
 		}
 		~ItsLog()
 		{
-			if (this->m_bLogToSyslog) {
-				closelog();
-			}
-		}
-		void LogInformation(const string& description)
-		{
-			ItsLogItem item;
-			item.When = ItsDateTime::Now().TM();
-			item.Description = description;
-			item.Type = ItsLogType::Information;
-
-			this->m_items.push_back(item);
-
-			if ( this->m_bLogToSyslog ) {
-				syslog(LOG_INFO, "%s", item.ToString().c_str());
-			}
 		}
 
-		void LogWarning(const string& description)
+		static inline std::unique_ptr<ItsLog> ApplicationLog = nullptr;
+
+		void Log(const ItsLogStatus& status, const ItsLogType type, const string& title, const string& description)
 		{
-			ItsLogItem item;
-			item.When = ItsDateTime::Now().TM();
-			item.Description = description;
-			item.Type = ItsLogType::Warning;
+			static int logCount = 1;
 
-			this->m_items.push_back(item);
-
-			if ( this->m_bLogToSyslog ) {
-				syslog(LOG_INFO, "%s", item.ToString().c_str());
-			}
-		}
-
-		void LogError(const string& description)
-		{
-			ItsLogItem item;
-			item.When = ItsDateTime::Now().TM();
-			item.Description = description;
-			item.Type = ItsLogType::Error;
-
-			this->m_items.push_back(item);
-
-			if ( this->m_bLogToSyslog ) {
-				syslog(LOG_INFO, "%s", item.ToString().c_str());
-			}
-		}
-
-		void LogOther(const string& description)
-		{
-			ItsLogItem item;
-			item.When = ItsDateTime::Now().TM();
-			item.Description = description;
-			item.Type = ItsLogType::Other;
-
-			this->m_items.push_back(item);
-
-			if ( this->m_bLogToSyslog ) {
-				syslog(LOG_INFO, "%s", item.ToString().c_str());
-			}
-		}
-
-		void LogDebug(const string& description)
-		{
-			ItsLogItem item;
-			item.When = ItsDateTime::Now().TM();
-			item.Description = description;
-			item.Type = ItsLogType::Debug;
-
-			this->m_items.push_back(item);
-
-			if ( this->m_bLogToSyslog ) {
-				syslog(LOG_INFO, "%s", item.ToString().c_str());
-			}
-		}
-
-		const vector<ItsLogItem> &GetItems()
-		{
-			return this->m_items;
-		}
-
-		size_t Count()
-		{
-			return this->m_items.size();
-		}
-
-		void Clear()
-		{
-			this->m_items.clear();
-		}
-
-		string ToString()
-		{
-			stringstream ss;
-			for (auto i : this->m_items)
-			{
-				ss << i.ToString() << endl;
+			if (logCount == 1) {
+				std::ofstream out(this->m_filename, std::ios::trunc);
+				out.close();
 			}
 
-			string retVal = ss.str();
-			return retVal;
-		}
-
-		string ToString(uint32_t tailN)
-		{
-			stringstream ss;
-			if ( this->m_items.size() > tailN ) {
-				auto ptr = this->m_items.end();
-				ptr -= tailN;
-
-				do
+			auto fnEscQuot = [](std::string s) {
+				//std::string escape_quotes(std::string s)
 				{
-					ss << (*ptr).ToString() << endl;
-				} while (++ptr != this->m_items.end());
-			}
-			else {
-				for (auto i : this->m_items)
-				{
-					ss << i.ToString() << endl;
+					size_t pos = 0;
+
+					while ((pos = s.find('"', pos)) != std::string::npos)
+					{
+						s.replace(pos, 1, "\\\"");
+						pos += 2;
+					}
+
+					return s;
 				}
-			}
+			};
 
-			string retVal = ss.str();
-			return retVal;
+			std::ofstream out(this->m_filename, std::ios::app);
+			out << logCount++ << "> ";			
+			out << ItsLogUtil::LogStatusToString(status) << " ";
+			out << "| Type=" << ItsLogUtil::LogTypeToString(type) << " ";
+			out << "| When=" << std::chrono::system_clock::now() << " ";
+			out << "| Title=\"" << fnEscQuot(title) << "\" ";
+			out << "| Description=\"" << fnEscQuot(description) << "\"\n";
+		}
+
+		void LogInformation(const ItsLogStatus& status, const string& title, const string& description)
+		{
+			Log(status, ItsLogType::Information, title, description);
+		}
+
+		void LogWarning(const ItsLogStatus& status, const string& title, const string& description)
+		{
+			Log(status, ItsLogType::Warning, title, description);
+		}
+
+		void LogError(const ItsLogStatus& status, const string& title, const string& description)
+		{
+			Log(status, ItsLogType::Error, title, description);
+		}
+
+		void LogOther(const ItsLogStatus& status, const string& title, const string& description)
+		{
+			Log(status, ItsLogType::Other, title, description);
+		}
+
+		void LogDebug(const ItsLogStatus& status, const string& title, const string& description)
+		{
+			Log(status, ItsLogType::Debug, title, description);
 		}
 	};
 
