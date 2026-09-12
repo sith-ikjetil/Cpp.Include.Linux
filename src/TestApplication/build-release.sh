@@ -3,7 +3,7 @@
 #: Date        : 2020-12-25
 #: Author      : Kjetil Kristoffer Solberg <post@ikjetil.no>
 #: Version     : 1.0
-#: Description : Builds debug TestApplication and TestDaemon.
+#: Description : Builds release TestApplication/TestDaemon/TestClient and TestServer.
 echo "Building TestApplication..."
 echo "> using release build <"
 g++ TestApplication.cpp -std=c++23 -luuid -D_GLIBCXX_GTHREAD_USE_WEAK=0 -static -pthread -o TestApplication
