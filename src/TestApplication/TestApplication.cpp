@@ -479,7 +479,7 @@ namespace ItSoftware::CppIncludeLinux::TestApplication
         ItsLog log{fileName};
         log.LogInformation(ItsLogStatus::OK, "This is an information log item", "Some description here.");
         log.LogWarning(ItsLogStatus::OK, "This is an warning log item", "Some description here.");
-        log.LogError(ItsLogStatus::OK, "This is an error log item", "Some description here.");
+        log.LogError(ItsLogStatus::FAILED, "This is an error log item", "Some description here.");
         log.LogOther(ItsLogStatus::OK, "This is an other log item", "Some description here.");
         log.LogDebug(ItsLogStatus::OK, "This is an debug log item", "Some description here.");
 
